@@ -4,6 +4,13 @@ A game of learning the concepts behind gradient descent by exploring the depths 
 Developed for the I AM AI exhibiton by IMAGINARY.
 Original concept by Aaron Montag.
 
+## Configuration
+
+The `config.json` file is loaded when opening the application. It supports the following keys:
+
+- **defaultLanguage** (string, default: en): Default language to use. Can be overriden by the 
+  `lang` query string.
+
 ## Compilation
 
 This web application is built using several compilable languages:
