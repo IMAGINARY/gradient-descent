@@ -33,6 +33,10 @@ export default class GradientDescentGame {
 
     this.registerMode('play', new PlayMode(this));
 
+    const preloaders = Object.entries(this.modes)
+      .map(([, mode]) => (() => { mode.preLoadAssets(); }));
+    await Promise.all(preloaders);
+
     this.setMode('play');
   }
 
@@ -61,7 +65,7 @@ export default class GradientDescentGame {
     this.run();
   }
 
-  registerMode(id, mode) {
+  async registerMode(id, mode) {
     this.modes[id] = mode;
   }
 
