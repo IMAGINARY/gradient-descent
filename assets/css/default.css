@@ -31,4 +31,14 @@ body {
   background-color: #151515;
   color: #fffa39; }
 
+.main {
+  width: 100%;
+  height: 100%; }
+  .main svg {
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 80vh;
+    top: 0; }
+
 /*# sourceMappingURL=default.css.map */

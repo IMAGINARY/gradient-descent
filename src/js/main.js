@@ -6,6 +6,8 @@ import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import 'fetch-ie8';
 
+import GradientDescentGame from './game';
+
 const defaultConfig = {
   defaultLanguage: 'en',
 };
@@ -39,6 +41,13 @@ async function loadConfig(uri) {
       translationsDirectory: 'tr',
       defaultLanguage: config.defaultLanguage || 'en',
     });
+    // eslint-disable-next-line no-unused-vars
+    const game = new GradientDescentGame(
+      document.querySelector('.main'),
+      config
+    );
+    await game.init();
+    game.run();
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error(err);
