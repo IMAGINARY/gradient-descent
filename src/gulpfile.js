@@ -14,6 +14,7 @@ const pugData = require('./pug/data.js');
 const OUTPUT_DIR = '..';
 
 const JS_BUNDLE_NAME = 'bundle';
+const DEPS_BUNDLE_NAME = 'dependencies';
 
 const paths = {
   html: {
@@ -51,10 +52,10 @@ function styles() {
     .pipe(gulp.dest(paths.styles.dest));
 }
 
-function scripts() {
+function es(entrypoint, outputName) {
   return browserify({
     extensions: ['.js', '.jsx'],
-    entries: './js/main.js',
+    entries: entrypoint,
   })
     .transform('babelify', { presets: ['@babel/env'] })
     .on('error', (msg) => {
@@ -62,14 +63,22 @@ function scripts() {
       console.error(msg);
     })
     .bundle()
-    .pipe(source(`${JS_BUNDLE_NAME}.js`))
+    .pipe(source(`${outputName}.js`))
     .pipe(buffer())
     .pipe(sourcemaps.init())
     .pipe(gulp.dest(paths.scripts.dest))
     .pipe(uglify())
-    .pipe(rename(`${JS_BUNDLE_NAME}.min.js`))
+    .pipe(rename(`${outputName}.min.js`))
     .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest(paths.scripts.dest));
+}
+
+function dependencies() {
+  return es('./js/dependencies.js', DEPS_BUNDLE_NAME);
+}
+
+function scripts() {
+  return es('./js/main.js', JS_BUNDLE_NAME);
 }
 
 function watch() {
@@ -81,6 +90,7 @@ const build = gulp.parallel(html, styles, scripts);
 
 exports.html = html;
 exports.styles = styles;
+exports.dependencies = dependencies;
 exports.scripts = scripts;
 exports.watch = watch;
 

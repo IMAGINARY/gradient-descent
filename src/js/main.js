@@ -1,11 +1,4 @@
-/* eslint-disable import/no-extraneous-dependencies */
 /* globals IMAGINARY */
-
-// Polyfills
-import 'core-js/stable';
-import 'regenerator-runtime/runtime';
-import 'fetch-ie8';
-
 import GradientDescentGame from './game';
 
 const defaultConfig = {
