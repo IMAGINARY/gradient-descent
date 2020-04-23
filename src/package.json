@@ -1,12 +1,12 @@
 {
-  "name": "my-project-name",
+  "name": "gradient-descent",
   "version": "0.1.0",
-  "description": "My project description",
-  "repository": "github:IMAGINARY/my-repository",
-  "author": "My Name <info@imaginary.org>",
+  "description": "A game of learning the concepts behind gradient descent by exploring the depths looking for treasure",
+  "repository": "github:IMAGINARY/gradient-descent",
+  "author": "Eric Londaits <eric.londaits@imaginary.org>",
   "private": true,
   "engines": {
-    "node": "^10.14.0"
+    "node": ">=10.14.0"
   },
   "dependencies": {},
   "devDependencies": {

@@ -1,28 +1,12 @@
-# web-tpl
-Template project for websites and web apps.
+# Gradient Descent
+A game of learning the concepts behind gradient descent by exploring the depths looking for treasure.
 
-Basic gulpfile with SASS, GULP and Babel/Browserify compilation of Javascript.
-
-## How to use
-
-**Don't fork, don't clone.**
-
-0. Download the latest release and use it as basis for your new repository.
-0. Modify package.json and set the first four items
-    - name
-    - version
-    - description
-    - repository
-    - author
-0. Modify `src/pug/config.json` setting the site name, description and URL.
-0. Change this README file but keep the **Compiling** section below for reference. 
-
-**Note:** This project does not use semver as future versions might evolve breaking backwards compatibility as new tools 
-and standard practices are incorporated.
+Developed for the I AM AI exhibiton by IMAGINARY.
+Original concept by Aaron Montag.
 
 ## Compilation
 
-This website is built using several compilable languages:
+This web application is built using several compilable languages:
 
 - The HTML pages are built from **pug** template files.
 - The CSS stylesheet is pre-compiled from **sass** files.
@@ -62,3 +46,13 @@ After it runs succesfuly you can compile as needed:
     ```
     yarn run build
     ```
+
+## Credits
+
+Developed by Christian Stussak and Eric Londaits for IMAGINARY gGmbH.
+Based on a prototype by Aaron Montag.
+
+## License
+
+Copyright (c) 2020 IMAGINARY gGmbH
+Licensed under the MIT License (see LICENSE)

@@ -21,4 +21,14 @@ body.lock-position {
   width: 100%;
   position: fixed; }
 
+html, body {
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  height: 100%; }
+
+body {
+  background-color: #151515;
+  color: #fffa39; }
+
 /*# sourceMappingURL=default.css.map */

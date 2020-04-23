@@ -1,8 +1,10 @@
 $color-black-real: #000;
 $color-white-real: #fff;
 
-$color-black: #666;
+$color-black: #151515;
 $color-white: $color-white-real;
+
+$color-yellow: #fffa39;
 
 @mixin neg {
   -webkit-font-smoothing: antialiased;
