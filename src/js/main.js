@@ -3,12 +3,16 @@ import GradientDescentGame from './game';
 
 const defaultConfig = {
   defaultLanguage: 'en',
+  useGamepads: true,
+  useScreenControls: true,
+  maxPlayers: 2,
+  debugControls: false,
 };
 
 /**
  * Loads the config file from an external JSON file
  *
- * @param {string} uri
+ * @param {String} uri
  * @return {Promise<any>}
  */
 async function loadConfig(uri) {

@@ -1,10 +1,17 @@
+/* eslint-disable class-methods-use-this,no-unused-vars,no-empty-function */
 /**
  * Abstract class for GameMode
  *
  * A GameMode does the actual handling of the input and drawing
  */
 export default class GameMode {
+  /**
+   * Constructor
+   *
+   * @param {GradientDescentGame} game
+   */
   constructor(game) {
+    // noinspection JSUnusedGlobalSymbols
     this.game = game;
   }
 
@@ -41,13 +48,25 @@ export default class GameMode {
 
   /**
    * Called once per frame so the mode can handle controller input
+   *
+   * Current input state and the previous one are passed
+   * to help with state change detection.
+   *
+   * Both are arrays with N objects with shape:
+   * - direction {integer}: Either -1, 0 or 1.
+   * - action {bool}
+   *
+   * @param {[{direction: Number, action: Boolean}]} input
+   * @param {[{direction: Number, action: Boolean}]} lastInput
    */
-  handleInput() {
+  handleInput(input, lastInput) {
 
   }
 
   /**
    * Called once per frame so the mode can draw based on the game's state
+   *
+   * @param {Number} ts
    */
   draw(ts) {
 

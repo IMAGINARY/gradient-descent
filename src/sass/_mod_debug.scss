@@ -1,0 +1,13 @@
+.debug-pane {
+  font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
+  font-size: 3vh;
+  color: $color-yellow;
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.debug-pane-controls {
+  position: absolute;
+  bottom: 1vh;
+  left: 3vh;
+}

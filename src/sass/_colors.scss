@@ -4,7 +4,15 @@ $color-white-real: #fff;
 $color-black: #151515;
 $color-white: $color-white-real;
 
-$color-yellow: #fffa39;
+$color-yellow: #ffec02;
+$color-blue: #2197ff;
+$color-red: #ff2d2d;
+$color-green: #29da29;
+
+$color-yellow-lit: #fffbcd;
+$color-blue-lit: #c2e2ff;
+$color-red-lit: #ffcaca;
+$color-green-lit: #b4ffb4;
 
 @mixin neg {
   -webkit-font-smoothing: antialiased;

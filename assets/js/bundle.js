@@ -91,7 +91,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
     }()
   }, {
     key: "handleInput",
-    value: function handleInput() {// Move the boats or check if they're lowering the probe
+    value: function handleInput(input, lastInput) {// Move the boats or check if they're lowering the probe
     }
   }, {
     key: "draw",
@@ -125,15 +125,23 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+/* eslint-disable class-methods-use-this,no-unused-vars,no-empty-function */
+
 /**
  * Abstract class for GameMode
  *
  * A GameMode does the actual handling of the input and drawing
  */
 var GameMode = /*#__PURE__*/function () {
+  /**
+   * Constructor
+   *
+   * @param {GradientDescentGame} game
+   */
   function GameMode(game) {
     _classCallCheck(this, GameMode);
 
+    // noinspection JSUnusedGlobalSymbols
     this.game = game;
   }
   /**
@@ -224,13 +232,25 @@ var GameMode = /*#__PURE__*/function () {
     }()
     /**
      * Called once per frame so the mode can handle controller input
+     *
+     * Current input state and the previous one are passed
+     * to help with state change detection.
+     *
+     * Both are arrays with N objects with shape:
+     * - direction {integer}: Either -1, 0 or 1.
+     * - action {bool}
+     *
+     * @param {[{direction: Number, action: Boolean}]} input
+     * @param {[{direction: Number, action: Boolean}]} lastInput
      */
 
   }, {
     key: "handleInput",
-    value: function handleInput() {}
+    value: function handleInput(input, lastInput) {}
     /**
      * Called once per frame so the mode can draw based on the game's state
+     *
+     * @param {Number} ts
      */
 
   }, {
@@ -252,6 +272,8 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = void 0;
 
 var _gameModePlay = _interopRequireDefault(require("./game-mode-play"));
+
+var _screenControls = _interopRequireDefault(require("./screen-controls"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -292,16 +314,14 @@ var GradientDescentGame = /*#__PURE__*/function () {
 
     this.container = container;
     this.config = config;
-    this.input = [{
-      direction: 0,
-      button: false
-    }, {
-      direction: 0,
-      button: false
-    }];
+    this.input = [];
+    this.inputLast = [];
+    this.initInput();
     this.isPaused = false;
     this.modes = {};
     this.currentMode = null;
+    this.screenControls = null;
+    this.debugControlsPane = null;
   }
   /**
    * Initializes the app and downloads any external assets
@@ -320,7 +340,23 @@ var GradientDescentGame = /*#__PURE__*/function () {
             switch (_context.prev = _context.next) {
               case 0:
                 this.svg = SVG().addTo(this.container);
-                this.registerMode('play', new _gameModePlay["default"](this));
+
+                if (this.config.useScreenControls) {
+                  this.screenControls = new _screenControls["default"](this.config.maxPlayers);
+                  this.container.appendChild(this.screenControls.element);
+                }
+
+                if (this.config.debugControls) {
+                  this.debugControlsPane = document.createElement('div');
+                  this.debugControlsPane.classList.add('debug-pane');
+                  this.debugControlsPane.classList.add('debug-pane-controls');
+                  this.container.appendChild(this.debugControlsPane);
+                }
+
+                _context.next = 5;
+                return this.registerMode('play', new _gameModePlay["default"](this));
+
+              case 5:
                 preloaders = Object.entries(this.modes).map(function (_ref) {
                   var _ref2 = _slicedToArray(_ref, 2),
                       mode = _ref2[1];
@@ -329,13 +365,14 @@ var GradientDescentGame = /*#__PURE__*/function () {
                     mode.preLoadAssets();
                   };
                 });
-                _context.next = 5;
+                _context.next = 8;
                 return Promise.all(preloaders);
 
-              case 5:
-                this.setMode('play');
+              case 8:
+                _context.next = 10;
+                return this.setMode('play');
 
-              case 6:
+              case 10:
               case "end":
                 return _context.stop();
             }
@@ -350,20 +387,90 @@ var GradientDescentGame = /*#__PURE__*/function () {
       return init;
     }()
     /**
+     * Initializes the input state
+     *
+     * @private
+     */
+
+  }, {
+    key: "initInput",
+    value: function initInput() {
+      this.input = Array(this.config.maxPlayers).fill(null).map(function () {
+        return {
+          direction: 0,
+          action: false
+        };
+      });
+    }
+    /**
+     * Reads the input state from all enabled controller types
+     *
+     * Loads the new input state in this.input and the previous
+     * state in this.inputLast.
+     *
+     * @private
+     */
+
+  }, {
+    key: "readInput",
+    value: function readInput() {
+      var _this = this;
+
+      this.inputLast = this.input;
+      this.initInput();
+
+      if (this.screenControls) {
+        this.screenControls.getState().forEach(function (ctrl, i) {
+          if (ctrl.left) {
+            _this.input[i].direction = -1;
+          }
+
+          if (ctrl.right) {
+            _this.input[i].direction = 1;
+          }
+
+          _this.input[i].action = _this.input[i].action || ctrl.action;
+        });
+      }
+
+      if (this.config.useGamepads) {
+        Array.from(navigator.getGamepads()).forEach(function (gp, i) {
+          if (gp !== null) {
+            if (gp.axes[0] < -0.5) {
+              _this.input[i].direction = -1;
+            }
+
+            if (gp.axes[0] > 0.5) {
+              _this.input[i].direction = 1;
+            }
+
+            _this.input[i].action = _this.input[i].action || gp.buttons[1].pressed || gp.buttons[2].pressed;
+          }
+        });
+      }
+
+      if (this.debugControlsPane) {
+        this.debugControlsPane.textContent = this.input.map(function (ctrl, i) {
+          return "C".concat(i, ": d=").concat(ctrl.direction, " a=").concat(ctrl.action ? 'T' : 'F');
+        }).join("\xA0\xA0\xA0\xA0"); // four &nbsp;
+      }
+    }
+    /**
      * Game loop
      */
 
   }, {
     key: "run",
     value: function run() {
-      var _this = this;
+      var _this2 = this;
 
       var gameLoop = function gameLoop(ts) {
-        if (!_this.isPaused) {
-          // To do: Read input from virtual and real gamepads
-          _this.currentMode.handleInput();
+        if (!_this2.isPaused) {
+          _this2.readInput();
 
-          _this.currentMode.draw(ts);
+          _this2.currentMode.handleInput(_this2.input, _this2.inputLast);
+
+          _this2.currentMode.draw(ts);
 
           window.requestAnimationFrame(gameLoop);
         }
@@ -371,17 +478,42 @@ var GradientDescentGame = /*#__PURE__*/function () {
 
       window.requestAnimationFrame(gameLoop);
     }
+    /**
+     * Pauses the game.
+     *
+     * While paused the main game loop not run.
+     */
+
   }, {
     key: "pause",
     value: function pause() {
       this.isPaused = true;
     }
+    /**
+     * Resumes the game.
+     *
+     * Enables the main game loop.
+     */
+
   }, {
     key: "resume",
     value: function resume() {
-      this.isPaused = false;
-      this.run();
+      if (this.isPaused) {
+        this.isPaused = false;
+        this.run();
+      }
     }
+    /**
+     * Registers a game mode
+     *
+     * @private
+     * @param {string} id
+     *  A name that identifies the mode
+     * @param {GameMode} mode
+     *  A GameMode subclass
+     * @return {Promise<void>}
+     */
+
   }, {
     key: "registerMode",
     value: function () {
@@ -406,6 +538,14 @@ var GradientDescentGame = /*#__PURE__*/function () {
 
       return registerMode;
     }()
+    /**
+     * Changes the current game mode
+     *
+     * @param {string} modeID
+     *  Name of a previously registered mode
+     * @return {Promise<void>}
+     */
+
   }, {
     key: "setMode",
     value: function () {
@@ -461,7 +601,7 @@ var GradientDescentGame = /*#__PURE__*/function () {
 
 exports["default"] = GradientDescentGame;
 
-},{"./game-mode-play":1}],4:[function(require,module,exports){
+},{"./game-mode-play":1,"./screen-controls":5}],4:[function(require,module,exports){
 "use strict";
 
 var _game = _interopRequireDefault(require("./game"));
@@ -473,12 +613,16 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
 var defaultConfig = {
-  defaultLanguage: 'en'
+  defaultLanguage: 'en',
+  useGamepads: true,
+  useScreenControls: true,
+  maxPlayers: 2,
+  debugControls: false
 };
 /**
  * Loads the config file from an external JSON file
  *
- * @param {string} uri
+ * @param {String} uri
  * @return {Promise<any>}
  */
 
@@ -589,4 +733,151 @@ function _loadConfig() {
   return main;
 })()();
 
-},{"./game":3}]},{},[4]);
+},{"./game":3}],5:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+/**
+ * Component that handles on-screen controls
+ *
+ * Supports both mouse and multitouch input.
+ *
+ */
+var ScreenControls = /*#__PURE__*/function () {
+  /**
+   * Constructor
+   *
+   * @param {Number} count
+   *  (Integer) Number of controllers to show
+   */
+  function ScreenControls(count) {
+    var _this = this;
+
+    _classCallCheck(this, ScreenControls);
+
+    this.element = document.createElement('div');
+    this.element.classList.add('screen-controls');
+    this.element.classList.add("with-".concat(count, "-controls"));
+    this.state = []; // Initialize the state of each controller
+
+    for (var i = 0; i < count; i += 1) {
+      this.state.push({
+        left: false,
+        right: false,
+        action: false
+      });
+      this.element.appendChild(this.buildControl(i));
+    } // Global mouseup handling for all buttons
+
+
+    this.mousePressedButton = null;
+    window.addEventListener('mouseup', function () {
+      if (_this.mousePressedButton !== null) {
+        _this.state[_this.mousePressedButton.id][_this.mousePressedButton.name] = false;
+
+        _this.mousePressedButton.element.classList.remove('active');
+
+        _this.mousePressedButton = null;
+      }
+    });
+  }
+  /**
+   * Builds a single on-screen controller
+   *
+   * @private
+   * @param {Number} id
+   *  Zero-based integer index of the controller
+   * @return {HTMLDivElement}
+   */
+
+
+  _createClass(ScreenControls, [{
+    key: "buildControl",
+    value: function buildControl(id) {
+      var _this2 = this;
+
+      var root = document.createElement('div');
+      root.classList.add('screen-control', "screen-control-".concat(id));
+
+      var newButton = function newButton(name) {
+        var button = document.createElement('button');
+        button.setAttribute('type', 'button');
+        button.classList.add(name);
+
+        var checkTouches = function checkTouches(ev) {
+          if (ev.targetTouches.length > 0) {
+            _this2.state[id][name] = true;
+            button.classList.add('active');
+          } else {
+            _this2.state[id][name] = false;
+            button.classList.remove('active');
+          }
+
+          ev.preventDefault();
+        };
+
+        button.addEventListener('touchstart', checkTouches, {
+          passive: false
+        });
+        button.addEventListener('touchmove', checkTouches, {
+          passive: false
+        });
+        button.addEventListener('touchend', checkTouches, {
+          passive: false
+        });
+        button.addEventListener('touchcancel', checkTouches, {
+          passive: false
+        });
+        button.addEventListener('mousedown', function () {
+          _this2.state[id][name] = true;
+          button.classList.add('active');
+          _this2.mousePressedButton = {
+            id: id,
+            name: name,
+            element: button
+          };
+        });
+        return button;
+      };
+
+      root.appendChild(newButton('left'));
+      root.appendChild(newButton('action'));
+      root.appendChild(newButton('right'));
+      return root;
+    }
+    /**
+     * Returns state of all controllers
+     *
+     * State is returned as an array with one object per controller
+     * with properties indicating the state of each button.
+     *
+     * @return {[{
+     *   left: Boolean,
+     *   right: Boolean,
+     *   action: Boolean
+     * }]}
+     */
+
+  }, {
+    key: "getState",
+    value: function getState() {
+      return this.state;
+    }
+  }]);
+
+  return ScreenControls;
+}();
+
+exports["default"] = ScreenControls;
+
+},{}]},{},[4]);

@@ -1,3 +1,7 @@
 {
-  "defaultLanguage": "en"
+  "defaultLanguage": "en",
+  "useGamepads": true,
+  "useScreenControls": true,
+  "maxPlayers": 4,
+  "debugControls": true
 }
