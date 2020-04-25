@@ -48,18 +48,61 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
   }
 
   _createClass(PlayMode, [{
-    key: "handleEnterMode",
+    key: "preLoadAssets",
     value: function () {
-      var _handleEnterMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+      var _preLoadAssets = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
+                _context.next = 2;
+                return this.game.loadSVGSymbol('assets/img/ship.svg').stroke({
+                  color: '#ff0000',
+                  width: 2
+                }).fill('transparent');
+
+              case 2:
+                this.shipSymbol = _context.sent;
+
+              case 3:
               case "end":
                 return _context.stop();
             }
           }
-        }, _callee);
+        }, _callee, this);
+      }));
+
+      function preLoadAssets() {
+        return _preLoadAssets.apply(this, arguments);
+      }
+
+      return preLoadAssets;
+    }()
+  }, {
+    key: "handleEnterMode",
+    value: function () {
+      var _handleEnterMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+        var svg;
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+                // Init state (boat positions, etc.)
+                svg = this.game.svg; // Draw sea
+
+                svg.line(0, 200, 1920, 200).stroke({
+                  color: '#9999ff',
+                  width: 2
+                });
+                this.boat = svg.use(this.shipSymbol).size(300, 200).center(300, 165);
+                window.myBoat = this.boat;
+
+              case 4:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2, this);
       }));
 
       function handleEnterMode() {
@@ -71,16 +114,16 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
   }, {
     key: "handleExitMode",
     value: function () {
-      var _handleExitMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+      var _handleExitMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context3.prev = _context3.next) {
               case 0:
               case "end":
-                return _context2.stop();
+                return _context3.stop();
             }
           }
-        }, _callee2);
+        }, _callee3);
       }));
 
       function handleExitMode() {
@@ -95,8 +138,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
     }
   }, {
     key: "draw",
-    value: function draw(ts) {// Draw sea
-      // Draw boats
+    value: function draw(ts) {// Move boats
       // Draw bottom
       // etc...
     }
@@ -333,13 +375,13 @@ var GradientDescentGame = /*#__PURE__*/function () {
   _createClass(GradientDescentGame, [{
     key: "init",
     value: function () {
-      var _init = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+      var _init = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
         var preloaders;
-        return regeneratorRuntime.wrap(function _callee$(_context) {
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
-            switch (_context.prev = _context.next) {
+            switch (_context2.prev = _context2.next) {
               case 0:
-                this.svg = SVG().addTo(this.container);
+                this.svg = SVG().addTo(this.container).size(500, 500);
 
                 if (this.config.useScreenControls) {
                   this.screenControls = new _screenControls["default"](this.config.maxPlayers);
@@ -353,31 +395,46 @@ var GradientDescentGame = /*#__PURE__*/function () {
                   this.container.appendChild(this.debugControlsPane);
                 }
 
-                _context.next = 5;
+                _context2.next = 5;
                 return this.registerMode('play', new _gameModePlay["default"](this));
 
               case 5:
-                preloaders = Object.entries(this.modes).map(function (_ref) {
-                  var _ref2 = _slicedToArray(_ref, 2),
-                      mode = _ref2[1];
+                preloaders = Object.entries(this.modes).map( /*#__PURE__*/function () {
+                  var _ref2 = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee(_ref) {
+                    var _ref3, mode;
 
-                  return function () {
-                    mode.preLoadAssets();
+                    return regeneratorRuntime.wrap(function _callee$(_context) {
+                      while (1) {
+                        switch (_context.prev = _context.next) {
+                          case 0:
+                            _ref3 = _slicedToArray(_ref, 2), mode = _ref3[1];
+                            return _context.abrupt("return", mode.preLoadAssets());
+
+                          case 2:
+                          case "end":
+                            return _context.stop();
+                        }
+                      }
+                    }, _callee);
+                  }));
+
+                  return function (_x) {
+                    return _ref2.apply(this, arguments);
                   };
-                });
-                _context.next = 8;
+                }());
+                _context2.next = 8;
                 return Promise.all(preloaders);
 
               case 8:
-                _context.next = 10;
+                _context2.next = 10;
                 return this.setMode('play');
 
               case 10:
               case "end":
-                return _context.stop();
+                return _context2.stop();
             }
           }
-        }, _callee, this);
+        }, _callee2, this);
       }));
 
       function init() {
@@ -385,6 +442,72 @@ var GradientDescentGame = /*#__PURE__*/function () {
       }
 
       return init;
+    }()
+    /**
+     * Loads an external SVG file into a symbol within the main svg element
+     *
+     * @param {string} uri
+     * @param {boolean} clearStyles
+     *  If true removes the style elements from the file
+     * @return {Promise<SVG.Symbol>}
+     */
+
+  }, {
+    key: "loadSVGSymbol",
+    value: function () {
+      var _loadSVGSymbol = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(uri) {
+        var clearStyles,
+            response,
+            newSymbol,
+            _args3 = arguments;
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                clearStyles = _args3.length > 1 && _args3[1] !== undefined ? _args3[1] : true;
+                _context3.next = 3;
+                return fetch(uri);
+
+              case 3:
+                response = _context3.sent;
+
+                if (!(response.status < 200 || response.status >= 300)) {
+                  _context3.next = 6;
+                  break;
+                }
+
+                throw new Error("Server returned status ".concat(response.status, " (").concat(response.statusText, ") loading ").concat(uri, "."));
+
+              case 6:
+                _context3.t0 = this.svg.symbol();
+                _context3.next = 9;
+                return response.text();
+
+              case 9:
+                _context3.t1 = _context3.sent;
+                newSymbol = _context3.t0.svg.call(_context3.t0, _context3.t1);
+
+                if (clearStyles) {
+                  newSymbol.find('style').forEach(function (s) {
+                    s.remove();
+                  });
+                }
+
+                return _context3.abrupt("return", newSymbol);
+
+              case 13:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function loadSVGSymbol(_x2) {
+        return _loadSVGSymbol.apply(this, arguments);
+      }
+
+      return loadSVGSymbol;
     }()
     /**
      * Initializes the input state
@@ -517,22 +640,22 @@ var GradientDescentGame = /*#__PURE__*/function () {
   }, {
     key: "registerMode",
     value: function () {
-      var _registerMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(id, mode) {
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+      var _registerMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(id, mode) {
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
                 this.modes[id] = mode;
 
               case 1:
               case "end":
-                return _context2.stop();
+                return _context4.stop();
             }
           }
-        }, _callee2, this);
+        }, _callee4, this);
       }));
 
-      function registerMode(_x, _x2) {
+      function registerMode(_x3, _x4) {
         return _registerMode.apply(this, arguments);
       }
 
@@ -549,24 +672,24 @@ var GradientDescentGame = /*#__PURE__*/function () {
   }, {
     key: "setMode",
     value: function () {
-      var _setMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3(modeID) {
-        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+      var _setMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(modeID) {
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context5.prev = _context5.next) {
               case 0:
                 this.pause();
 
                 if (!this.currentMode) {
-                  _context3.next = 4;
+                  _context5.next = 4;
                   break;
                 }
 
-                _context3.next = 4;
+                _context5.next = 4;
                 return this.currentMode.handleExitMode();
 
               case 4:
                 if (!(this.modes[modeID] === undefined)) {
-                  _context3.next = 6;
+                  _context5.next = 6;
                   break;
                 }
 
@@ -574,7 +697,7 @@ var GradientDescentGame = /*#__PURE__*/function () {
 
               case 6:
                 this.currentMode = this.modes[modeID];
-                _context3.next = 9;
+                _context5.next = 9;
                 return this.currentMode.handleEnterMode();
 
               case 9:
@@ -582,13 +705,13 @@ var GradientDescentGame = /*#__PURE__*/function () {
 
               case 10:
               case "end":
-                return _context3.stop();
+                return _context5.stop();
             }
           }
-        }, _callee3, this);
+        }, _callee5, this);
       }));
 
-      function setMode(_x3) {
+      function setMode(_x5) {
         return _setMode.apply(this, arguments);
       }
 

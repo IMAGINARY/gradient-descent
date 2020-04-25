@@ -34,7 +34,7 @@ export default class GradientDescentGame {
    * @return {Promise<void>}
    */
   async init() {
-    this.svg = SVG().addTo(this.container);
+    this.svg = SVG().addTo(this.container).size(500, 500);
     if (this.config.useScreenControls) {
       this.screenControls = new ScreenControls(this.config.maxPlayers);
       this.container.appendChild(this.screenControls.element);
@@ -54,6 +54,27 @@ export default class GradientDescentGame {
     await Promise.all(preloaders);
 
     await this.setMode('play');
+  }
+
+  /**
+   * Loads an external SVG file into a symbol within the main svg element
+   *
+   * @param {string} uri
+   * @param {boolean} clearStyles
+   *  If true removes the style elements from the file
+   * @return {Promise<SVG.Symbol>}
+   */
+  async loadSVGSymbol(uri, clearStyles = true) {
+    const response = await fetch(uri);
+    if (response.status < 200 || response.status >= 300) {
+      throw new Error(`Server returned status ${response.status} (${response.statusText}) loading ${uri}.`);
+    }
+    const newSymbol = this.svg.symbol().svg(await response.text());
+    if (clearStyles) {
+      newSymbol.find('style').forEach((s) => { s.remove(); });
+    }
+
+    return newSymbol;
   }
 
   /**
