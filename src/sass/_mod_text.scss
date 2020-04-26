@@ -1,0 +1,26 @@
+.text {
+  width: 90vw;
+  margin: 0 5vw;
+  text-transform: uppercase;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-vcenter {
+  position: absolute;
+  top: 40vh;
+}
+
+@keyframes blinking{
+  0%    {	opacity: 1;	}
+  49%   {	opacity: 1;	}
+  75%   {	opacity: 0;	}
+  99%   {	opacity: 0;	}
+  100%  {	opacity: 1;	}
+}
+
+.blinking {
+  animation: blinking 1.25s infinite;
+}

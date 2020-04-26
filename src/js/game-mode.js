@@ -1,4 +1,6 @@
 /* eslint-disable class-methods-use-this,no-unused-vars,no-empty-function */
+import EventEmitter from 'events';
+
 /**
  * Abstract class for GameMode
  *
@@ -13,6 +15,7 @@ export default class GameMode {
   constructor(game) {
     // noinspection JSUnusedGlobalSymbols
     this.game = game;
+    this.events = new EventEmitter();
   }
 
   /**
@@ -70,5 +73,16 @@ export default class GameMode {
    */
   draw(ts) {
 
+  }
+
+  /**
+   * Triggers an event for the game to handle
+   *
+   * Events can be used to transition to another mode, etc.
+   *
+   * @param {string} name
+   */
+  triggerEvent(name) {
+    this.events.emit(name);
   }
 }

@@ -1,5 +1,7 @@
 /* globals SVG */
 import PlayMode from './game-mode-play';
+import TitleMode from './game-mode-title';
+import PlayerNumberMode from './game-mode-numplayers';
 import ScreenControls from './screen-controls';
 
 /**
@@ -26,6 +28,8 @@ export default class GradientDescentGame {
 
     this.screenControls = null;
     this.debugControlsPane = null;
+
+    this.numPlayers = 1;
   }
 
   /**
@@ -34,7 +38,13 @@ export default class GradientDescentGame {
    * @return {Promise<void>}
    */
   async init() {
-    this.svg = SVG().addTo(this.container).size(500, 500);
+    this.svgDoc = SVG().addTo(this.container).size(500, 500);
+    this.draw = this.svgDoc.nested();
+
+    this.overlay = document.createElement('div');
+    this.overlay.classList.add('overlay');
+    this.container.append(this.overlay);
+
     if (this.config.useScreenControls) {
       this.screenControls = new ScreenControls(this.config.maxPlayers);
       this.container.appendChild(this.screenControls.element);
@@ -47,13 +57,20 @@ export default class GradientDescentGame {
       this.container.appendChild(this.debugControlsPane);
     }
 
+    await this.registerMode('title', new TitleMode(this));
+    await this.registerMode('numplayers', new PlayerNumberMode(this));
     await this.registerMode('play', new PlayMode(this));
 
-    const preloaders = Object.entries(this.modes)
-      .map(async ([, mode]) => mode.preLoadAssets());
-    await Promise.all(preloaders);
-
-    await this.setMode('play');
+    if (this.config.continuousGame) {
+      this.transition('play', 'done', 'play');
+      await this.setMode('play');
+    } else {
+      this.transition('title', 'done',
+        this.config.maxPlayers > 1 ? 'numplayers' : 'play');
+      this.transition('numplayers', 'done', 'play');
+      this.transition('play', 'done', 'title');
+      await this.setMode('title');
+    }
   }
 
   /**
@@ -69,7 +86,7 @@ export default class GradientDescentGame {
     if (response.status < 200 || response.status >= 300) {
       throw new Error(`Server returned status ${response.status} (${response.statusText}) loading ${uri}.`);
     }
-    const newSymbol = this.svg.symbol().svg(await response.text());
+    const newSymbol = this.svgDoc.symbol().svg(await response.text());
     if (clearStyles) {
       newSymbol.find('style').forEach((s) => { s.remove(); });
     }
@@ -181,6 +198,7 @@ export default class GradientDescentGame {
    */
   async registerMode(id, mode) {
     this.modes[id] = mode;
+    await mode.preLoadAssets();
   }
 
   /**
@@ -200,8 +218,30 @@ export default class GradientDescentGame {
       throw new Error(`Can't change to unknown mode ${modeID}`);
     }
     this.currentMode = this.modes[modeID];
+    this.draw.clear();
+    this.overlay.innerHTML = '';
     await this.currentMode.handleEnterMode();
 
     this.resume();
+  }
+
+  transition(modeId, event, nextModeId = null, callback = null) {
+    if (this.modes[modeId] === undefined) {
+      throw new Error(`Can't define transition from unknown game mode '${modeId}'`);
+    }
+    if (nextModeId && this.modes[nextModeId] === undefined) {
+      throw new Error(`Can't define transition to unknown game mode '${nextModeId}'`);
+    }
+    this.modes[modeId].events.on(event, () => {
+      if (this.currentMode !== this.modes[modeId]) {
+        throw new Error(`Mode ${modeId} triggered the event ${event} while not active. Something was not cleaned up?`);
+      }
+      if (nextModeId !== null) {
+        this.setMode(nextModeId);
+      }
+      if (callback && typeof callback === 'function') {
+        callback();
+      }
+    });
   }
 }

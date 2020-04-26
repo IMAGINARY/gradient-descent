@@ -6,6 +6,7 @@ const defaultConfig = {
   useGamepads: true,
   useScreenControls: true,
   maxPlayers: 2,
+  continuousGame: false,
   debugControls: false,
 };
 

@@ -9,4 +9,39 @@
     height: 80vh;
     top: 0;
   }
+
+  .overlay {
+    display: block;
+    position: absolute;
+    width: 100%;
+    height: 80vh;
+    top: 0;
+    background-color: transparent;
+    pointer-events: none;
+  }
+}
+
+.numPlayers-title {
+  margin-top: 20vh;
+}
+
+.numPlayers-selector {
+  text-align: center;
+  margin-top: 10vh;
+
+  .item {
+    position: relative;
+    display: inline-block;
+    margin: 0 5vw;
+
+    &.selected {
+      &:after {
+        position: absolute;
+        display: block;
+        content: "^";
+        top: 5vh;
+        left: 0;
+      }
+    }
+  }
 }
