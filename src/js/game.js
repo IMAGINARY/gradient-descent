@@ -29,7 +29,7 @@ export default class GradientDescentGame {
     this.screenControls = null;
     this.debugControlsPane = null;
 
-    this.numPlayers = 1;
+    this.numPlayers = this.config.maxPlayers;
   }
 
   /**

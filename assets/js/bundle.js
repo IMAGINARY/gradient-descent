@@ -689,7 +689,7 @@ var GradientDescentGame = /*#__PURE__*/function () {
     this.currentMode = null;
     this.screenControls = null;
     this.debugControlsPane = null;
-    this.numPlayers = 1;
+    this.numPlayers = this.config.maxPlayers;
   }
   /**
    * Initializes the app and downloads any external assets
