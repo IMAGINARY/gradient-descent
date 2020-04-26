@@ -155,7 +155,7 @@ var PlayerNumberMode = /*#__PURE__*/function (_GameMode) {
     }
   }, {
     key: "draw",
-    value: function draw(ts) {// Move boats
+    value: function draw(delta, ts) {// Move boats
       // Draw bottom
       // etc...
     }
@@ -306,7 +306,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
     }
   }, {
     key: "draw",
-    value: function draw(ts) {
+    value: function draw(delta, ts) {
       var _this$game2 = this.game,
           draw = _this$game2.draw,
           numPlayers = _this$game2.numPlayers; // Move boats
@@ -452,7 +452,7 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
     }
   }, {
     key: "draw",
-    value: function draw(ts) {// Move boats
+    value: function draw(delta, ts) {// Move boats
       // Draw bottom
       // etc...
     }
@@ -609,12 +609,15 @@ var GameMode = /*#__PURE__*/function () {
     /**
      * Called once per frame so the mode can draw based on the game's state
      *
+     * @param {Number }delta
+     *  Amount of milliseconds since the last call (capped to a maximum)
      * @param {Number} ts
+     *  Timestamp received via requestAnimationFrame
      */
 
   }, {
     key: "draw",
-    value: function draw(ts) {}
+    value: function draw(delta, ts) {}
     /**
      * Triggers an event for the game to handle
      *
@@ -911,14 +914,18 @@ var GradientDescentGame = /*#__PURE__*/function () {
     value: function run() {
       var _this2 = this;
 
+      var lastTs = 0;
+      var MAX_DELTA = 125;
+
       var gameLoop = function gameLoop(ts) {
         if (!_this2.isPaused) {
           _this2.readInput();
 
           _this2.currentMode.handleInput(_this2.input, _this2.inputLast);
 
-          _this2.currentMode.draw(ts);
+          _this2.currentMode.draw(Math.min(ts - lastTs, MAX_DELTA), ts);
 
+          lastTs = ts;
           window.requestAnimationFrame(gameLoop);
         }
       };

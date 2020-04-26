@@ -69,9 +69,12 @@ export default class GameMode {
   /**
    * Called once per frame so the mode can draw based on the game's state
    *
+   * @param {Number }delta
+   *  Amount of milliseconds since the last call (capped to a maximum)
    * @param {Number} ts
+   *  Timestamp received via requestAnimationFrame
    */
-  draw(ts) {
+  draw(delta, ts) {
 
   }
 

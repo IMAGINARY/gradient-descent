@@ -26,7 +26,7 @@ export default class PlayMode extends GameMode {
     // Move the boats or check if they're lowering the probe
   }
 
-  draw(ts) {
+  draw(delta, ts) {
     const { draw, numPlayers } = this.game;
     // Move boats
     // Draw bottom

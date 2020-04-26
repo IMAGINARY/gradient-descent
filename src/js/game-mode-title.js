@@ -26,7 +26,7 @@ export default class TitleMode extends GameMode {
     }
   }
 
-  draw(ts) {
+  draw(delta, ts) {
     // Move boats
     // Draw bottom
     // etc...
