@@ -45,7 +45,6 @@ async function loadConfig(uri) {
       config
     );
     await game.init();
-    game.run();
   } catch (err) {
     // eslint-disable-next-line no-console
     console.error(err);
