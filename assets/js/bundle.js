@@ -330,6 +330,8 @@ exports["default"] = void 0;
 
 var _gameMode = _interopRequireDefault(require("./game-mode"));
 
+var _wavyAnimation = _interopRequireDefault(require("./wavy-animation"));
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -377,11 +379,19 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
+                _context.next = 2;
+                return this.game.loadSVGSymbol('assets/img/descent-logo.svg');
+
+              case 2:
+                this.logoSprite = _context.sent;
+                this.poly = this.logoSprite.findOne('#descent');
+
+              case 4:
               case "end":
                 return _context.stop();
             }
           }
-        }, _callee);
+        }, _callee, this);
       }));
 
       function preLoadAssets() {
@@ -394,18 +404,31 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
     key: "handleEnterMode",
     value: function () {
       var _handleEnterMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
-        var svg, pressToStart;
+        var draw, pressToStart, gradientLogo;
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
-                svg = this.game.svg;
+                draw = this.game.draw;
                 pressToStart = document.createElement('div');
                 pressToStart.classList.add('blinking', 'text', 'text-center', 'text-vcenter');
                 pressToStart.textContent = IMAGINARY.i18n.t('press-to-start');
                 this.game.overlay.append(pressToStart);
+                gradientLogo = draw.use(this.logoSprite).size(1200, 400).stroke({
+                  color: '#00368a',
+                  width: 2
+                }).fill('transparent').center(1920 / 2, 1080 / 2.5);
+                gradientLogo.animate({
+                  duration: 5000
+                }).stroke({
+                  color: '#34c6ff'
+                });
+                this.wavyStep = (0, _wavyAnimation["default"])(this.logoSprite, {
+                  duration: 3500
+                });
+                this.animCounter = 0;
 
-              case 5:
+              case 9:
               case "end":
                 return _context2.stop();
             }
@@ -452,9 +475,8 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
     }
   }, {
     key: "draw",
-    value: function draw(delta, ts) {// Move boats
-      // Draw bottom
-      // etc...
+    value: function draw(delta, ts) {
+      this.wavyStep(delta, ts);
     }
   }]);
 
@@ -463,7 +485,7 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = TitleMode;
 
-},{"./game-mode":4}],4:[function(require,module,exports){
+},{"./game-mode":4,"./wavy-animation":8}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -638,7 +660,7 @@ var GameMode = /*#__PURE__*/function () {
 
 exports["default"] = GameMode;
 
-},{"events":8}],5:[function(require,module,exports){
+},{"events":9}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1197,22 +1219,21 @@ function _loadConfig() {
             return game.init();
 
           case 13:
-            game.run();
-            _context.next = 19;
+            _context.next = 18;
             break;
 
-          case 16:
-            _context.prev = 16;
+          case 15:
+            _context.prev = 15;
             _context.t4 = _context["catch"](0);
             // eslint-disable-next-line no-console
             console.error(_context.t4);
 
-          case 19:
+          case 18:
           case "end":
             return _context.stop();
         }
       }
-    }, _callee, null, [[0, 16]]);
+    }, _callee, null, [[0, 15]]);
   }));
 
   function main() {
@@ -1370,6 +1391,95 @@ var ScreenControls = /*#__PURE__*/function () {
 exports["default"] = ScreenControls;
 
 },{}],8:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = WavyAnimation;
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(n); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+/**
+ * Setup a wave-like animation for an svg.js shape made up of polygons.
+ *
+ * This animation works by applying a transformation on all points of
+ * all polygons of the passed shape. The points will move on a sine wave
+ * that is continuously phase shifting and whose amplitude decreases over time.
+ *
+ * Returns a stepping function that takes a delta in milliseconds which should
+ * be called on the frame rendering function.
+ *
+ * Options:
+ * - xAmplitude: Maximum distance that the x coordinates are shifted from their
+ *   starting position.
+ * - duration: Duration of the animation
+ * - cycles: Number of cycles of phase shifting.
+ *
+ * @param {SVG.Container} shape
+ *  The shape whose polygons will be animated
+ * @param {Object} userOptions
+ *  Options (see above)
+ * @return {function(...[*]=)}
+ *  Returns an animation callback that takes a delta.
+ */
+function WavyAnimation(shape) {
+  var userOptions = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : {};
+  var defaultOptions = {
+    xAmplitude: 50,
+    duration: 5000,
+    cycles: 3
+  };
+  var options = Object.assign({}, defaultOptions, userOptions);
+  var polygons = shape.find('polygon');
+  var originalPlots = polygons.map(function (p) {
+    return p.plot();
+  });
+  var maxY = Math.max.apply(Math, _toConsumableArray(originalPlots.flat().map(function (_ref) {
+    var _ref2 = _slicedToArray(_ref, 2),
+        y = _ref2[1];
+
+    return y;
+  })));
+  var counter = 0;
+  return function (delta, ts) {
+    if (counter > options.duration) {
+      return;
+    }
+
+    counter += delta;
+    var progress = Math.min(counter, options.duration) / options.duration;
+    polygons.forEach(function (p, i) {
+      p.plot(originalPlots[i].map(function (_ref3) {
+        var _ref4 = _slicedToArray(_ref3, 2),
+            x = _ref4[0],
+            y = _ref4[1];
+
+        return [x + Math.sin((y / maxY + progress * options.cycles) * Math.PI * 2) * options.xAmplitude * (1 - Math.pow(progress, 2)), y];
+      }));
+    });
+  };
+}
+
+},{}],9:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
