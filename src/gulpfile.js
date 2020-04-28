@@ -19,6 +19,7 @@ const DEPS_BUNDLE_NAME = 'dependencies';
 const paths = {
   html: {
     src: ['./pug/**/*.pug', '!./pug/include/**/*.pug', '!./pug/tpl/**/*.pug', '!./pug/sections/**/*.pug'],
+    watchSrc: './pug/**/*.pug',
     dest: `${OUTPUT_DIR}`,
   },
   styles: {
@@ -29,6 +30,9 @@ const paths = {
   scripts: {
     watchSrc: ['./js/**/*.js', '!./js/dependencies.js'],
     dest: `${OUTPUT_DIR}/assets/js`,
+  },
+  dependencies: {
+    watchSrc: './js/dependencies.js',
   },
 };
 
@@ -84,8 +88,10 @@ function scripts() {
 }
 
 function watch() {
+  gulp.watch(paths.html.watchSrc, html);
   gulp.watch(paths.styles.watchSrc, styles);
   gulp.watch(paths.scripts.watchSrc, scripts);
+  gulp.watch(paths.dependencies.watchSrc, dependencies);
 }
 
 const build = gulp.parallel(html, styles, scripts);
