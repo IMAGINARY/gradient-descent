@@ -94,7 +94,7 @@ function watch() {
   gulp.watch(paths.dependencies.watchSrc, dependencies);
 }
 
-const build = gulp.parallel(html, styles, scripts);
+const build = gulp.parallel(html, styles, scripts, dependencies);
 
 exports.html = html;
 exports.styles = styles;
