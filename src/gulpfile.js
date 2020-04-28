@@ -23,10 +23,11 @@ const paths = {
   },
   styles: {
     src: './sass/**/*.scss',
+    watchSrc: './sass/**/*.scss',
     dest: `${OUTPUT_DIR}/assets/css`,
   },
   scripts: {
-    src: './js/*.js',
+    watchSrc: ['./js/**/*.js', '!./js/dependencies.js'],
     dest: `${OUTPUT_DIR}/assets/js`,
   },
 };
@@ -83,8 +84,8 @@ function scripts() {
 }
 
 function watch() {
-  gulp.watch(paths.styles.src, styles);
-  gulp.watch(paths.scripts.src, scripts);
+  gulp.watch(paths.styles.watchSrc, styles);
+  gulp.watch(paths.scripts.watchSrc, scripts);
 }
 
 const build = gulp.parallel(html, styles, scripts);
