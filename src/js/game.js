@@ -2,7 +2,9 @@
 import PlayMode from './game-mode-play';
 import TitleMode from './game-mode-title';
 import PlayerNumberMode from './game-mode-numplayers';
-import ScreenControls from './screen-controls';
+import GamepadControls from "./controls/gamepad";
+import ScreenControls from './controls/screen';
+import KeyboardControls from "./controls/keyboard";
 
 /**
  * The main application
@@ -18,15 +20,14 @@ export default class GradientDescentGame {
     this.container = container;
     this.config = config;
 
-    this.input = [];
-    this.inputLast = [];
-    this.initInput();
+    this.inputs = this.createInputs();
+    this.inputsLast = this.createInputs();
 
     this.isPaused = false;
     this.modes = {};
     this.currentMode = null;
 
-    this.screenControls = null;
+    this.controls = {};
     this.debugControlsPane = null;
 
     this.numPlayers = this.config.maxPlayers;
@@ -46,8 +47,15 @@ export default class GradientDescentGame {
     this.container.append(this.overlay);
 
     if (this.config.useScreenControls) {
-      this.screenControls = new ScreenControls(this.config.maxPlayers);
-      this.container.appendChild(this.screenControls.element);
+      this.controls.screen = new ScreenControls(this.config.maxPlayers);
+      this.container.appendChild(this.controls.screen.element);
+    }
+
+    if (this.config.useGamepads) {
+      this.controls.gamepad = new GamepadControls(this.config.maxPlayers);
+    }
+    if (this.config.useKeyboardControls) {
+      this.controls.keyboard = new KeyboardControls(this.config.maxPlayers);
     }
 
     if (this.config.debugControls) {
@@ -88,7 +96,7 @@ export default class GradientDescentGame {
     }
     const newSymbol = this.svgDoc.symbol().svg(await response.text());
     if (clearStyles) {
-      newSymbol.find('style').forEach((s) => { s.remove(); });
+      newSymbol.find('style').forEach(s => s.remove());
     }
 
     return newSymbol;
@@ -99,10 +107,14 @@ export default class GradientDescentGame {
    *
    * @private
    */
-  initInput() {
-    this.input = Array(this.config.maxPlayers).fill(null).map(() => ({
-      direction: 0, action: false,
-    }));
+  initInputs() {
+    this.inputs = this.createInputs();
+  }
+
+  createInputs() {
+    return Array(this.config.maxPlayers)
+      .fill(null)
+      .map(() => ({ direction: 0, action: false }));
   }
 
   /**
@@ -113,37 +125,19 @@ export default class GradientDescentGame {
    *
    * @private
    */
-  readInput() {
-    this.inputLast = this.input;
-    this.initInput();
-    if (this.screenControls) {
-      this.screenControls.getState().forEach((ctrl, i) => {
-        if (ctrl.left) {
-          this.input[i].direction = -1;
-        }
-        if (ctrl.right) {
-          this.input[i].direction = 1;
-        }
-        this.input[i].action = this.input[i].action || ctrl.action;
-      });
-    }
-    if (this.config.useGamepads) {
-      Array.from(navigator.getGamepads())
-        .forEach((gp, i) => {
-          if (gp !== null) {
-            if (gp.axes[0] < -0.5) {
-              this.input[i].direction = -1;
-            }
-            if (gp.axes[0] > 0.5) {
-              this.input[i].direction = 1;
-            }
-            this.input[i].action = this.input[i].action
-              || gp.buttons[1].pressed || gp.buttons[2].pressed;
-          }
-        });
-    }
+  readInputs() {
+    this.inputsLast = this.inputs;
+    const states = Object.values(this.controls).map(c => c.getStates());
+    const inputReducer = (accInput, curState) => ({
+      direction: curState.right ? 1 : (curState.left ? -1 : accInput.direction),
+      action: curState.action || accInput.action,
+    });
+    this.inputs = this.createInputs().map(
+      (input, i) => states.map(s => s[i]).reduce(inputReducer, input)
+    );
+
     if (this.debugControlsPane) {
-      this.debugControlsPane.textContent = this.input.map((ctrl, i) => (
+      this.debugControlsPane.textContent = this.inputs.map((ctrl, i) => (
         `C${i}: d=${ctrl.direction} a=${ctrl.action ? 'T' : 'F'}`
       )).join('\u00a0\u00a0\u00a0\u00a0'); // four &nbsp;
     }
@@ -158,8 +152,8 @@ export default class GradientDescentGame {
 
     const gameLoop = (ts) => {
       if (!this.isPaused) {
-        this.readInput();
-        this.currentMode.handleInput(this.input, this.inputLast);
+        this.readInputs();
+        this.currentMode.handleInputs(this.inputs, this.inputsLast);
         this.currentMode.draw(Math.min(ts - lastTs, MAX_DELTA), ts);
         lastTs = ts;
 

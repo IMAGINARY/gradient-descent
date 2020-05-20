@@ -45,7 +45,7 @@ export default function WavyAnimation(shape, userOptions = {}) {
       p.plot(originalPlots[i].map(([x, y]) => (
         [
           x + Math.sin((y / maxY + progress * options.cycles) * Math.PI * 2)
-            * options.xAmplitude * (1 - (progress ** 2)),
+          * options.xAmplitude * (1 - (progress ** 2)),
           y,
         ]
       )));

@@ -3,3 +3,4 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import 'fetch-ie8';
+/* eslint-enable import/no-extraneous-dependencies */

@@ -62,7 +62,7 @@ export default class GameMode {
    * @param {[{direction: Number, action: Boolean}]} input
    * @param {[{direction: Number, action: Boolean}]} lastInput
    */
-  handleInput(input, lastInput) {
+  handleInputs(input, lastInput) {
 
   }
 

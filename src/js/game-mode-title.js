@@ -31,7 +31,7 @@ export default class TitleMode extends GameMode {
     // Cleanup timers, etc. created on handleEnterMode
   }
 
-  handleInput(input, lastInput) {
+  handleInputs(input, lastInput) {
     // If any button was pressed
     if (input
       .find((ctrl, i) => ctrl.action && !lastInput[i].action)) {
@@ -39,7 +39,7 @@ export default class TitleMode extends GameMode {
     }
   }
 
-  draw(delta,ts) {
+  draw(delta, ts) {
 
     this.wavyStep(delta, ts);
   }

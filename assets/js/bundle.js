@@ -6,6 +6,457 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+/**
+ * Component that handles gamepad controls
+ *
+ */
+var Controls = /*#__PURE__*/function () {
+  /**
+   * Constructor
+   *
+   * @param {Number} count
+   *  (Integer) Number of controllers to handle
+   */
+  function Controls(count) {
+    _classCallCheck(this, Controls);
+
+    this.states = Array(count).fill(null).map(function (_) {
+      return {
+        left: false,
+        right: false,
+        action: false
+      };
+    });
+    this.statesModified = false;
+  }
+  /**
+   * Builds a single on-screen controller
+   *
+   * @protected
+   */
+
+
+  _createClass(Controls, [{
+    key: "modifyState",
+    value: function modifyState(id, key, value) {
+      if (this.states[id][key] !== value) {
+        this.states[id][key] = value;
+        this.statesModified = true;
+      }
+    }
+    /**
+     * Returns state of all controllers
+     *
+     * State is returned as an array with one object per controller
+     * with properties indicating the state of each button.
+     *
+     * @return {[{
+     *   left: Boolean,
+     *   right: Boolean,
+     *   action: Boolean
+     * }]}
+     */
+
+  }, {
+    key: "getStates",
+    value: function getStates() {
+      if (this.statesModified) {
+        var result = this.states;
+        this.states = this.states.map(function (s) {
+          return Object.assign({}, s);
+        }); // immutability: use cloned array for future changes
+
+        this.statesModified = false;
+        return result;
+      } else {
+        return this.states;
+      }
+    }
+  }]);
+
+  return Controls;
+}();
+
+exports["default"] = Controls;
+
+},{}],2:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _controls = _interopRequireDefault(require("./controls"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(n); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+/**
+ * Component that handles gamepad controls
+ *
+ */
+var GamepadControls = /*#__PURE__*/function (_Controls) {
+  _inherits(GamepadControls, _Controls);
+
+  var _super = _createSuper(GamepadControls);
+
+  /**
+   * Constructor
+   *
+   * @param {Number} count
+   *  (Integer) Number of controllers to show
+   */
+  function GamepadControls(count) {
+    _classCallCheck(this, GamepadControls);
+
+    return _super.call(this, count);
+  }
+
+  _createClass(GamepadControls, [{
+    key: "updateState",
+    value: function updateState() {
+      var _this = this;
+
+      // clone the current state such state objects are immutable
+      this.states = _toConsumableArray(this.states);
+      Array.from(navigator.getGamepads()).filter(function (gp) {
+        return gp !== null && gp.index < _this.states.length;
+      }).forEach(function (gp) {
+        _this.modifyState(gp.index, "left", gp.axes[0] < -0.5);
+
+        _this.modifyState(gp.index, "right", gp.axes[0] > 0.5);
+
+        _this.modifyState(gp.index, "action", gp.buttons[1].pressed || gp.buttons[2].pressed);
+      });
+    }
+    /**
+     * Returns state of all controllers
+     *
+     * State is returned as an array with one object per controller
+     * with properties indicating the state of each button.
+     *
+     * @return {[{
+     *   left: Boolean,
+     *   right: Boolean,
+     *   action: Boolean
+     * }]}
+     */
+
+  }, {
+    key: "getStates",
+    value: function getStates() {
+      this.updateState();
+      return _get(_getPrototypeOf(GamepadControls.prototype), "getStates", this).call(this);
+    }
+  }]);
+
+  return GamepadControls;
+}(_controls["default"]);
+
+exports["default"] = GamepadControls;
+
+},{"./controls":1}],3:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _controls = _interopRequireDefault(require("./controls"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+var keyMap = {
+  'ArrowLeft': {
+    id: 0,
+    prop: 'left'
+  },
+  'ArrowRight': {
+    id: 0,
+    prop: 'right'
+  },
+  'ArrowDown': {
+    id: 0,
+    prop: 'action'
+  },
+  'KeyA': {
+    id: 1,
+    prop: 'left'
+  },
+  'KeyD': {
+    id: 1,
+    prop: 'right'
+  },
+  'KeyS': {
+    id: 1,
+    prop: 'action'
+  }
+};
+/**
+ * Component that handles on-screen controls
+ *
+ * Supports both mouse and multitouch input.
+ *
+ */
+
+var KeyboardControls = /*#__PURE__*/function (_Controls) {
+  _inherits(KeyboardControls, _Controls);
+
+  var _super = _createSuper(KeyboardControls);
+
+  /**
+   * Constructor
+   *
+   * @param {Number} count
+   *  (Integer) Number of controllers to show
+   */
+  function KeyboardControls(count) {
+    var _this;
+
+    _classCallCheck(this, KeyboardControls);
+
+    _this = _super.call(this, count);
+
+    var keyCallback = function keyCallback(ev) {
+      var key = keyMap[ev.code];
+      if (key && key.id < count) _this.modifyState(key.id, key.prop, ev.type === 'keydown');
+    };
+
+    window.addEventListener('keydown', keyCallback);
+    window.addEventListener('keyup', keyCallback);
+    return _this;
+  }
+
+  return KeyboardControls;
+}(_controls["default"]);
+
+exports["default"] = KeyboardControls;
+
+},{"./controls":1}],4:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _controls = _interopRequireDefault(require("./controls"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+/**
+ * Component that handles on-screen controls
+ *
+ * Supports both mouse and multitouch input.
+ *
+ */
+var ScreenControls = /*#__PURE__*/function (_Controls) {
+  _inherits(ScreenControls, _Controls);
+
+  var _super = _createSuper(ScreenControls);
+
+  /**
+   * Constructor
+   *
+   * @param {Number} count
+   *  (Integer) Number of controllers to show
+   */
+  function ScreenControls(count) {
+    var _this;
+
+    _classCallCheck(this, ScreenControls);
+
+    _this = _super.call(this, count);
+    _this.element = document.createElement('div');
+
+    _this.element.classList.add('screen-controls');
+
+    _this.element.classList.add("with-".concat(count, "-controls"));
+
+    for (var i = 0; i < _this.states.length; ++i) {
+      _this.element.appendChild(_this.buildControl(i));
+    } // Global mouseup handling for all buttons
+
+
+    _this.mousePressedButton = null;
+    window.addEventListener('mouseup', function () {
+      if (_this.mousePressedButton !== null) {
+        _this.modifyState(_this.mousePressedButton.id, _this.mousePressedButton.name, false);
+
+        _this.mousePressedButton.element.classList.remove('active');
+
+        _this.mousePressedButton = null;
+      }
+    });
+    return _this;
+  }
+  /**
+   * Builds a single on-screen controller
+   *
+   * @private
+   * @param {Number} id
+   *  Zero-based integer index of the controller
+   * @return {HTMLDivElement}
+   */
+
+
+  _createClass(ScreenControls, [{
+    key: "buildControl",
+    value: function buildControl(id) {
+      var _this2 = this;
+
+      var root = document.createElement('div');
+      root.classList.add('screen-control', "screen-control-".concat(id));
+
+      var newButton = function newButton(name) {
+        var button = document.createElement('button');
+        button.setAttribute('type', 'button');
+        button.classList.add(name);
+
+        var checkTouches = function checkTouches(ev) {
+          if (ev.targetTouches.length > 0) {
+            _this2.modifyState(id, name, true);
+
+            button.classList.add('active');
+          } else {
+            _this2.modifyState(id, name, false);
+
+            button.classList.remove('active');
+          }
+
+          ev.preventDefault();
+        };
+
+        button.addEventListener('touchstart', checkTouches, {
+          passive: false
+        });
+        button.addEventListener('touchmove', checkTouches, {
+          passive: false
+        });
+        button.addEventListener('touchend', checkTouches, {
+          passive: false
+        });
+        button.addEventListener('touchcancel', checkTouches, {
+          passive: false
+        });
+        button.addEventListener('mousedown', function () {
+          _this2.modifyState(id, name, true);
+
+          button.classList.add('active');
+          _this2.mousePressedButton = {
+            id: id,
+            name: name,
+            element: button
+          };
+        });
+        return button;
+      };
+
+      root.appendChild(newButton('left'));
+      root.appendChild(newButton('action'));
+      root.appendChild(newButton('right'));
+      return root;
+    }
+  }]);
+
+  return ScreenControls;
+}(_controls["default"]);
+
+exports["default"] = ScreenControls;
+
+},{"./controls":1}],5:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
 var _gameMode = _interopRequireDefault(require("./game-mode"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
@@ -124,8 +575,8 @@ var PlayerNumberMode = /*#__PURE__*/function (_GameMode) {
       return handleExitMode;
     }()
   }, {
-    key: "handleInput",
-    value: function handleInput(input, lastInput) {
+    key: "handleInputs",
+    value: function handleInputs(input, lastInput) {
       var maxPlayers = this.game.config.maxPlayers;
       var newSelection = null;
 
@@ -166,7 +617,7 @@ var PlayerNumberMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = PlayerNumberMode;
 
-},{"./game-mode":4}],2:[function(require,module,exports){
+},{"./game-mode":8}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -301,8 +752,8 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       return handleExitMode;
     }()
   }, {
-    key: "handleInput",
-    value: function handleInput(input, lastInput) {// Move the boats or check if they're lowering the probe
+    key: "handleInputs",
+    value: function handleInputs(input, lastInput) {// Move the boats or check if they're lowering the probe
     }
   }, {
     key: "draw",
@@ -320,7 +771,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = PlayMode;
 
-},{"./game-mode":4}],3:[function(require,module,exports){
+},{"./game-mode":8}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -464,8 +915,8 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
       return handleExitMode;
     }()
   }, {
-    key: "handleInput",
-    value: function handleInput(input, lastInput) {
+    key: "handleInputs",
+    value: function handleInputs(input, lastInput) {
       // If any button was pressed
       if (input.find(function (ctrl, i) {
         return ctrl.action && !lastInput[i].action;
@@ -485,7 +936,7 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = TitleMode;
 
-},{"./game-mode":4,"./wavy-animation":8}],4:[function(require,module,exports){
+},{"./game-mode":8,"./wavy-animation":11}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -626,8 +1077,8 @@ var GameMode = /*#__PURE__*/function () {
      */
 
   }, {
-    key: "handleInput",
-    value: function handleInput(input, lastInput) {}
+    key: "handleInputs",
+    value: function handleInputs(input, lastInput) {}
     /**
      * Called once per frame so the mode can draw based on the game's state
      *
@@ -660,7 +1111,7 @@ var GameMode = /*#__PURE__*/function () {
 
 exports["default"] = GameMode;
 
-},{"events":9}],5:[function(require,module,exports){
+},{"events":12}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -674,7 +1125,11 @@ var _gameModeTitle = _interopRequireDefault(require("./game-mode-title"));
 
 var _gameModeNumplayers = _interopRequireDefault(require("./game-mode-numplayers"));
 
-var _screenControls = _interopRequireDefault(require("./screen-controls"));
+var _gamepad = _interopRequireDefault(require("./controls/gamepad"));
+
+var _screen = _interopRequireDefault(require("./controls/screen"));
+
+var _keyboard = _interopRequireDefault(require("./controls/keyboard"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -703,13 +1158,12 @@ var GradientDescentGame = /*#__PURE__*/function () {
 
     this.container = container;
     this.config = config;
-    this.input = [];
-    this.inputLast = [];
-    this.initInput();
+    this.inputs = this.createInputs();
+    this.inputsLast = this.createInputs();
     this.isPaused = false;
     this.modes = {};
     this.currentMode = null;
-    this.screenControls = null;
+    this.controls = {};
     this.debugControlsPane = null;
     this.numPlayers = this.config.maxPlayers;
   }
@@ -735,8 +1189,16 @@ var GradientDescentGame = /*#__PURE__*/function () {
                 this.container.append(this.overlay);
 
                 if (this.config.useScreenControls) {
-                  this.screenControls = new _screenControls["default"](this.config.maxPlayers);
-                  this.container.appendChild(this.screenControls.element);
+                  this.controls.screen = new _screen["default"](this.config.maxPlayers);
+                  this.container.appendChild(this.controls.screen.element);
+                }
+
+                if (this.config.useGamepads) {
+                  this.controls.gamepad = new _gamepad["default"](this.config.maxPlayers);
+                }
+
+                if (this.config.useKeyboardControls) {
+                  this.controls.keyboard = new _keyboard["default"](this.config.maxPlayers);
                 }
 
                 if (this.config.debugControls) {
@@ -746,39 +1208,39 @@ var GradientDescentGame = /*#__PURE__*/function () {
                   this.container.appendChild(this.debugControlsPane);
                 }
 
-                _context.next = 9;
-                return this.registerMode('title', new _gameModeTitle["default"](this));
-
-              case 9:
                 _context.next = 11;
-                return this.registerMode('numplayers', new _gameModeNumplayers["default"](this));
+                return this.registerMode('title', new _gameModeTitle["default"](this));
 
               case 11:
                 _context.next = 13;
-                return this.registerMode('play', new _gameModePlay["default"](this));
+                return this.registerMode('numplayers', new _gameModeNumplayers["default"](this));
 
               case 13:
+                _context.next = 15;
+                return this.registerMode('play', new _gameModePlay["default"](this));
+
+              case 15:
                 if (!this.config.continuousGame) {
-                  _context.next = 19;
+                  _context.next = 21;
                   break;
                 }
 
                 this.transition('play', 'done', 'play');
-                _context.next = 17;
+                _context.next = 19;
                 return this.setMode('play');
 
-              case 17:
-                _context.next = 24;
+              case 19:
+                _context.next = 26;
                 break;
 
-              case 19:
+              case 21:
                 this.transition('title', 'done', this.config.maxPlayers > 1 ? 'numplayers' : 'play');
                 this.transition('numplayers', 'done', 'play');
                 this.transition('play', 'done', 'title');
-                _context.next = 24;
+                _context.next = 26;
                 return this.setMode('title');
 
-              case 24:
+              case 26:
               case "end":
                 return _context.stop();
             }
@@ -838,7 +1300,7 @@ var GradientDescentGame = /*#__PURE__*/function () {
 
                 if (clearStyles) {
                   newSymbol.find('style').forEach(function (s) {
-                    s.remove();
+                    return s.remove();
                   });
                 }
 
@@ -865,9 +1327,14 @@ var GradientDescentGame = /*#__PURE__*/function () {
      */
 
   }, {
-    key: "initInput",
-    value: function initInput() {
-      this.input = Array(this.config.maxPlayers).fill(null).map(function () {
+    key: "initInputs",
+    value: function initInputs() {
+      this.inputs = this.createInputs();
+    }
+  }, {
+    key: "createInputs",
+    value: function createInputs() {
+      return Array(this.config.maxPlayers).fill(null).map(function () {
         return {
           direction: 0,
           action: false
@@ -884,45 +1351,28 @@ var GradientDescentGame = /*#__PURE__*/function () {
      */
 
   }, {
-    key: "readInput",
-    value: function readInput() {
-      var _this = this;
+    key: "readInputs",
+    value: function readInputs() {
+      this.inputsLast = this.inputs;
+      var states = Object.values(this.controls).map(function (c) {
+        return c.getStates();
+      });
 
-      this.inputLast = this.input;
-      this.initInput();
+      var inputReducer = function inputReducer(accInput, curState) {
+        return {
+          direction: curState.right ? 1 : curState.left ? -1 : accInput.direction,
+          action: curState.action || accInput.action
+        };
+      };
 
-      if (this.screenControls) {
-        this.screenControls.getState().forEach(function (ctrl, i) {
-          if (ctrl.left) {
-            _this.input[i].direction = -1;
-          }
-
-          if (ctrl.right) {
-            _this.input[i].direction = 1;
-          }
-
-          _this.input[i].action = _this.input[i].action || ctrl.action;
-        });
-      }
-
-      if (this.config.useGamepads) {
-        Array.from(navigator.getGamepads()).forEach(function (gp, i) {
-          if (gp !== null) {
-            if (gp.axes[0] < -0.5) {
-              _this.input[i].direction = -1;
-            }
-
-            if (gp.axes[0] > 0.5) {
-              _this.input[i].direction = 1;
-            }
-
-            _this.input[i].action = _this.input[i].action || gp.buttons[1].pressed || gp.buttons[2].pressed;
-          }
-        });
-      }
+      this.inputs = this.createInputs().map(function (input, i) {
+        return states.map(function (s) {
+          return s[i];
+        }).reduce(inputReducer, input);
+      });
 
       if (this.debugControlsPane) {
-        this.debugControlsPane.textContent = this.input.map(function (ctrl, i) {
+        this.debugControlsPane.textContent = this.inputs.map(function (ctrl, i) {
           return "C".concat(i, ": d=").concat(ctrl.direction, " a=").concat(ctrl.action ? 'T' : 'F');
         }).join("\xA0\xA0\xA0\xA0"); // four &nbsp;
       }
@@ -934,18 +1384,18 @@ var GradientDescentGame = /*#__PURE__*/function () {
   }, {
     key: "run",
     value: function run() {
-      var _this2 = this;
+      var _this = this;
 
       var lastTs = 0;
       var MAX_DELTA = 125;
 
       var gameLoop = function gameLoop(ts) {
-        if (!_this2.isPaused) {
-          _this2.readInput();
+        if (!_this.isPaused) {
+          _this.readInputs();
 
-          _this2.currentMode.handleInput(_this2.input, _this2.inputLast);
+          _this.currentMode.handleInputs(_this.inputs, _this.inputsLast);
 
-          _this2.currentMode.draw(Math.min(ts - lastTs, MAX_DELTA), ts);
+          _this.currentMode.draw(Math.min(ts - lastTs, MAX_DELTA), ts);
 
           lastTs = ts;
           window.requestAnimationFrame(gameLoop);
@@ -1077,7 +1527,7 @@ var GradientDescentGame = /*#__PURE__*/function () {
   }, {
     key: "transition",
     value: function transition(modeId, event) {
-      var _this3 = this;
+      var _this2 = this;
 
       var nextModeId = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
       var callback = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
@@ -1091,12 +1541,12 @@ var GradientDescentGame = /*#__PURE__*/function () {
       }
 
       this.modes[modeId].events.on(event, function () {
-        if (_this3.currentMode !== _this3.modes[modeId]) {
+        if (_this2.currentMode !== _this2.modes[modeId]) {
           throw new Error("Mode ".concat(modeId, " triggered the event ").concat(event, " while not active. Something was not cleaned up?"));
         }
 
         if (nextModeId !== null) {
-          _this3.setMode(nextModeId);
+          _this2.setMode(nextModeId);
         }
 
         if (callback && typeof callback === 'function') {
@@ -1111,7 +1561,7 @@ var GradientDescentGame = /*#__PURE__*/function () {
 
 exports["default"] = GradientDescentGame;
 
-},{"./game-mode-numplayers":1,"./game-mode-play":2,"./game-mode-title":3,"./screen-controls":7}],6:[function(require,module,exports){
+},{"./controls/gamepad":2,"./controls/keyboard":3,"./controls/screen":4,"./game-mode-numplayers":5,"./game-mode-play":6,"./game-mode-title":7}],10:[function(require,module,exports){
 "use strict";
 
 var _game = _interopRequireDefault(require("./game"));
@@ -1243,154 +1693,7 @@ function _loadConfig() {
   return main;
 })()();
 
-},{"./game":5}],7:[function(require,module,exports){
-"use strict";
-
-Object.defineProperty(exports, "__esModule", {
-  value: true
-});
-exports["default"] = void 0;
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
-
-function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
-
-/**
- * Component that handles on-screen controls
- *
- * Supports both mouse and multitouch input.
- *
- */
-var ScreenControls = /*#__PURE__*/function () {
-  /**
-   * Constructor
-   *
-   * @param {Number} count
-   *  (Integer) Number of controllers to show
-   */
-  function ScreenControls(count) {
-    var _this = this;
-
-    _classCallCheck(this, ScreenControls);
-
-    this.element = document.createElement('div');
-    this.element.classList.add('screen-controls');
-    this.element.classList.add("with-".concat(count, "-controls"));
-    this.state = []; // Initialize the state of each controller
-
-    for (var i = 0; i < count; i += 1) {
-      this.state.push({
-        left: false,
-        right: false,
-        action: false
-      });
-      this.element.appendChild(this.buildControl(i));
-    } // Global mouseup handling for all buttons
-
-
-    this.mousePressedButton = null;
-    window.addEventListener('mouseup', function () {
-      if (_this.mousePressedButton !== null) {
-        _this.state[_this.mousePressedButton.id][_this.mousePressedButton.name] = false;
-
-        _this.mousePressedButton.element.classList.remove('active');
-
-        _this.mousePressedButton = null;
-      }
-    });
-  }
-  /**
-   * Builds a single on-screen controller
-   *
-   * @private
-   * @param {Number} id
-   *  Zero-based integer index of the controller
-   * @return {HTMLDivElement}
-   */
-
-
-  _createClass(ScreenControls, [{
-    key: "buildControl",
-    value: function buildControl(id) {
-      var _this2 = this;
-
-      var root = document.createElement('div');
-      root.classList.add('screen-control', "screen-control-".concat(id));
-
-      var newButton = function newButton(name) {
-        var button = document.createElement('button');
-        button.setAttribute('type', 'button');
-        button.classList.add(name);
-
-        var checkTouches = function checkTouches(ev) {
-          if (ev.targetTouches.length > 0) {
-            _this2.state[id][name] = true;
-            button.classList.add('active');
-          } else {
-            _this2.state[id][name] = false;
-            button.classList.remove('active');
-          }
-
-          ev.preventDefault();
-        };
-
-        button.addEventListener('touchstart', checkTouches, {
-          passive: false
-        });
-        button.addEventListener('touchmove', checkTouches, {
-          passive: false
-        });
-        button.addEventListener('touchend', checkTouches, {
-          passive: false
-        });
-        button.addEventListener('touchcancel', checkTouches, {
-          passive: false
-        });
-        button.addEventListener('mousedown', function () {
-          _this2.state[id][name] = true;
-          button.classList.add('active');
-          _this2.mousePressedButton = {
-            id: id,
-            name: name,
-            element: button
-          };
-        });
-        return button;
-      };
-
-      root.appendChild(newButton('left'));
-      root.appendChild(newButton('action'));
-      root.appendChild(newButton('right'));
-      return root;
-    }
-    /**
-     * Returns state of all controllers
-     *
-     * State is returned as an array with one object per controller
-     * with properties indicating the state of each button.
-     *
-     * @return {[{
-     *   left: Boolean,
-     *   right: Boolean,
-     *   action: Boolean
-     * }]}
-     */
-
-  }, {
-    key: "getState",
-    value: function getState() {
-      return this.state;
-    }
-  }]);
-
-  return ScreenControls;
-}();
-
-exports["default"] = ScreenControls;
-
-},{}],8:[function(require,module,exports){
+},{"./game":9}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1479,7 +1782,7 @@ function WavyAnimation(shape) {
   };
 }
 
-},{}],9:[function(require,module,exports){
+},{}],12:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -2004,4 +2307,5 @@ function functionBindPolyfill(context) {
   };
 }
 
-},{}]},{},[6]);
+},{}]},{},[10])
+

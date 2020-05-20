@@ -1,10 +1,12 @@
+import Controls from "./controls";
+
 /**
  * Component that handles on-screen controls
  *
  * Supports both mouse and multitouch input.
  *
  */
-export default class ScreenControls {
+export default class ScreenControls extends Controls {
   /**
    * Constructor
    *
@@ -12,26 +14,19 @@ export default class ScreenControls {
    *  (Integer) Number of controllers to show
    */
   constructor(count) {
+    super(count);
     this.element = document.createElement('div');
     this.element.classList.add('screen-controls');
     this.element.classList.add(`with-${count}-controls`);
-    this.state = [];
 
-    // Initialize the state of each controller
-    for (let i = 0; i < count; i += 1) {
-      this.state.push({
-        left: false,
-        right: false,
-        action: false,
-      });
+    for (let i = 0; i < this.states.length; ++i)
       this.element.appendChild(this.buildControl(i));
-    }
 
     // Global mouseup handling for all buttons
     this.mousePressedButton = null;
     window.addEventListener('mouseup', () => {
       if (this.mousePressedButton !== null) {
-        this.state[this.mousePressedButton.id][this.mousePressedButton.name] = false;
+        this.modifyState(this.mousePressedButton.id, this.mousePressedButton.name, false);
         this.mousePressedButton.element.classList.remove('active');
         this.mousePressedButton = null;
       }
@@ -57,10 +52,10 @@ export default class ScreenControls {
 
       const checkTouches = (ev) => {
         if (ev.targetTouches.length > 0) {
-          this.state[id][name] = true;
+          this.modifyState(id, name, true);
           button.classList.add('active');
         } else {
-          this.state[id][name] = false;
+          this.modifyState(id, name, false);
           button.classList.remove('active');
         }
         ev.preventDefault();
@@ -72,7 +67,7 @@ export default class ScreenControls {
       button.addEventListener('touchcancel', checkTouches, { passive: false });
 
       button.addEventListener('mousedown', () => {
-        this.state[id][name] = true;
+        this.modifyState(id, name, true);
         button.classList.add('active');
         this.mousePressedButton = {
           id,
@@ -89,21 +84,5 @@ export default class ScreenControls {
     root.appendChild(newButton('right'));
 
     return root;
-  }
-
-  /**
-   * Returns state of all controllers
-   *
-   * State is returned as an array with one object per controller
-   * with properties indicating the state of each button.
-   *
-   * @return {[{
-   *   left: Boolean,
-   *   right: Boolean,
-   *   action: Boolean
-   * }]}
-   */
-  getState() {
-    return this.state;
   }
 }
