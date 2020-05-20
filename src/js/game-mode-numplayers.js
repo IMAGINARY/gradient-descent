@@ -30,7 +30,7 @@ export default class PlayerNumberMode extends GameMode {
     // Cleanup timers, etc. created on handleEnterMode
   }
 
-  handleInput(input, lastInput) {
+  handleInputs(input, lastInput) {
     const { maxPlayers } = this.game.config;
 
     let newSelection = null;

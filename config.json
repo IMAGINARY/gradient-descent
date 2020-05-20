@@ -2,6 +2,7 @@
   "defaultLanguage": "en",
   "useGamepads": true,
   "useScreenControls": true,
+  "useKeyboardControls": true,
   "maxPlayers": 4,
   "continuousGame": true,
   "debugControls": true
