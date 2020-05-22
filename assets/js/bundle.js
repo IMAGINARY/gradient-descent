@@ -655,6 +655,9 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
+// TODO: static properties of individual players should be defined globally, maybe even via CSS
+var playerColors = ['#0000FF', '#FF0000', '#00FF00', '#ffff00'];
+
 var PlayMode = /*#__PURE__*/function (_GameMode) {
   _inherits(PlayMode, _GameMode);
 
@@ -698,25 +701,35 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
     key: "handleEnterMode",
     value: function () {
       var _handleEnterMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
-        var _this$game, draw, numPlayers;
+        var _this = this;
+
+        var _this$game, draw, numPlayers, canvasWidth;
 
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 _this$game = this.game, draw = _this$game.draw, numPlayers = _this$game.numPlayers;
-                draw.line(0, 200, 1920, 200).stroke({
+                canvasWidth = 1920;
+                draw.line(0, 200, canvasWidth, 200).stroke({
                   color: '#9999ff',
-                  width: 2
-                });
-                this.boat = draw.use(this.shipSymbol).size(300, 200).stroke({
-                  color: '#ff0000',
-                  width: 2
-                }).fill('transparent').center(300, 165); // todo: remove (temporary)
+                  width: 10
+                }); // Create a boat for each player
 
-                window.myBoat = this.boat;
+                this.boats = Array(numPlayers).fill(null).map(function () {
+                  return draw.use(_this.shipSymbol);
+                }); // Set the boats properties
 
-              case 4:
+                this.boats.forEach(function (boat, playerIndex) {
+                  return boat.size(300, 200).stroke({
+                    color: playerColors[playerIndex % playerColors.length],
+                    width: 10
+                  }).fill('transparent').center(canvasWidth * ((playerIndex + 1) / (numPlayers + 1)), 165);
+                }); // todo: remove (temporary)
+
+                window.myBoats = this.boats;
+
+              case 6:
               case "end":
                 return _context2.stop();
             }
@@ -753,7 +766,15 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
     }()
   }, {
     key: "handleInputs",
-    value: function handleInputs(inputs, lastInputs, delta, ts) {// Move the boats or check if they're lowering the probe
+    value: function handleInputs(inputs, lastInputs, delta, ts) {
+      var _this2 = this;
+
+      // Move the boats or check if they're lowering the probe
+      var numPlayers = this.game.numPlayers;
+      inputs.slice(0, numPlayers) // discard inputs that don't belong to an active player
+      .forEach(function (input, playerIndex) {
+        return _this2.boats[playerIndex].dmove(delta * input.direction, 0);
+      });
     }
   }, {
     key: "draw",
@@ -1187,7 +1208,7 @@ var GradientDescentGame = /*#__PURE__*/function () {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                this.svgDoc = SVG().addTo(this.container).size(500, 500);
+                this.svgDoc = SVG().addTo(this.container).size(1920, 1080);
                 this.draw = this.svgDoc.nested();
                 this.overlay = document.createElement('div');
                 this.overlay.classList.add('overlay');

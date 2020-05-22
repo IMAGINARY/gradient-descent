@@ -39,7 +39,7 @@ export default class GradientDescentGame {
    * @return {Promise<void>}
    */
   async init() {
-    this.svgDoc = SVG().addTo(this.container).size(500, 500);
+    this.svgDoc = SVG().addTo(this.container).size(1920, 1080);
     this.draw = this.svgDoc.nested();
 
     this.overlay = document.createElement('div');

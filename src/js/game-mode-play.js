@@ -1,5 +1,13 @@
 import GameMode from './game-mode';
 
+// TODO: static properties of individual players should be defined globally, maybe even via CSS
+const playerColors = [
+  '#0000FF',
+  '#FF0000',
+  '#00FF00',
+  '#ffff00',
+];
+
 export default class PlayMode extends GameMode {
   async preLoadAssets() {
     this.shipSymbol = await this.game.loadSVGSymbol('assets/img/ship.svg');
@@ -7,15 +15,24 @@ export default class PlayMode extends GameMode {
 
   async handleEnterMode() {
     const { draw, numPlayers } = this.game;
+    const canvasWidth = 1920;
 
-    draw.line(0, 200, 1920, 200).stroke({ color: '#9999ff', width: 2 });
-    this.boat = draw.use(this.shipSymbol)
-      .size(300, 200)
-      .stroke({ color: '#ff0000', width: 2 })
+    draw.line(0, 200, canvasWidth, 200).stroke({ color: '#9999ff', width: 10 });
+
+    // Create a boat for each player
+    this.boats = Array(numPlayers)
+      .fill(null)
+      .map(() => draw.use(this.shipSymbol));
+
+    // Set the boats properties
+    this.boats.forEach((boat, playerIndex) => boat.size(300, 200)
+      .stroke({ color: playerColors[playerIndex % playerColors.length], width: 10 })
       .fill('transparent')
-      .center(300, 165);
+      .center(canvasWidth * ((playerIndex + 1) / (numPlayers + 1)), 165)
+    );
+
     // todo: remove (temporary)
-    window.myBoat = this.boat;
+    window.myBoats = this.boats;
   }
 
   async handleExitMode() {
@@ -24,6 +41,10 @@ export default class PlayMode extends GameMode {
 
   handleInputs(inputs, lastInputs, delta, ts) {
     // Move the boats or check if they're lowering the probe
+    const { numPlayers } = this.game;
+    inputs
+      .slice(0, numPlayers) // discard inputs that don't belong to an active player
+      .forEach((input, playerIndex) => this.boats[playerIndex].dmove(delta * input.direction, 0));
   }
 
   draw(delta, ts) {
