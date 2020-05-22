@@ -153,8 +153,9 @@ export default class GradientDescentGame {
     const gameLoop = (ts) => {
       if (!this.isPaused) {
         this.readInputs();
-        this.currentMode.handleInputs(this.inputs, this.inputsLast);
-        this.currentMode.draw(Math.min(ts - lastTs, MAX_DELTA), ts);
+        const delta = Math.min(ts - lastTs, MAX_DELTA);
+        this.currentMode.handleInputs(this.inputs, this.inputsLast, delta, ts);
+        this.currentMode.draw(delta, ts);
         lastTs = ts;
 
         window.requestAnimationFrame(gameLoop);

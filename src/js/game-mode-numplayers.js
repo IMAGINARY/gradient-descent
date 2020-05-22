@@ -30,15 +30,15 @@ export default class PlayerNumberMode extends GameMode {
     // Cleanup timers, etc. created on handleEnterMode
   }
 
-  handleInputs(input, lastInput) {
+  handleInputs(inputs, lastInputs, delta, ts) {
     const { maxPlayers } = this.game.config;
 
     let newSelection = null;
-    if (input.find((ctrl, i) => (
-      ctrl.direction === -1 && lastInput[i].direction !== -1))) {
+    if (inputs.find((ctrl, i) => (
+      ctrl.direction === -1 && lastInputs[i].direction !== -1))) {
       newSelection = Math.max(1, this.selectedNumber - 1);
-    } else if (input.find((ctrl, i) => (
-      ctrl.direction === 1 && lastInput[i].direction !== 1))) {
+    } else if (inputs.find((ctrl, i) => (
+      ctrl.direction === 1 && lastInputs[i].direction !== 1))) {
       newSelection = Math.min(maxPlayers, this.selectedNumber + 1);
     }
 
@@ -49,8 +49,8 @@ export default class PlayerNumberMode extends GameMode {
     }
 
     // If any button was pressed
-    if (input
-      .find((ctrl, i) => ctrl.action && !lastInput[i].action)) {
+    if (inputs
+      .find((ctrl, i) => ctrl.action && !lastInputs[i].action)) {
       this.game.numPlayers = this.selectedNumber;
       this.triggerEvent('done');
     }

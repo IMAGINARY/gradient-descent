@@ -576,16 +576,16 @@ var PlayerNumberMode = /*#__PURE__*/function (_GameMode) {
     }()
   }, {
     key: "handleInputs",
-    value: function handleInputs(input, lastInput) {
+    value: function handleInputs(inputs, lastInputs, delta, ts) {
       var maxPlayers = this.game.config.maxPlayers;
       var newSelection = null;
 
-      if (input.find(function (ctrl, i) {
-        return ctrl.direction === -1 && lastInput[i].direction !== -1;
+      if (inputs.find(function (ctrl, i) {
+        return ctrl.direction === -1 && lastInputs[i].direction !== -1;
       })) {
         newSelection = Math.max(1, this.selectedNumber - 1);
-      } else if (input.find(function (ctrl, i) {
-        return ctrl.direction === 1 && lastInput[i].direction !== 1;
+      } else if (inputs.find(function (ctrl, i) {
+        return ctrl.direction === 1 && lastInputs[i].direction !== 1;
       })) {
         newSelection = Math.min(maxPlayers, this.selectedNumber + 1);
       }
@@ -597,8 +597,8 @@ var PlayerNumberMode = /*#__PURE__*/function (_GameMode) {
       } // If any button was pressed
 
 
-      if (input.find(function (ctrl, i) {
-        return ctrl.action && !lastInput[i].action;
+      if (inputs.find(function (ctrl, i) {
+        return ctrl.action && !lastInputs[i].action;
       })) {
         this.game.numPlayers = this.selectedNumber;
         this.triggerEvent('done');
@@ -753,7 +753,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
     }()
   }, {
     key: "handleInputs",
-    value: function handleInputs(input, lastInput) {// Move the boats or check if they're lowering the probe
+    value: function handleInputs(inputs, lastInputs, delta, ts) {// Move the boats or check if they're lowering the probe
     }
   }, {
     key: "draw",
@@ -916,10 +916,10 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
     }()
   }, {
     key: "handleInputs",
-    value: function handleInputs(input, lastInput) {
+    value: function handleInputs(inputs, lastInputs, delta, ts0) {
       // If any button was pressed
-      if (input.find(function (ctrl, i) {
-        return ctrl.action && !lastInput[i].action;
+      if (inputs.find(function (ctrl, i) {
+        return ctrl.action && !lastInputs[i].action;
       })) {
         this.triggerEvent('done');
       }
@@ -1072,17 +1072,22 @@ var GameMode = /*#__PURE__*/function () {
      * - direction {integer}: Either -1, 0 or 1.
      * - action {bool}
      *
-     * @param {[{direction: Number, action: Boolean}]} input
-     * @param {[{direction: Number, action: Boolean}]} lastInput
+     * @param {[{direction: Number, action: Boolean}]} inputs
+     * @param {[{direction: Number, action: Boolean}]} lastInputs
+     * @param {Number} delta
+     *  Amount of milliseconds since the last call (capped to a maximum)
+     * @param {Number} ts
+     *  Timestamp received via requestAnimationFrame
+      *
      */
 
   }, {
     key: "handleInputs",
-    value: function handleInputs(input, lastInput) {}
+    value: function handleInputs(inputs, lastInputs, delta, ts) {}
     /**
      * Called once per frame so the mode can draw based on the game's state
      *
-     * @param {Number }delta
+     * @param {Number} delta
      *  Amount of milliseconds since the last call (capped to a maximum)
      * @param {Number} ts
      *  Timestamp received via requestAnimationFrame
@@ -1393,9 +1398,11 @@ var GradientDescentGame = /*#__PURE__*/function () {
         if (!_this.isPaused) {
           _this.readInputs();
 
-          _this.currentMode.handleInputs(_this.inputs, _this.inputsLast);
+          var delta = Math.min(ts - lastTs, MAX_DELTA);
 
-          _this.currentMode.draw(Math.min(ts - lastTs, MAX_DELTA), ts);
+          _this.currentMode.handleInputs(_this.inputs, _this.inputsLast, delta, ts);
+
+          _this.currentMode.draw(delta, ts);
 
           lastTs = ts;
           window.requestAnimationFrame(gameLoop);

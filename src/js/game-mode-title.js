@@ -31,10 +31,10 @@ export default class TitleMode extends GameMode {
     // Cleanup timers, etc. created on handleEnterMode
   }
 
-  handleInputs(input, lastInput) {
+  handleInputs(inputs, lastInputs, delta, ts0) {
     // If any button was pressed
-    if (input
-      .find((ctrl, i) => ctrl.action && !lastInput[i].action)) {
+    if (inputs
+      .find((ctrl, i) => ctrl.action && !lastInputs[i].action)) {
       this.triggerEvent('done');
     }
   }

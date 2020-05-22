@@ -59,17 +59,23 @@ export default class GameMode {
    * - direction {integer}: Either -1, 0 or 1.
    * - action {bool}
    *
-   * @param {[{direction: Number, action: Boolean}]} input
-   * @param {[{direction: Number, action: Boolean}]} lastInput
+   * @param {[{direction: Number, action: Boolean}]} inputs
+   * @param {[{direction: Number, action: Boolean}]} lastInputs
+   * @param {Number} delta
+   *  Amount of milliseconds since the last call (capped to a maximum)
+   * @param {Number} ts
+   *  Timestamp received via requestAnimationFrame
+
+   *
    */
-  handleInputs(input, lastInput) {
+  handleInputs(inputs, lastInputs, delta, ts) {
 
   }
 
   /**
    * Called once per frame so the mode can draw based on the game's state
    *
-   * @param {Number }delta
+   * @param {Number} delta
    *  Amount of milliseconds since the last call (capped to a maximum)
    * @param {Number} ts
    *  Timestamp received via requestAnimationFrame

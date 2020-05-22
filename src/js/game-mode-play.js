@@ -22,7 +22,7 @@ export default class PlayMode extends GameMode {
     // Cleanup timers, etc. created on handleEnterMode
   }
 
-  handleInputs(input, lastInput) {
+  handleInputs(inputs, lastInputs, delta, ts) {
     // Move the boats or check if they're lowering the probe
   }
 
