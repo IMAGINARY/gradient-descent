@@ -1413,13 +1413,16 @@ var GradientDescentGame = /*#__PURE__*/function () {
       var _this = this;
 
       var lastTs = 0;
+      var lag = 0;
       var MAX_DELTA = 125;
 
       var gameLoop = function gameLoop(ts) {
         if (!_this.isPaused) {
           _this.readInputs();
 
-          var delta = Math.min(ts - lastTs, MAX_DELTA);
+          lag += Math.max(0, ts - lag - lastTs - MAX_DELTA);
+          ts -= lag;
+          var delta = ts - lastTs;
 
           _this.currentMode.handleInputs(_this.inputs, _this.inputsLast, delta, ts);
 
