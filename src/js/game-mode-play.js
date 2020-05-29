@@ -1,8 +1,15 @@
 import GameMode from './game-mode';
+import terrain from './terrain';
 import * as waves from './waves';
 
 const WATER_HEIGHT_SCALE = 10;
 const NUM_WATER_POINTS = 300;
+
+const TERRAIN_HEIGHT_SCALE = 300;
+const NUM_TERRAIN_POINTS = 300;
+const MAX_TERRAIN_EXTREMA = 20;
+const TERRAIN_MARGIN_WIDTH = 0.1;
+const TERRAIN_DISTANCE = 300;
 
 export default class PlayMode extends GameMode {
 
@@ -38,6 +45,13 @@ export default class PlayMode extends GameMode {
       .addClass('water')
       .scale(draw.width(), WATER_HEIGHT_SCALE, 0, 0);
 
+    const terrainOptions = { marginWidth: TERRAIN_MARGIN_WIDTH };
+    const terrainHeights = terrain(MAX_TERRAIN_EXTREMA, NUM_TERRAIN_POINTS, terrainOptions);
+    const terrainPoints = terrainHeights.map((h, i) => [i / (terrainHeights.length - 1), h]);
+    this.ground = group.polyline(terrainPoints)
+      .addClass('ground')
+      .scale(draw.width(), TERRAIN_HEIGHT_SCALE, 0, 0)
+      .translate(0, TERRAIN_DISTANCE);
   }
 
   async handleExitMode() {
@@ -47,8 +61,8 @@ export default class PlayMode extends GameMode {
   handleInputs(inputs, lastInputs, delta, ts) {
     // Move the boats or check if they're lowering the probe
     const { draw, numPlayers } = this.game;
-    const leftMargin = 0.1 * draw.width();
-    const rightMargin = 0.9 * draw.width();
+    const leftMargin = TERRAIN_MARGIN_WIDTH * draw.width();
+    const rightMargin = (1.0 - TERRAIN_MARGIN_WIDTH) * draw.width();
     inputs
       .slice(0, numPlayers) // discard inputs that don't belong to an active player
       .forEach((input, playerIndex) => {

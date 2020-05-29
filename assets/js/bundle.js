@@ -627,6 +627,8 @@ exports["default"] = void 0;
 
 var _gameMode = _interopRequireDefault(require("./game-mode"));
 
+var _terrain = _interopRequireDefault(require("./terrain"));
+
 var waves = _interopRequireWildcard(require("./waves"));
 
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
@@ -663,6 +665,11 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 
 var WATER_HEIGHT_SCALE = 10;
 var NUM_WATER_POINTS = 300;
+var TERRAIN_HEIGHT_SCALE = 300;
+var NUM_TERRAIN_POINTS = 300;
+var MAX_TERRAIN_EXTREMA = 20;
+var TERRAIN_MARGIN_WIDTH = 0.1;
+var TERRAIN_DISTANCE = 300;
 
 var PlayMode = /*#__PURE__*/function (_GameMode) {
   _inherits(PlayMode, _GameMode);
@@ -718,7 +725,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       var _handleEnterMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
         var _this2 = this;
 
-        var _this$game, draw, numPlayers, group;
+        var _this$game, draw, numPlayers, group, terrainOptions, terrainHeights, terrainPoints;
 
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
@@ -735,8 +742,16 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                   return boat.size(300, 200).addClass("boat-".concat(playerIndex)).center(draw.width() * ((playerIndex + 1) / (numPlayers + 1)), -35);
                 });
                 this.water = group.polyline(this.wavesPoints(0)).addClass('water').scale(draw.width(), WATER_HEIGHT_SCALE, 0, 0);
+                terrainOptions = {
+                  marginWidth: TERRAIN_MARGIN_WIDTH
+                };
+                terrainHeights = (0, _terrain["default"])(MAX_TERRAIN_EXTREMA, NUM_TERRAIN_POINTS, terrainOptions);
+                terrainPoints = terrainHeights.map(function (h, i) {
+                  return [i / (terrainHeights.length - 1), h];
+                });
+                this.ground = group.polyline(terrainPoints).addClass('ground').scale(draw.width(), TERRAIN_HEIGHT_SCALE, 0, 0).translate(0, TERRAIN_DISTANCE);
 
-              case 5:
+              case 9:
               case "end":
                 return _context2.stop();
             }
@@ -780,8 +795,8 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       var _this$game2 = this.game,
           draw = _this$game2.draw,
           numPlayers = _this$game2.numPlayers;
-      var leftMargin = 0.1 * draw.width();
-      var rightMargin = 0.9 * draw.width();
+      var leftMargin = TERRAIN_MARGIN_WIDTH * draw.width();
+      var rightMargin = (1.0 - TERRAIN_MARGIN_WIDTH) * draw.width();
       inputs.slice(0, numPlayers) // discard inputs that don't belong to an active player
       .forEach(function (input, playerIndex) {
         var cx = _this3.boats[playerIndex].cx() + delta * input.direction;
@@ -823,7 +838,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = PlayMode;
 
-},{"./game-mode":8,"./waves":11}],7:[function(require,module,exports){
+},{"./game-mode":8,"./terrain":11,"./waves":12}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -988,7 +1003,7 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = TitleMode;
 
-},{"./game-mode":8,"./wavy-animation":12}],8:[function(require,module,exports){
+},{"./game-mode":8,"./wavy-animation":13}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1168,7 +1183,7 @@ var GameMode = /*#__PURE__*/function () {
 
 exports["default"] = GameMode;
 
-},{"events":13}],9:[function(require,module,exports){
+},{"events":14}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1764,6 +1779,137 @@ function _loadConfig() {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports["default"] = terrain;
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(n); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+function smoothChaikin(arr, num) {
+  var open = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : true;
+  if (num === 0) return arr;
+  var l = arr.length;
+  var smooth = arr.map(function (c, i) {
+    return [[0.75 * c[0] + 0.25 * arr[(i + 1) % l][0], 0.75 * c[1] + 0.25 * arr[(i + 1) % l][1]], [0.25 * c[0] + 0.75 * arr[(i + 1) % l][0], 0.25 * c[1] + 0.75 * arr[(i + 1) % l][1]]];
+  }).flat();
+
+  if (open) {
+    smooth.length -= 1;
+    smooth[0] = arr[0];
+    smooth[smooth.length - 1] = arr[arr.length - 1];
+  }
+
+  return smoothChaikin(smooth, num - 1, open);
+}
+
+function subdivide(length, leftHeight, rightHeight) {
+  return {
+    index: Math.floor(length * Math.random()),
+    height: Math.max(leftHeight, rightHeight) * Math.random()
+  };
+}
+
+function generateInnerTerrainHeights(heights, leftHeight, rightHeight) {
+  if (heights.length > 0) {
+    var _subdivide = subdivide(heights.length, leftHeight, rightHeight),
+        index = _subdivide.index,
+        height = _subdivide.height;
+
+    heights[index] = height;
+    generateInnerTerrainHeights(heights.subarray(0, index), leftHeight, height);
+    generateInnerTerrainHeights(heights.subarray(index + 1, heights.length), height, rightHeight);
+  }
+
+  return heights;
+}
+
+function generateTerrainPoints(numPoints) {
+  var marginWidth = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : 0.1;
+  var marginHeight = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 0.2;
+  var jitter = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 0.25;
+  var heights = new Float32Array(numPoints);
+  var marginIndices = [Math.floor(marginWidth * numPoints), Math.floor(marginWidth + (1 - 2 * marginWidth) * numPoints)];
+  var predefinedHeights = [[0, Math.random() * marginHeight], [marginIndices[0], marginHeight], [marginIndices[0] + 1 + Math.floor(Math.random() * (marginIndices[1] - marginIndices[0])), 1.0], [marginIndices[1], marginHeight], [numPoints - 1, Math.random() * marginHeight]];
+
+  if (numPoints > 0) {
+    predefinedHeights.forEach(function (_ref) {
+      var _ref2 = _slicedToArray(_ref, 2),
+          i = _ref2[0],
+          h = _ref2[1];
+
+      return heights[i] = h;
+    });
+    predefinedHeights.reduce(function (_ref3, _ref4) {
+      var _ref5 = _slicedToArray(_ref3, 2),
+          i0 = _ref5[0],
+          h0 = _ref5[1];
+
+      var _ref6 = _slicedToArray(_ref4, 2),
+          i1 = _ref6[0],
+          h1 = _ref6[1];
+
+      generateInnerTerrainHeights(heights.subarray(i0 + 1, i1), h0, h1);
+      return [i1, h1];
+    });
+  } // restrict jitter range to prevent points from switching their order
+
+
+  jitter = Math.max(0.0, Math.min(jitter, 1.0));
+  return new Array(heights.length).fill(null).map(function (_, i) {
+    return [(i + jitter * (Math.random() - 0.5)) / (heights.length - 1), heights[i]];
+  });
+}
+
+function convertPointsToHeights(points, numHeights) {
+  var left = points[0][0];
+  var right = points[points.length - 1][0];
+  var width = right - left;
+  var heights = Array(numHeights);
+  var j = 0;
+
+  for (var i = 0; i < heights.length - 1; ++i) {
+    while (i >= (numHeights - 1) * (points[j][0] - left) / width) {
+      ++j;
+    }
+
+    var t = (left + i / (numHeights - 1) * width - points[j - 1][0]) / (points[j][0] - points[j - 1][0]);
+    heights[i] = points[j - 1][1] + (points[j][1] - points[j - 1][1]) * t;
+  }
+
+  heights[heights.length - 1] = points[points.length - 1][1];
+  return heights;
+}
+
+var defaultOptions = {
+  marginWidth: 0.1,
+  marginHeight: 0.1,
+  jitter: 0.25,
+  smoothing: 6
+};
+
+function terrain(numSamples, length) {
+  var options = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : {};
+  options = Object.assign({}, defaultOptions, options);
+  var roughTerrainPoints = generateTerrainPoints(numSamples, options.marginWidth, options.marginHeight, options.jitter);
+  var smoothTerrainPoints = smoothChaikin(roughTerrainPoints, options.smoothing);
+  var smoothTerrainHeights = convertPointsToHeights(smoothTerrainPoints, length);
+  return smoothTerrainHeights;
+}
+
+},{}],12:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports.height = height;
 exports.slope = slope;
 exports.heights = heights;
@@ -1794,7 +1940,7 @@ function points(arr, ts) {
   return arr;
 }
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1883,7 +2029,7 @@ function WavyAnimation(shape) {
   };
 }
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
