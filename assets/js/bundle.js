@@ -1696,25 +1696,26 @@ function _loadConfig() {
           case 10:
             // eslint-disable-next-line no-unused-vars
             game = new _game["default"](document.querySelector('.main'), config);
-            _context.next = 13;
+            window.game = game;
+            _context.next = 14;
             return game.init();
 
-          case 13:
-            _context.next = 18;
+          case 14:
+            _context.next = 19;
             break;
 
-          case 15:
-            _context.prev = 15;
+          case 16:
+            _context.prev = 16;
             _context.t4 = _context["catch"](0);
             // eslint-disable-next-line no-console
             console.error(_context.t4);
 
-          case 18:
+          case 19:
           case "end":
             return _context.stop();
         }
       }
-    }, _callee, null, [[0, 15]]);
+    }, _callee, null, [[0, 16]]);
   }));
 
   function main() {
