@@ -180,4 +180,27 @@ body {
       top: 5vh;
       left: 0; }
 
+.play {
+  stroke-width: 3;
+  fill: none; }
+
+.boat, .boat-0, .boat-1, .boat-2, .boat-3 {
+  fill: none; }
+  .boat-0 {
+    stroke: #2197ff; }
+  .boat-1 {
+    stroke: #ff2d2d; }
+  .boat-2 {
+    stroke: #29da29; }
+  .boat-3 {
+    stroke: #ffec02; }
+
+.water {
+  stroke: #9999ff;
+  vector-effect: non-scaling-stroke; }
+
+.ground {
+  stroke: #ffe699;
+  vector-effect: non-scaling-stroke; }
+
 /*# sourceMappingURL=default.css.map */

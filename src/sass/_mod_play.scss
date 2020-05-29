@@ -1,0 +1,40 @@
+@import "colors";
+
+.play {
+  stroke-width: 3;
+  fill: none;
+}
+
+.boat {
+  fill: none;
+
+  &-0 {
+    @extend .boat;
+    stroke: $color-blue;
+  }
+
+  &-1 {
+    @extend .boat;
+    stroke: $color-red;
+  }
+
+  &-2 {
+    @extend .boat;
+    stroke: $color-green;
+  }
+
+  &-3 {
+    @extend .boat;
+    stroke: $color-yellow;
+  }
+}
+
+.water {
+  stroke: $color-water;
+  vector-effect: non-scaling-stroke;
+}
+
+.ground {
+  stroke: $color-ground;
+  vector-effect: non-scaling-stroke;
+}

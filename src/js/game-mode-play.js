@@ -1,12 +1,5 @@
 import GameMode from './game-mode';
 
-// TODO: static properties of individual players should be defined globally, maybe even via CSS
-const playerColors = [
-  '#0000FF',
-  '#FF0000',
-  '#00FF00',
-  '#ffff00',
-];
 
 export default class PlayMode extends GameMode {
   async preLoadAssets() {
@@ -15,24 +8,26 @@ export default class PlayMode extends GameMode {
 
   async handleEnterMode() {
     const { draw, numPlayers } = this.game;
-    const canvasWidth = 1920;
 
-    draw.line(0, 200, canvasWidth, 200).stroke({ color: '#9999ff', width: 10 });
+    const group = draw.group()
+      .addClass('play')
+      .translate(0, 200);
 
     // Create a boat for each player
     this.boats = Array(numPlayers)
       .fill(null)
-      .map(() => draw.use(this.shipSymbol));
+      .map(() => group.use(this.shipSymbol));
 
     // Set the boats properties
     this.boats.forEach((boat, playerIndex) => boat.size(300, 200)
-      .stroke({ color: playerColors[playerIndex % playerColors.length], width: 10 })
-      .fill('transparent')
-      .center(canvasWidth * ((playerIndex + 1) / (numPlayers + 1)), 165)
+      .addClass(`boat-${playerIndex}`)
+      .center(draw.width() * ((playerIndex + 1) / (numPlayers + 1)), -35)
     );
 
     // todo: remove (temporary)
     window.myBoats = this.boats;
+    group.line(0, 0, draw.width(), 0)
+      .addClass('water');
   }
 
   async handleExitMode() {

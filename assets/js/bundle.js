@@ -655,9 +655,6 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
-// TODO: static properties of individual players should be defined globally, maybe even via CSS
-var playerColors = ['#0000FF', '#FF0000', '#00FF00', '#ffff00'];
-
 var PlayMode = /*#__PURE__*/function (_GameMode) {
   _inherits(PlayMode, _GameMode);
 
@@ -703,31 +700,25 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       var _handleEnterMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
         var _this = this;
 
-        var _this$game, draw, numPlayers, canvasWidth;
+        var _this$game, draw, numPlayers, group;
 
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 _this$game = this.game, draw = _this$game.draw, numPlayers = _this$game.numPlayers;
-                canvasWidth = 1920;
-                draw.line(0, 200, canvasWidth, 200).stroke({
-                  color: '#9999ff',
-                  width: 10
-                }); // Create a boat for each player
+                group = draw.group().addClass('play').translate(0, 200); // Create a boat for each player
 
                 this.boats = Array(numPlayers).fill(null).map(function () {
-                  return draw.use(_this.shipSymbol);
+                  return group.use(_this.shipSymbol);
                 }); // Set the boats properties
 
                 this.boats.forEach(function (boat, playerIndex) {
-                  return boat.size(300, 200).stroke({
-                    color: playerColors[playerIndex % playerColors.length],
-                    width: 10
-                  }).fill('transparent').center(canvasWidth * ((playerIndex + 1) / (numPlayers + 1)), 165);
+                  return boat.size(300, 200).addClass("boat-".concat(playerIndex)).center(draw.width() * ((playerIndex + 1) / (numPlayers + 1)), -35);
                 }); // todo: remove (temporary)
 
                 window.myBoats = this.boats;
+                group.line(0, 0, draw.width(), 0).addClass('water');
 
               case 6:
               case "end":
