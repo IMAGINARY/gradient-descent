@@ -1,7 +1,17 @@
 import GameMode from './game-mode';
+import * as waves from './waves';
 
+const WATER_HEIGHT_SCALE = 10;
+const NUM_WATER_POINTS = 300;
 
 export default class PlayMode extends GameMode {
+
+  constructor(game) {
+    super(game);
+    const wavesPoints = Array(NUM_WATER_POINTS).fill(null);
+    this.wavesPoints = ts => waves.points(wavesPoints, ts);
+  }
+
   async preLoadAssets() {
     this.shipSymbol = await this.game.loadSVGSymbol('assets/img/ship.svg');
   }
@@ -23,11 +33,11 @@ export default class PlayMode extends GameMode {
       .addClass(`boat-${playerIndex}`)
       .center(draw.width() * ((playerIndex + 1) / (numPlayers + 1)), -35)
     );
+    
+    this.water = group.polyline(this.wavesPoints(0))
+      .addClass('water')
+      .scale(draw.width(), WATER_HEIGHT_SCALE, 0, 0);
 
-    // todo: remove (temporary)
-    window.myBoats = this.boats;
-    group.line(0, 0, draw.width(), 0)
-      .addClass('water');
   }
 
   async handleExitMode() {
@@ -47,5 +57,19 @@ export default class PlayMode extends GameMode {
     // Move boats
     // Draw bottom
     // etc...
+
+    this.water.plot(this.wavesPoints(ts));
+
+    this.boats.forEach((boat, playerIndex) => {
+      const x = boat.cx() / draw.width();
+      const y = WATER_HEIGHT_SCALE * waves.height(x, ts);
+      const slope = WATER_HEIGHT_SCALE * waves.slope(x, ts);
+      const angle = 0.25 * 180 * Math.atan2(slope, draw.width()) / Math.PI;
+      const transform = {
+        translateY: y,
+        rotate: angle,
+      };
+      boat.transform(transform);
+    });
   }
 }

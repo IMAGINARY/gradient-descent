@@ -627,6 +627,12 @@ exports["default"] = void 0;
 
 var _gameMode = _interopRequireDefault(require("./game-mode"));
 
+var waves = _interopRequireWildcard(require("./waves"));
+
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -655,15 +661,27 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
+var WATER_HEIGHT_SCALE = 10;
+var NUM_WATER_POINTS = 300;
+
 var PlayMode = /*#__PURE__*/function (_GameMode) {
   _inherits(PlayMode, _GameMode);
 
   var _super = _createSuper(PlayMode);
 
-  function PlayMode() {
+  function PlayMode(game) {
+    var _this;
+
     _classCallCheck(this, PlayMode);
 
-    return _super.apply(this, arguments);
+    _this = _super.call(this, game);
+    var wavesPoints = Array(NUM_WATER_POINTS).fill(null);
+
+    _this.wavesPoints = function (ts) {
+      return waves.points(wavesPoints, ts);
+    };
+
+    return _this;
   }
 
   _createClass(PlayMode, [{
@@ -698,7 +716,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
     key: "handleEnterMode",
     value: function () {
       var _handleEnterMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
-        var _this = this;
+        var _this2 = this;
 
         var _this$game, draw, numPlayers, group;
 
@@ -710,17 +728,15 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 group = draw.group().addClass('play').translate(0, 200); // Create a boat for each player
 
                 this.boats = Array(numPlayers).fill(null).map(function () {
-                  return group.use(_this.shipSymbol);
+                  return group.use(_this2.shipSymbol);
                 }); // Set the boats properties
 
                 this.boats.forEach(function (boat, playerIndex) {
                   return boat.size(300, 200).addClass("boat-".concat(playerIndex)).center(draw.width() * ((playerIndex + 1) / (numPlayers + 1)), -35);
-                }); // todo: remove (temporary)
+                });
+                this.water = group.polyline(this.wavesPoints(0)).addClass('water').scale(draw.width(), WATER_HEIGHT_SCALE, 0, 0);
 
-                window.myBoats = this.boats;
-                group.line(0, 0, draw.width(), 0).addClass('water');
-
-              case 6:
+              case 5:
               case "end":
                 return _context2.stop();
             }
@@ -758,13 +774,13 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
   }, {
     key: "handleInputs",
     value: function handleInputs(inputs, lastInputs, delta, ts) {
-      var _this2 = this;
+      var _this3 = this;
 
       // Move the boats or check if they're lowering the probe
       var numPlayers = this.game.numPlayers;
       inputs.slice(0, numPlayers) // discard inputs that don't belong to an active player
       .forEach(function (input, playerIndex) {
-        return _this2.boats[playerIndex].dmove(delta * input.direction, 0);
+        return _this3.boats[playerIndex].dmove(delta * input.direction, 0);
       });
     }
   }, {
@@ -775,6 +791,19 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
           numPlayers = _this$game2.numPlayers; // Move boats
       // Draw bottom
       // etc...
+
+      this.water.plot(this.wavesPoints(ts));
+      this.boats.forEach(function (boat, playerIndex) {
+        var x = boat.cx() / draw.width();
+        var y = WATER_HEIGHT_SCALE * waves.height(x, ts);
+        var slope = WATER_HEIGHT_SCALE * waves.slope(x, ts);
+        var angle = 0.25 * 180 * Math.atan2(slope, draw.width()) / Math.PI;
+        var transform = {
+          translateY: y,
+          rotate: angle
+        };
+        boat.transform(transform);
+      });
     }
   }]);
 
@@ -783,7 +812,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = PlayMode;
 
-},{"./game-mode":8}],7:[function(require,module,exports){
+},{"./game-mode":8,"./waves":11}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -948,7 +977,7 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = TitleMode;
 
-},{"./game-mode":8,"./wavy-animation":11}],8:[function(require,module,exports){
+},{"./game-mode":8,"./wavy-animation":12}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1128,7 +1157,7 @@ var GameMode = /*#__PURE__*/function () {
 
 exports["default"] = GameMode;
 
-},{"events":12}],9:[function(require,module,exports){
+},{"events":13}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1724,6 +1753,42 @@ function _loadConfig() {
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports.height = height;
+exports.slope = slope;
+exports.heights = heights;
+exports.points = points;
+
+function height(x, ts) {
+  ts = ts / 500;
+  return (Math.sin(x * 100 + ts) + Math.sin(x * 50 - 1 * ts) + Math.sin(x * 30 + 2 * ts) + Math.sin(x * 10 - 3 * ts)) / 4;
+}
+
+function slope(x, ts) {
+  ts = ts / 500;
+  return (100 * Math.cos(100 * x + ts) + 50 * Math.cos(50 * x - ts) + 30 * Math.cos(30 * x + 2 * ts) + 10 * Math.cos(10 * x - 3 * ts)) / 4;
+}
+
+function heights(arr, ts) {
+  arr.forEach(function (_, i) {
+    return arr[i] = height(i / (arr.length - 1), ts);
+  });
+  return arr;
+}
+
+function points(arr, ts) {
+  arr.forEach(function (_, i) {
+    var x = i / (arr.length - 1);
+    arr[i] = [x, height(x, ts)];
+  });
+  return arr;
+}
+
+},{}],12:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports["default"] = WavyAnimation;
 
 function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
@@ -1807,7 +1872,7 @@ function WavyAnimation(shape) {
   };
 }
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
