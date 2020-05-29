@@ -33,7 +33,7 @@ export default class PlayMode extends GameMode {
       .addClass(`boat-${playerIndex}`)
       .center(draw.width() * ((playerIndex + 1) / (numPlayers + 1)), -35)
     );
-    
+
     this.water = group.polyline(this.wavesPoints(0))
       .addClass('water')
       .scale(draw.width(), WATER_HEIGHT_SCALE, 0, 0);
@@ -46,10 +46,17 @@ export default class PlayMode extends GameMode {
 
   handleInputs(inputs, lastInputs, delta, ts) {
     // Move the boats or check if they're lowering the probe
-    const { numPlayers } = this.game;
+    const { draw, numPlayers } = this.game;
+    const leftMargin = 0.1 * draw.width();
+    const rightMargin = 0.9 * draw.width();
     inputs
       .slice(0, numPlayers) // discard inputs that don't belong to an active player
-      .forEach((input, playerIndex) => this.boats[playerIndex].dmove(delta * input.direction, 0));
+      .forEach((input, playerIndex) => {
+        const cx = this.boats[playerIndex].cx() + delta * input.direction;
+        this.boats[playerIndex].cx(Math.min(Math.max(leftMargin, cx), rightMargin));
+        if (input.direction !== 0)
+          this.boats[playerIndex].attr({ 'data-flip': input.direction === -1 })
+      });
   }
 
   draw(delta, ts) {
@@ -69,6 +76,8 @@ export default class PlayMode extends GameMode {
         translateY: y,
         rotate: angle,
       };
+      if (boat.attr('data-flip') === 'true')
+        transform.flip = 'x';
       boat.transform(transform);
     });
   }

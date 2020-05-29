@@ -777,18 +777,28 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       var _this3 = this;
 
       // Move the boats or check if they're lowering the probe
-      var numPlayers = this.game.numPlayers;
+      var _this$game2 = this.game,
+          draw = _this$game2.draw,
+          numPlayers = _this$game2.numPlayers;
+      var leftMargin = 0.1 * draw.width();
+      var rightMargin = 0.9 * draw.width();
       inputs.slice(0, numPlayers) // discard inputs that don't belong to an active player
       .forEach(function (input, playerIndex) {
-        return _this3.boats[playerIndex].dmove(delta * input.direction, 0);
+        var cx = _this3.boats[playerIndex].cx() + delta * input.direction;
+
+        _this3.boats[playerIndex].cx(Math.min(Math.max(leftMargin, cx), rightMargin));
+
+        if (input.direction !== 0) _this3.boats[playerIndex].attr({
+          'data-flip': input.direction === -1
+        });
       });
     }
   }, {
     key: "draw",
     value: function draw(delta, ts) {
-      var _this$game2 = this.game,
-          draw = _this$game2.draw,
-          numPlayers = _this$game2.numPlayers; // Move boats
+      var _this$game3 = this.game,
+          draw = _this$game3.draw,
+          numPlayers = _this$game3.numPlayers; // Move boats
       // Draw bottom
       // etc...
 
@@ -802,6 +812,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
           translateY: y,
           rotate: angle
         };
+        if (boat.attr('data-flip') === 'true') transform.flip = 'x';
         boat.transform(transform);
       });
     }
