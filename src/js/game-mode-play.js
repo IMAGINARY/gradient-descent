@@ -14,6 +14,8 @@ const TERRAIN_DISTANCE = 300;
 // How far should the boat move on user input per ms
 const SPEED_FACTOR = 0.2 / 1000.0;
 
+const PROBE_SIZE = 10;
+
 export default class PlayMode extends GameMode {
 
   constructor(game) {
@@ -47,9 +49,15 @@ export default class PlayMode extends GameMode {
         boat.size(300, 200)
           .center(0, -35)
 
+        const probe = group.group();
+        probe.line(0, 20, 0, 100 - PROBE_SIZE / 2);
+        probe.circle(PROBE_SIZE)
+          .center(0, 100);
+
         return {
           group: group,
           boat: boat,
+          probe: probe,
           x: x,
           flipX: false,
         };

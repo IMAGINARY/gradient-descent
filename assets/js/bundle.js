@@ -672,6 +672,7 @@ var TERRAIN_MARGIN_WIDTH = 0.1;
 var TERRAIN_DISTANCE = 300; // How far should the boat move on user input per ms
 
 var SPEED_FACTOR = 0.2 / 1000.0;
+var PROBE_SIZE = 10;
 
 var PlayMode = /*#__PURE__*/function (_GameMode) {
   _inherits(PlayMode, _GameMode);
@@ -744,9 +745,13 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                   });
                   var boat = group.use(_this2.shipSymbol);
                   boat.size(300, 200).center(0, -35);
+                  var probe = group.group();
+                  probe.line(0, 20, 0, 100 - PROBE_SIZE / 2);
+                  probe.circle(PROBE_SIZE).center(0, 100);
                   return {
                     group: group,
                     boat: boat,
+                    probe: probe,
                     x: x,
                     flipX: false
                   };
