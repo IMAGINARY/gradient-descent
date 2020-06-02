@@ -82,11 +82,24 @@ export default class PlayMode extends GameMode {
     const terrainOptions = { marginWidth: TERRAIN_MARGIN_WIDTH };
     const terrainHeights = terrain(MAX_TERRAIN_EXTREMA, NUM_TERRAIN_POINTS, terrainOptions);
     const terrainPoints = terrainHeights.map((h, i) => [i / (terrainHeights.length - 1), h]);
+    this.terrainHeights = terrainHeights;
+    this.treasureLocation = this.locateTreasure();
+
+    const behindGroundGroup = this.groundGroup.group();
+    const treasure = behindGroundGroup.rect(40, 20)
+      .move(-20, -20)
+      .fill('red')
+      .transform({
+        translateX: this.treasureLocation.x * draw.width(),
+        translateY: TERRAIN_DISTANCE + this.treasureLocation.y * TERRAIN_HEIGHT_SCALE,
+      });
+
     this.ground = this.groundGroup.polyline(terrainPoints)
       .addClass('ground')
       .scale(draw.width(), TERRAIN_HEIGHT_SCALE, 0, 0)
       .translate(0, TERRAIN_DISTANCE);
-    this.terrainHeights = terrainHeights;
+
+    behindGroundGroup.clipWith(this.groundGroup.use(this.ground));
 
     this.groundClip = this.groundGroup.clip();
     this.groundGroup.clipWith(this.groundClip);
@@ -160,6 +173,15 @@ export default class PlayMode extends GameMode {
     const h1 = this.terrainHeights[i1];
     const t = xInArray - i0;
     return h0 + t * (h1 - h0);
+  }
+
+  locateTreasure() {
+    const argmax = array => [].reduce.call(array, (m, c, i, arr) => c > arr[m] ? i : m, 0);
+    const treasureIndex = argmax(this.terrainHeights);
+    return {
+      x: treasureIndex / (this.terrainHeights.length - 1),
+      y: this.terrainHeights[treasureIndex],
+    }
   }
 
   addGroundClip(x) {

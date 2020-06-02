@@ -732,7 +732,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       var _handleEnterMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
         var _this2 = this;
 
-        var _this$game, draw, numPlayers, modeGroup, terrainOptions, terrainHeights, terrainPoints;
+        var _this$game, draw, numPlayers, modeGroup, terrainOptions, terrainHeights, terrainPoints, behindGroundGroup, treasure;
 
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
@@ -777,12 +777,19 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 terrainPoints = terrainHeights.map(function (h, i) {
                   return [i / (terrainHeights.length - 1), h];
                 });
-                this.ground = this.groundGroup.polyline(terrainPoints).addClass('ground').scale(draw.width(), TERRAIN_HEIGHT_SCALE, 0, 0).translate(0, TERRAIN_DISTANCE);
                 this.terrainHeights = terrainHeights;
+                this.treasureLocation = this.locateTreasure();
+                behindGroundGroup = this.groundGroup.group();
+                treasure = behindGroundGroup.rect(40, 20).move(-20, -20).fill('red').transform({
+                  translateX: this.treasureLocation.x * draw.width(),
+                  translateY: TERRAIN_DISTANCE + this.treasureLocation.y * TERRAIN_HEIGHT_SCALE
+                });
+                this.ground = this.groundGroup.polyline(terrainPoints).addClass('ground').scale(draw.width(), TERRAIN_HEIGHT_SCALE, 0, 0).translate(0, TERRAIN_DISTANCE);
+                behindGroundGroup.clipWith(this.groundGroup.use(this.ground));
                 this.groundClip = this.groundGroup.clip();
                 this.groundGroup.clipWith(this.groundClip);
 
-              case 12:
+              case 16:
               case "end":
                 return _context2.stop();
             }
@@ -892,6 +899,21 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       var h1 = this.terrainHeights[i1];
       var t = xInArray - i0;
       return h0 + t * (h1 - h0);
+    }
+  }, {
+    key: "locateTreasure",
+    value: function locateTreasure() {
+      var argmax = function argmax(array) {
+        return [].reduce.call(array, function (m, c, i, arr) {
+          return c > arr[m] ? i : m;
+        }, 0);
+      };
+
+      var treasureIndex = argmax(this.terrainHeights);
+      return {
+        x: treasureIndex / (this.terrainHeights.length - 1),
+        y: this.terrainHeights[treasureIndex]
+      };
     }
   }, {
     key: "addGroundClip",
