@@ -11,6 +11,9 @@ const MAX_TERRAIN_EXTREMA = 20;
 const TERRAIN_MARGIN_WIDTH = 0.1;
 const TERRAIN_DISTANCE = 300;
 
+// How far should the boat move on user input per ms
+const SPEED_FACTOR = 0.2 / 1000.0;
+
 export default class PlayMode extends GameMode {
 
   constructor(game) {
@@ -26,29 +29,40 @@ export default class PlayMode extends GameMode {
   async handleEnterMode() {
     const { draw, numPlayers } = this.game;
 
-    const group = draw.group()
+    const modeGroup = draw.group()
       .addClass('play')
       .translate(0, 200);
 
     // Create a boat for each player
-    this.boats = Array(numPlayers)
+    this.players = Array(numPlayers)
       .fill(null)
-      .map(() => group.use(this.shipSymbol));
+      .map((_, playerIndex) => {
+        const x = (playerIndex + 1) / (numPlayers + 1);
+        const group = modeGroup.group();
+        group
+          .addClass(`boat-${playerIndex}`)
+          .transform({ translateX: x * draw.width() });
 
-    // Set the boats properties
-    this.boats.forEach((boat, playerIndex) => boat.size(300, 200)
-      .addClass(`boat-${playerIndex}`)
-      .center(draw.width() * ((playerIndex + 1) / (numPlayers + 1)), -35)
-    );
+        const boat = group.use(this.shipSymbol);
+        boat.size(300, 200)
+          .center(0, -35)
 
-    this.water = group.polyline(this.wavesPoints(0))
+        return {
+          group: group,
+          boat: boat,
+          x: x,
+          flipX: false,
+        };
+      });
+
+    this.water = modeGroup.polyline(this.wavesPoints(0))
       .addClass('water')
       .scale(draw.width(), WATER_HEIGHT_SCALE, 0, 0);
 
     const terrainOptions = { marginWidth: TERRAIN_MARGIN_WIDTH };
     const terrainHeights = terrain(MAX_TERRAIN_EXTREMA, NUM_TERRAIN_POINTS, terrainOptions);
     const terrainPoints = terrainHeights.map((h, i) => [i / (terrainHeights.length - 1), h]);
-    this.ground = group.polyline(terrainPoints)
+    this.ground = modeGroup.polyline(terrainPoints)
       .addClass('ground')
       .scale(draw.width(), TERRAIN_HEIGHT_SCALE, 0, 0)
       .translate(0, TERRAIN_DISTANCE);
@@ -61,15 +75,13 @@ export default class PlayMode extends GameMode {
   handleInputs(inputs, lastInputs, delta, ts) {
     // Move the boats or check if they're lowering the probe
     const { draw, numPlayers } = this.game;
-    const leftMargin = TERRAIN_MARGIN_WIDTH * draw.width();
-    const rightMargin = (1.0 - TERRAIN_MARGIN_WIDTH) * draw.width();
     inputs
       .slice(0, numPlayers) // discard inputs that don't belong to an active player
       .forEach((input, playerIndex) => {
-        const cx = this.boats[playerIndex].cx() + delta * input.direction;
-        this.boats[playerIndex].cx(Math.min(Math.max(leftMargin, cx), rightMargin));
-        if (input.direction !== 0)
-          this.boats[playerIndex].attr({ 'data-flip': input.direction === -1 })
+        const player = this.players[playerIndex];
+        player.x += SPEED_FACTOR * (delta * input.direction);
+        player.x = Math.min(Math.max(TERRAIN_MARGIN_WIDTH, player.x), 1.0 - TERRAIN_MARGIN_WIDTH);
+        player.flipX = input.direction === 0 ? player.flipX : input.direction === -1;
       });
   }
 
@@ -81,18 +93,21 @@ export default class PlayMode extends GameMode {
 
     this.water.plot(this.wavesPoints(ts));
 
-    this.boats.forEach((boat, playerIndex) => {
-      const x = boat.cx() / draw.width();
+    this.players.forEach((player, playerIndex) => {
+      const x = player.x;
       const y = WATER_HEIGHT_SCALE * waves.height(x, ts);
       const slope = WATER_HEIGHT_SCALE * waves.slope(x, ts);
       const angle = 0.25 * 180 * Math.atan2(slope, draw.width()) / Math.PI;
-      const transform = {
-        translateY: y,
+      const boatTransform = {
         rotate: angle,
       };
-      if (boat.attr('data-flip') === 'true')
-        transform.flip = 'x';
-      boat.transform(transform);
+      if (player.flipX)
+        boatTransform.flip = 'x';
+      player.boat.transform(boatTransform);
+      player.group.transform({
+        translateX: x * draw.width(),
+        translateY: y
+      });
     });
   }
 }

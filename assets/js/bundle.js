@@ -669,7 +669,9 @@ var TERRAIN_HEIGHT_SCALE = 300;
 var NUM_TERRAIN_POINTS = 300;
 var MAX_TERRAIN_EXTREMA = 20;
 var TERRAIN_MARGIN_WIDTH = 0.1;
-var TERRAIN_DISTANCE = 300;
+var TERRAIN_DISTANCE = 300; // How far should the boat move on user input per ms
+
+var SPEED_FACTOR = 0.2 / 1000.0;
 
 var PlayMode = /*#__PURE__*/function (_GameMode) {
   _inherits(PlayMode, _GameMode);
@@ -725,23 +727,31 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       var _handleEnterMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
         var _this2 = this;
 
-        var _this$game, draw, numPlayers, group, terrainOptions, terrainHeights, terrainPoints;
+        var _this$game, draw, numPlayers, modeGroup, terrainOptions, terrainHeights, terrainPoints;
 
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 _this$game = this.game, draw = _this$game.draw, numPlayers = _this$game.numPlayers;
-                group = draw.group().addClass('play').translate(0, 200); // Create a boat for each player
+                modeGroup = draw.group().addClass('play').translate(0, 200); // Create a boat for each player
 
-                this.boats = Array(numPlayers).fill(null).map(function () {
-                  return group.use(_this2.shipSymbol);
-                }); // Set the boats properties
-
-                this.boats.forEach(function (boat, playerIndex) {
-                  return boat.size(300, 200).addClass("boat-".concat(playerIndex)).center(draw.width() * ((playerIndex + 1) / (numPlayers + 1)), -35);
+                this.players = Array(numPlayers).fill(null).map(function (_, playerIndex) {
+                  var x = (playerIndex + 1) / (numPlayers + 1);
+                  var group = modeGroup.group();
+                  group.addClass("boat-".concat(playerIndex)).transform({
+                    translateX: x * draw.width()
+                  });
+                  var boat = group.use(_this2.shipSymbol);
+                  boat.size(300, 200).center(0, -35);
+                  return {
+                    group: group,
+                    boat: boat,
+                    x: x,
+                    flipX: false
+                  };
                 });
-                this.water = group.polyline(this.wavesPoints(0)).addClass('water').scale(draw.width(), WATER_HEIGHT_SCALE, 0, 0);
+                this.water = modeGroup.polyline(this.wavesPoints(0)).addClass('water').scale(draw.width(), WATER_HEIGHT_SCALE, 0, 0);
                 terrainOptions = {
                   marginWidth: TERRAIN_MARGIN_WIDTH
                 };
@@ -749,9 +759,9 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 terrainPoints = terrainHeights.map(function (h, i) {
                   return [i / (terrainHeights.length - 1), h];
                 });
-                this.ground = group.polyline(terrainPoints).addClass('ground').scale(draw.width(), TERRAIN_HEIGHT_SCALE, 0, 0).translate(0, TERRAIN_DISTANCE);
+                this.ground = modeGroup.polyline(terrainPoints).addClass('ground').scale(draw.width(), TERRAIN_HEIGHT_SCALE, 0, 0).translate(0, TERRAIN_DISTANCE);
 
-              case 9:
+              case 8:
               case "end":
                 return _context2.stop();
             }
@@ -795,17 +805,12 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       var _this$game2 = this.game,
           draw = _this$game2.draw,
           numPlayers = _this$game2.numPlayers;
-      var leftMargin = TERRAIN_MARGIN_WIDTH * draw.width();
-      var rightMargin = (1.0 - TERRAIN_MARGIN_WIDTH) * draw.width();
       inputs.slice(0, numPlayers) // discard inputs that don't belong to an active player
       .forEach(function (input, playerIndex) {
-        var cx = _this3.boats[playerIndex].cx() + delta * input.direction;
-
-        _this3.boats[playerIndex].cx(Math.min(Math.max(leftMargin, cx), rightMargin));
-
-        if (input.direction !== 0) _this3.boats[playerIndex].attr({
-          'data-flip': input.direction === -1
-        });
+        var player = _this3.players[playerIndex];
+        player.x += SPEED_FACTOR * (delta * input.direction);
+        player.x = Math.min(Math.max(TERRAIN_MARGIN_WIDTH, player.x), 1.0 - TERRAIN_MARGIN_WIDTH);
+        player.flipX = input.direction === 0 ? player.flipX : input.direction === -1;
       });
     }
   }, {
@@ -818,17 +823,20 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       // etc...
 
       this.water.plot(this.wavesPoints(ts));
-      this.boats.forEach(function (boat, playerIndex) {
-        var x = boat.cx() / draw.width();
+      this.players.forEach(function (player, playerIndex) {
+        var x = player.x;
         var y = WATER_HEIGHT_SCALE * waves.height(x, ts);
         var slope = WATER_HEIGHT_SCALE * waves.slope(x, ts);
         var angle = 0.25 * 180 * Math.atan2(slope, draw.width()) / Math.PI;
-        var transform = {
-          translateY: y,
+        var boatTransform = {
           rotate: angle
         };
-        if (boat.attr('data-flip') === 'true') transform.flip = 'x';
-        boat.transform(transform);
+        if (player.flipX) boatTransform.flip = 'x';
+        player.boat.transform(boatTransform);
+        player.group.transform({
+          translateX: x * draw.width(),
+          translateY: y
+        });
       });
     }
   }]);
