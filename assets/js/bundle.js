@@ -711,8 +711,11 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
 
               case 2:
                 this.shipSymbol = _context.sent;
+                this.shipSymbol.attr({
+                  overflow: 'visible'
+                });
 
-              case 3:
+              case 4:
               case "end":
                 return _context.stop();
             }

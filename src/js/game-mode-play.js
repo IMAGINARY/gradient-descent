@@ -30,6 +30,7 @@ export default class PlayMode extends GameMode {
 
   async preLoadAssets() {
     this.shipSymbol = await this.game.loadSVGSymbol('assets/img/ship.svg');
+    this.shipSymbol.attr({ overflow: 'visible' });
   }
 
   async handleEnterMode() {
