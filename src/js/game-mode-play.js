@@ -15,6 +15,9 @@ const TERRAIN_DISTANCE = 300;
 const SPEED_FACTOR = 0.2 / 1000.0;
 
 const PROBE_SIZE = 10;
+const PROBE_DISTANCE_AT_REST = 0.3;
+const PROBE_MIN_DURATION = 500;
+const PROBE_DELAY = 500;
 
 export default class PlayMode extends GameMode {
 
@@ -49,10 +52,16 @@ export default class PlayMode extends GameMode {
         boat.size(300, 200)
           .center(0, -35)
 
-        const probe = group.group();
-        probe.line(0, 20, 0, 100 - PROBE_SIZE / 2);
-        probe.circle(PROBE_SIZE)
-          .center(0, 100);
+        const probeParent = group.group();
+        const probe = probeParent.group();
+        probe.line(0, -draw.height(), 0, -PROBE_SIZE / 2);
+        probe.circle(PROBE_SIZE).center(0, 0);
+        probe.transform({ translateY: TERRAIN_DISTANCE * PROBE_DISTANCE_AT_REST });
+
+        // Clip the probe such that only the part below the boat is visible.
+        const probeClip = probeParent.rect(PROBE_SIZE * 4, draw.height())
+          .move(-PROBE_SIZE * 2, 20);
+        probeParent.clipWith(probeClip);
 
         return {
           group: group,
@@ -60,6 +69,7 @@ export default class PlayMode extends GameMode {
           probe: probe,
           x: x,
           flipX: false,
+          probing: false,
         };
       });
 
@@ -74,6 +84,7 @@ export default class PlayMode extends GameMode {
       .addClass('ground')
       .scale(draw.width(), TERRAIN_HEIGHT_SCALE, 0, 0)
       .translate(0, TERRAIN_DISTANCE);
+    this.terrainHeights = terrainHeights;
   }
 
   async handleExitMode() {
@@ -87,9 +98,25 @@ export default class PlayMode extends GameMode {
       .slice(0, numPlayers) // discard inputs that don't belong to an active player
       .forEach((input, playerIndex) => {
         const player = this.players[playerIndex];
-        player.x += SPEED_FACTOR * (delta * input.direction);
-        player.x = Math.min(Math.max(TERRAIN_MARGIN_WIDTH, player.x), 1.0 - TERRAIN_MARGIN_WIDTH);
-        player.flipX = input.direction === 0 ? player.flipX : input.direction === -1;
+        if (!player.probing) {
+          player.x += SPEED_FACTOR * (delta * input.direction);
+          player.x = Math.min(Math.max(TERRAIN_MARGIN_WIDTH, player.x), 1.0 - TERRAIN_MARGIN_WIDTH);
+          player.flipX = input.direction === 0 ? player.flipX : input.direction === -1;
+          if (input.action) {
+            // Switch to probe mode
+            player.probing = true;
+            // Lower the probe, wait and raise it again
+            const terrainHeight = this.terrainHeight(player.x);
+            const probeHeight = TERRAIN_DISTANCE + TERRAIN_HEIGHT_SCALE * terrainHeight;
+            const probeDuration = probeHeight * (PROBE_MIN_DURATION / TERRAIN_DISTANCE);
+            player.probe
+              .animate(probeDuration, 0, 'now')
+              .transform({ translateY: probeHeight })
+              .animate(probeDuration, PROBE_DELAY)
+              .transform({ translateY: TERRAIN_DISTANCE * PROBE_DISTANCE_AT_REST })
+              .after(() => player.probing = false);
+          }
+        }
       });
   }
 
@@ -117,5 +144,15 @@ export default class PlayMode extends GameMode {
         translateY: y
       });
     });
+  }
+
+  terrainHeight(x) {
+    const xInArray = (this.terrainHeights.length - 1) * x;
+    const i0 = Math.floor(xInArray);
+    const i1 = Math.ceil(xInArray);
+    const h0 = this.terrainHeights[i0];
+    const h1 = this.terrainHeights[i1];
+    const t = xInArray - i0;
+    return h0 + t * (h1 - h0);
   }
 }

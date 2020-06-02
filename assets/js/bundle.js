@@ -673,6 +673,9 @@ var TERRAIN_DISTANCE = 300; // How far should the boat move on user input per ms
 
 var SPEED_FACTOR = 0.2 / 1000.0;
 var PROBE_SIZE = 10;
+var PROBE_DISTANCE_AT_REST = 0.3;
+var PROBE_MIN_DURATION = 500;
+var PROBE_DELAY = 500;
 
 var PlayMode = /*#__PURE__*/function (_GameMode) {
   _inherits(PlayMode, _GameMode);
@@ -745,15 +748,23 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                   });
                   var boat = group.use(_this2.shipSymbol);
                   boat.size(300, 200).center(0, -35);
-                  var probe = group.group();
-                  probe.line(0, 20, 0, 100 - PROBE_SIZE / 2);
-                  probe.circle(PROBE_SIZE).center(0, 100);
+                  var probeParent = group.group();
+                  var probe = probeParent.group();
+                  probe.line(0, -draw.height(), 0, -PROBE_SIZE / 2);
+                  probe.circle(PROBE_SIZE).center(0, 0);
+                  probe.transform({
+                    translateY: TERRAIN_DISTANCE * PROBE_DISTANCE_AT_REST
+                  }); // Clip the probe such that only the part below the boat is visible.
+
+                  var probeClip = probeParent.rect(PROBE_SIZE * 4, draw.height()).move(-PROBE_SIZE * 2, 20);
+                  probeParent.clipWith(probeClip);
                   return {
                     group: group,
                     boat: boat,
                     probe: probe,
                     x: x,
-                    flipX: false
+                    flipX: false,
+                    probing: false
                   };
                 });
                 this.water = modeGroup.polyline(this.wavesPoints(0)).addClass('water').scale(draw.width(), WATER_HEIGHT_SCALE, 0, 0);
@@ -765,8 +776,9 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                   return [i / (terrainHeights.length - 1), h];
                 });
                 this.ground = modeGroup.polyline(terrainPoints).addClass('ground').scale(draw.width(), TERRAIN_HEIGHT_SCALE, 0, 0).translate(0, TERRAIN_DISTANCE);
+                this.terrainHeights = terrainHeights;
 
-              case 8:
+              case 9:
               case "end":
                 return _context2.stop();
             }
@@ -813,9 +825,29 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       inputs.slice(0, numPlayers) // discard inputs that don't belong to an active player
       .forEach(function (input, playerIndex) {
         var player = _this3.players[playerIndex];
-        player.x += SPEED_FACTOR * (delta * input.direction);
-        player.x = Math.min(Math.max(TERRAIN_MARGIN_WIDTH, player.x), 1.0 - TERRAIN_MARGIN_WIDTH);
-        player.flipX = input.direction === 0 ? player.flipX : input.direction === -1;
+
+        if (!player.probing) {
+          player.x += SPEED_FACTOR * (delta * input.direction);
+          player.x = Math.min(Math.max(TERRAIN_MARGIN_WIDTH, player.x), 1.0 - TERRAIN_MARGIN_WIDTH);
+          player.flipX = input.direction === 0 ? player.flipX : input.direction === -1;
+
+          if (input.action) {
+            // Switch to probe mode
+            player.probing = true; // Lower the probe, wait and raise it again
+
+            var terrainHeight = _this3.terrainHeight(player.x);
+
+            var probeHeight = TERRAIN_DISTANCE + TERRAIN_HEIGHT_SCALE * terrainHeight;
+            var probeDuration = probeHeight * (PROBE_MIN_DURATION / TERRAIN_DISTANCE);
+            player.probe.animate(probeDuration, 0, 'now').transform({
+              translateY: probeHeight
+            }).animate(probeDuration, PROBE_DELAY).transform({
+              translateY: TERRAIN_DISTANCE * PROBE_DISTANCE_AT_REST
+            }).after(function () {
+              return player.probing = false;
+            });
+          }
+        }
       });
     }
   }, {
@@ -843,6 +875,17 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
           translateY: y
         });
       });
+    }
+  }, {
+    key: "terrainHeight",
+    value: function terrainHeight(x) {
+      var xInArray = (this.terrainHeights.length - 1) * x;
+      var i0 = Math.floor(xInArray);
+      var i1 = Math.ceil(xInArray);
+      var h0 = this.terrainHeights[i0];
+      var h1 = this.terrainHeights[i1];
+      var t = xInArray - i0;
+      return h0 + t * (h1 - h0);
     }
   }]);
 
