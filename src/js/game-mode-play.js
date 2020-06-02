@@ -18,6 +18,7 @@ const PROBE_SIZE = 10;
 const PROBE_DISTANCE_AT_REST = 0.3;
 const PROBE_MIN_DURATION = 500;
 const PROBE_DELAY = 500;
+const PROBE_EXPOSURE_RADIUS = 0.01;
 
 export default class PlayMode extends GameMode {
 
@@ -77,14 +78,18 @@ export default class PlayMode extends GameMode {
       .addClass('water')
       .scale(draw.width(), WATER_HEIGHT_SCALE, 0, 0);
 
+    this.groundGroup = modeGroup.group();
     const terrainOptions = { marginWidth: TERRAIN_MARGIN_WIDTH };
     const terrainHeights = terrain(MAX_TERRAIN_EXTREMA, NUM_TERRAIN_POINTS, terrainOptions);
     const terrainPoints = terrainHeights.map((h, i) => [i / (terrainHeights.length - 1), h]);
-    this.ground = modeGroup.polyline(terrainPoints)
+    this.ground = this.groundGroup.polyline(terrainPoints)
       .addClass('ground')
       .scale(draw.width(), TERRAIN_HEIGHT_SCALE, 0, 0)
       .translate(0, TERRAIN_DISTANCE);
     this.terrainHeights = terrainHeights;
+
+    this.groundClip = this.groundGroup.clip();
+    this.groundGroup.clipWith(this.groundClip);
   }
 
   async handleExitMode() {
@@ -112,6 +117,7 @@ export default class PlayMode extends GameMode {
             player.probe
               .animate(probeDuration, 0, 'now')
               .transform({ translateY: probeHeight })
+              .after(() => this.addGroundClip(player.x))
               .animate(probeDuration, PROBE_DELAY)
               .transform({ translateY: TERRAIN_DISTANCE * PROBE_DISTANCE_AT_REST })
               .after(() => player.probing = false);
@@ -154,5 +160,14 @@ export default class PlayMode extends GameMode {
     const h1 = this.terrainHeights[i1];
     const t = xInArray - i0;
     return h0 + t * (h1 - h0);
+  }
+
+  addGroundClip(x) {
+    const { draw } = this.game;
+    const width = 2 * PROBE_EXPOSURE_RADIUS * draw.width();
+    const rect = this.groundGroup
+      .rect(width, draw.height())
+      .transform({ translateX: draw.width() * x - width / 2 });
+    this.groundClip.add(rect);
   }
 }

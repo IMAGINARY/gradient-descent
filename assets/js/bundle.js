@@ -676,6 +676,7 @@ var PROBE_SIZE = 10;
 var PROBE_DISTANCE_AT_REST = 0.3;
 var PROBE_MIN_DURATION = 500;
 var PROBE_DELAY = 500;
+var PROBE_EXPOSURE_RADIUS = 0.01;
 
 var PlayMode = /*#__PURE__*/function (_GameMode) {
   _inherits(PlayMode, _GameMode);
@@ -768,6 +769,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                   };
                 });
                 this.water = modeGroup.polyline(this.wavesPoints(0)).addClass('water').scale(draw.width(), WATER_HEIGHT_SCALE, 0, 0);
+                this.groundGroup = modeGroup.group();
                 terrainOptions = {
                   marginWidth: TERRAIN_MARGIN_WIDTH
                 };
@@ -775,10 +777,12 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 terrainPoints = terrainHeights.map(function (h, i) {
                   return [i / (terrainHeights.length - 1), h];
                 });
-                this.ground = modeGroup.polyline(terrainPoints).addClass('ground').scale(draw.width(), TERRAIN_HEIGHT_SCALE, 0, 0).translate(0, TERRAIN_DISTANCE);
+                this.ground = this.groundGroup.polyline(terrainPoints).addClass('ground').scale(draw.width(), TERRAIN_HEIGHT_SCALE, 0, 0).translate(0, TERRAIN_DISTANCE);
                 this.terrainHeights = terrainHeights;
+                this.groundClip = this.groundGroup.clip();
+                this.groundGroup.clipWith(this.groundClip);
 
-              case 9:
+              case 12:
               case "end":
                 return _context2.stop();
             }
@@ -841,6 +845,8 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
             var probeDuration = probeHeight * (PROBE_MIN_DURATION / TERRAIN_DISTANCE);
             player.probe.animate(probeDuration, 0, 'now').transform({
               translateY: probeHeight
+            }).after(function () {
+              return _this3.addGroundClip(player.x);
             }).animate(probeDuration, PROBE_DELAY).transform({
               translateY: TERRAIN_DISTANCE * PROBE_DISTANCE_AT_REST
             }).after(function () {
@@ -886,6 +892,16 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       var h1 = this.terrainHeights[i1];
       var t = xInArray - i0;
       return h0 + t * (h1 - h0);
+    }
+  }, {
+    key: "addGroundClip",
+    value: function addGroundClip(x) {
+      var draw = this.game.draw;
+      var width = 2 * PROBE_EXPOSURE_RADIUS * draw.width();
+      var rect = this.groundGroup.rect(width, draw.height()).transform({
+        translateX: draw.width() * x - width / 2
+      });
+      this.groundClip.add(rect);
     }
   }]);
 
