@@ -21,6 +21,10 @@ const PROBE_DELAY = 500;
 
 const TANGENT_LENGTH = 0.02;
 
+const TREASURE_SIZE = 0.03;
+
+const UNCOVER_DURATION = 3000;
+
 export default class PlayMode extends GameMode {
 
   constructor(game) {
@@ -139,7 +143,11 @@ export default class PlayMode extends GameMode {
             const runnerDown = player.probe
               .animate(probeDuration, 0, 'now')
               .transform({ translateY: probeHeight })
+              .after(() => this.addGroundClip(player.x))
               .after(() => this.addTangent(player));
+            if (Math.abs(player.x - this.treasureLocation.x) <= TREASURE_SIZE / 2)
+              runnerDown.animate(PROBE_DELAY / 2)
+                .after(() => this.uncoverGround());
             const runnerUp = runnerDown.animate(probeDuration, PROBE_DELAY)
               .transform({ translateY: TERRAIN_DISTANCE * PROBE_DISTANCE_AT_REST })
               .after(() => player.probing = false);
@@ -213,5 +221,26 @@ export default class PlayMode extends GameMode {
         translateY: TERRAIN_HEIGHT_SCALE * value,
         rotate: angle,
       });
+  }
+
+  addGroundClip(x) {
+    const { draw } = this.game;
+    const w = draw.width();
+    const h = draw.height();
+    const rect = this.groundClip
+      .polygon([[-w, -h], [w, -h], [w, h], [-w, h]])
+      .center(draw.width() * x, 0)
+      .transform({ scaleX: 0.001 });
+    this.groundClip.add(rect);
+  }
+
+  async uncoverGround() {
+    this.ground.show();
+    const uncoverGround = clip => new Promise(resolve => {
+      clip.animate(UNCOVER_DURATION)
+        .transform({ scaleX: 1.0 })
+        .after(resolve);
+    });
+    return Promise.all(this.groundClip.children().map(uncoverGround));
   }
 }

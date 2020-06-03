@@ -677,6 +677,8 @@ var PROBE_DISTANCE_AT_REST = 0.3;
 var PROBE_MIN_DURATION = 500;
 var PROBE_DELAY = 500;
 var TANGENT_LENGTH = 0.02;
+var TREASURE_SIZE = 0.03;
+var UNCOVER_DURATION = 3000;
 
 var PlayMode = /*#__PURE__*/function (_GameMode) {
   _inherits(PlayMode, _GameMode);
@@ -858,7 +860,12 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
             var runnerDown = player.probe.animate(probeDuration, 0, 'now').transform({
               translateY: probeHeight
             }).after(function () {
+              return _this3.addGroundClip(player.x);
+            }).after(function () {
               return _this3.addTangent(player);
+            });
+            if (Math.abs(player.x - _this3.treasureLocation.x) <= TREASURE_SIZE / 2) runnerDown.animate(PROBE_DELAY / 2).after(function () {
+              return _this3.uncoverGround();
             });
             var runnerUp = runnerDown.animate(probeDuration, PROBE_DELAY).transform({
               translateY: TERRAIN_DISTANCE * PROBE_DISTANCE_AT_REST
@@ -947,6 +954,52 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
         rotate: angle
       });
     }
+  }, {
+    key: "addGroundClip",
+    value: function addGroundClip(x) {
+      var draw = this.game.draw;
+      var w = draw.width();
+      var h = draw.height();
+      var rect = this.groundClip.polygon([[-w, -h], [w, -h], [w, h], [-w, h]]).center(draw.width() * x, 0).transform({
+        scaleX: 0.001
+      });
+      this.groundClip.add(rect);
+    }
+  }, {
+    key: "uncoverGround",
+    value: function () {
+      var _uncoverGround = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4() {
+        var uncoverGround;
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                this.ground.show();
+
+                uncoverGround = function uncoverGround(clip) {
+                  return new Promise(function (resolve) {
+                    clip.animate(UNCOVER_DURATION).transform({
+                      scaleX: 1.0
+                    }).after(resolve);
+                  });
+                };
+
+                return _context4.abrupt("return", Promise.all(this.groundClip.children().map(uncoverGround)));
+
+              case 3:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4, this);
+      }));
+
+      function uncoverGround() {
+        return _uncoverGround.apply(this, arguments);
+      }
+
+      return uncoverGround;
+    }()
   }]);
 
   return PlayMode;
