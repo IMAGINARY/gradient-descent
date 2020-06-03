@@ -676,7 +676,7 @@ var PROBE_SIZE = 10;
 var PROBE_DISTANCE_AT_REST = 0.3;
 var PROBE_MIN_DURATION = 500;
 var PROBE_DELAY = 500;
-var PROBE_EXPOSURE_RADIUS = 0.01;
+var TANGENT_LENGTH = 0.02;
 
 var PlayMode = /*#__PURE__*/function (_GameMode) {
   _inherits(PlayMode, _GameMode);
@@ -763,6 +763,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                   var probeClip = probeParent.rect(PROBE_SIZE * 4, draw.height()).move(-PROBE_SIZE * 2, 20);
                   probeParent.clipWith(probeClip);
                   return {
+                    id: playerIndex,
                     group: group,
                     boat: boat,
                     probe: probe,
@@ -787,12 +788,13 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                   translateX: this.treasureLocation.x * draw.width(),
                   translateY: TERRAIN_DISTANCE + this.treasureLocation.y * TERRAIN_HEIGHT_SCALE
                 });
-                this.ground = this.groundGroup.polyline(terrainPoints).addClass('ground').translate(0, TERRAIN_DISTANCE);
+                this.ground = this.groundGroup.polyline(terrainPoints).addClass('ground').translate(0, TERRAIN_DISTANCE).hide();
                 behindGroundGroup.clipWith(this.groundGroup.use(this.ground));
                 this.groundClip = this.groundGroup.clip();
                 this.groundGroup.clipWith(this.groundClip);
+                this.tangents = modeGroup.group().translate(0, TERRAIN_DISTANCE);
 
-              case 16:
+              case 17:
               case "end":
                 return _context2.stop();
             }
@@ -853,11 +855,12 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
 
             var probeHeight = TERRAIN_DISTANCE + TERRAIN_HEIGHT_SCALE * terrainHeight;
             var probeDuration = probeHeight * (PROBE_MIN_DURATION / TERRAIN_DISTANCE);
-            player.probe.animate(probeDuration, 0, 'now').transform({
+            var runnerDown = player.probe.animate(probeDuration, 0, 'now').transform({
               translateY: probeHeight
             }).after(function () {
-              return _this3.addGroundClip(player.x);
-            }).animate(probeDuration, PROBE_DELAY).transform({
+              return _this3.addTangent(player);
+            });
+            var runnerUp = runnerDown.animate(probeDuration, PROBE_DELAY).transform({
               translateY: TERRAIN_DISTANCE * PROBE_DISTANCE_AT_REST
             }).after(function () {
               return player.probing = false;
@@ -895,13 +898,22 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
   }, {
     key: "terrainHeight",
     value: function terrainHeight(x) {
+      return this.terrainHeightExt(x).value;
+    }
+  }, {
+    key: "terrainHeightExt",
+    value: function terrainHeightExt(x) {
       var xInArray = (this.terrainHeights.length - 1) * x;
-      var i0 = Math.floor(xInArray);
-      var i1 = Math.ceil(xInArray);
+      var tmpIndex = Math.floor(xInArray);
+      var i0 = tmpIndex === this.terrainHeights.length - 1 ? tmpIndex - 1 : tmpIndex;
+      var i1 = i0 + 1;
       var h0 = this.terrainHeights[i0];
       var h1 = this.terrainHeights[i1];
       var t = xInArray - i0;
-      return h0 + t * (h1 - h0);
+      return {
+        value: h0 + t * (h1 - h0),
+        slope: (h1 - h0) * (this.terrainHeights.length - 1)
+      };
     }
   }, {
     key: "locateTreasure",
@@ -919,14 +931,21 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       };
     }
   }, {
-    key: "addGroundClip",
-    value: function addGroundClip(x) {
+    key: "addTangent",
+    value: function addTangent(player) {
       var draw = this.game.draw;
-      var width = 2 * PROBE_EXPOSURE_RADIUS * draw.width();
-      var rect = this.groundGroup.rect(width, draw.height()).transform({
-        translateX: draw.width() * x - width / 2
+      var width = draw.width();
+
+      var _this$terrainHeightEx = this.terrainHeightExt(player.x),
+          value = _this$terrainHeightEx.value,
+          slope = _this$terrainHeightEx.slope;
+
+      var angle = 180 * Math.atan2(slope * TERRAIN_HEIGHT_SCALE, width) / Math.PI;
+      this.tangents.line(-width * TANGENT_LENGTH / 2, 0, width * TANGENT_LENGTH / 2, 0).addClass("boat-".concat(player.id)).transform({
+        translateX: width * player.x,
+        translateY: TERRAIN_HEIGHT_SCALE * value,
+        rotate: angle
       });
-      this.groundClip.add(rect);
     }
   }]);
 

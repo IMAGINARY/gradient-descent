@@ -18,7 +18,8 @@ const PROBE_SIZE = 10;
 const PROBE_DISTANCE_AT_REST = 0.3;
 const PROBE_MIN_DURATION = 500;
 const PROBE_DELAY = 500;
-const PROBE_EXPOSURE_RADIUS = 0.01;
+
+const TANGENT_LENGTH = 0.02;
 
 export default class PlayMode extends GameMode {
 
@@ -66,6 +67,7 @@ export default class PlayMode extends GameMode {
         probeParent.clipWith(probeClip);
 
         return {
+          id: playerIndex,
           group: group,
           boat: boat,
           probe: probe,
@@ -100,12 +102,16 @@ export default class PlayMode extends GameMode {
 
     this.ground = this.groundGroup.polyline(terrainPoints)
       .addClass('ground')
-      .translate(0, TERRAIN_DISTANCE);
+      .translate(0, TERRAIN_DISTANCE)
+      .hide();
 
     behindGroundGroup.clipWith(this.groundGroup.use(this.ground));
 
     this.groundClip = this.groundGroup.clip();
     this.groundGroup.clipWith(this.groundClip);
+
+    this.tangents = modeGroup.group()
+      .translate(0, TERRAIN_DISTANCE);
   }
 
   async handleExitMode() {
@@ -130,11 +136,11 @@ export default class PlayMode extends GameMode {
             const terrainHeight = this.terrainHeight(player.x);
             const probeHeight = TERRAIN_DISTANCE + TERRAIN_HEIGHT_SCALE * terrainHeight;
             const probeDuration = probeHeight * (PROBE_MIN_DURATION / TERRAIN_DISTANCE);
-            player.probe
+            const runnerDown = player.probe
               .animate(probeDuration, 0, 'now')
               .transform({ translateY: probeHeight })
-              .after(() => this.addGroundClip(player.x))
-              .animate(probeDuration, PROBE_DELAY)
+              .after(() => this.addTangent(player));
+            const runnerUp = runnerDown.animate(probeDuration, PROBE_DELAY)
               .transform({ translateY: TERRAIN_DISTANCE * PROBE_DISTANCE_AT_REST })
               .after(() => player.probing = false);
           }
@@ -169,13 +175,21 @@ export default class PlayMode extends GameMode {
   }
 
   terrainHeight(x) {
+    return this.terrainHeightExt(x).value;
+  }
+
+  terrainHeightExt(x) {
     const xInArray = (this.terrainHeights.length - 1) * x;
-    const i0 = Math.floor(xInArray);
-    const i1 = Math.ceil(xInArray);
+    const tmpIndex = Math.floor(xInArray);
+    const i0 = tmpIndex === this.terrainHeights.length - 1 ? tmpIndex - 1 : tmpIndex;
+    const i1 = i0 + 1;
     const h0 = this.terrainHeights[i0];
     const h1 = this.terrainHeights[i1];
     const t = xInArray - i0;
-    return h0 + t * (h1 - h0);
+    return {
+      value: h0 + t * (h1 - h0),
+      slope: (h1 - h0) * (this.terrainHeights.length - 1),
+    };
   }
 
   locateTreasure() {
@@ -184,15 +198,20 @@ export default class PlayMode extends GameMode {
     return {
       x: treasureIndex / (this.terrainHeights.length - 1),
       y: this.terrainHeights[treasureIndex],
-    }
+    };
   }
 
-  addGroundClip(x) {
+  addTangent(player) {
     const { draw } = this.game;
-    const width = 2 * PROBE_EXPOSURE_RADIUS * draw.width();
-    const rect = this.groundGroup
-      .rect(width, draw.height())
-      .transform({ translateX: draw.width() * x - width / 2 });
-    this.groundClip.add(rect);
+    const width = draw.width();
+    const { value, slope } = this.terrainHeightExt(player.x);
+    const angle = 180 * Math.atan2(slope * TERRAIN_HEIGHT_SCALE, width) / Math.PI;
+    this.tangents.line(-width * TANGENT_LENGTH / 2, 0, width * TANGENT_LENGTH / 2, 0,)
+      .addClass(`boat-${player.id}`)
+      .transform({
+        translateX: width * player.x,
+        translateY: TERRAIN_HEIGHT_SCALE * value,
+        rotate: angle,
+      });
   }
 }
