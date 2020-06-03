@@ -1347,14 +1347,19 @@ var GradientDescentGame = /*#__PURE__*/function () {
     key: "init",
     value: function () {
       var _init = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
-        var width, height;
+        var width, height, viewContainer;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
-                width = 1920, height = 1080;
-                this.svgDoc = SVG().addTo(this.container);
-                this.svgDoc.viewbox(0, 0, width, height).attr("preserveAspectRatio", "xMinYMin meet");
+                width = 1920, height = 864;
+                this.overlay = document.createElement('div');
+                this.overlay.classList.add('overlay');
+                viewContainer = document.createElement('div');
+                viewContainer.classList.add('game-view');
+                this.container.append(viewContainer);
+                this.svgDoc = SVG().addTo(viewContainer);
+                this.svgDoc.viewbox(0, 0, width, height).attr('preserveAspectRatio', 'xMinYMin meet');
                 this.draw = this.svgDoc.nested().size(width, height);
                 this.overlay = document.createElement('div');
                 this.overlay.classList.add('overlay');
@@ -1380,39 +1385,39 @@ var GradientDescentGame = /*#__PURE__*/function () {
                   this.container.appendChild(this.debugControlsPane);
                 }
 
-                _context.next = 13;
+                _context.next = 18;
                 return this.registerMode('title', new _gameModeTitle["default"](this));
 
-              case 13:
-                _context.next = 15;
+              case 18:
+                _context.next = 20;
                 return this.registerMode('numplayers', new _gameModeNumplayers["default"](this));
 
-              case 15:
-                _context.next = 17;
+              case 20:
+                _context.next = 22;
                 return this.registerMode('play', new _gameModePlay["default"](this));
 
-              case 17:
+              case 22:
                 if (!this.config.continuousGame) {
-                  _context.next = 23;
+                  _context.next = 28;
                   break;
                 }
 
                 this.transition('play', 'done', 'play');
-                _context.next = 21;
+                _context.next = 26;
                 return this.setMode('play');
 
-              case 21:
-                _context.next = 28;
+              case 26:
+                _context.next = 33;
                 break;
 
-              case 23:
+              case 28:
                 this.transition('title', 'done', this.config.maxPlayers > 1 ? 'numplayers' : 'play');
                 this.transition('numplayers', 'done', 'play');
                 this.transition('play', 'done', 'title');
-                _context.next = 28;
+                _context.next = 33;
                 return this.setMode('title');
 
-              case 28:
+              case 33:
               case "end":
                 return _context.stop();
             }
