@@ -75,7 +75,8 @@ export default class PlayMode extends GameMode {
         };
       });
 
-    this.water = modeGroup.polyline(this.wavesPoints(0))
+    this.water = modeGroup.group()
+      .polyline(this.wavesPoints(0))
       .addClass('water')
 
     this.groundGroup = modeGroup.group();

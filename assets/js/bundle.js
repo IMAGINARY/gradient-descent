@@ -771,7 +771,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                     probing: false
                   };
                 });
-                this.water = modeGroup.polyline(this.wavesPoints(0)).addClass('water');
+                this.water = modeGroup.group().polyline(this.wavesPoints(0)).addClass('water');
                 this.groundGroup = modeGroup.group();
                 terrainOptions = {
                   marginWidth: TERRAIN_MARGIN_WIDTH
