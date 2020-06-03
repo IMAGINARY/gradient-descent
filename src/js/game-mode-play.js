@@ -94,6 +94,7 @@ export default class PlayMode extends GameMode {
     ]);
     this.terrainHeights = terrainHeights;
     this.treasureLocation = this.locateTreasure();
+    console.log("Treasure location:", this.treasureLocation);
 
     const behindGroundGroup = this.groundGroup.group();
     const treasure = behindGroundGroup.rect(40, 20)
@@ -151,6 +152,7 @@ export default class PlayMode extends GameMode {
             const runnerUp = runnerDown.animate(probeDuration, PROBE_DELAY)
               .transform({ translateY: TERRAIN_DISTANCE * PROBE_DISTANCE_AT_REST })
               .after(() => player.probing = false);
+            console.log(`Player ${playerIndex} is probing at:`, { x: player.x, y: terrainHeight });
           }
         }
       });

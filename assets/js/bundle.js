@@ -785,6 +785,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 });
                 this.terrainHeights = terrainHeights;
                 this.treasureLocation = this.locateTreasure();
+                console.log("Treasure location:", this.treasureLocation);
                 behindGroundGroup = this.groundGroup.group();
                 treasure = behindGroundGroup.rect(40, 20).move(-20, -20).fill('red').transform({
                   translateX: this.treasureLocation.x * draw.width(),
@@ -796,7 +797,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 this.groundGroup.clipWith(this.groundClip);
                 this.tangents = modeGroup.group().translate(0, TERRAIN_DISTANCE);
 
-              case 17:
+              case 18:
               case "end":
                 return _context2.stop();
             }
@@ -871,6 +872,10 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
               translateY: TERRAIN_DISTANCE * PROBE_DISTANCE_AT_REST
             }).after(function () {
               return player.probing = false;
+            });
+            console.log("Player ".concat(playerIndex, " is probing at:"), {
+              x: player.x,
+              y: terrainHeight
             });
           }
         }
