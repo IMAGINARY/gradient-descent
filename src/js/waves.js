@@ -23,10 +23,10 @@ export function heights(arr, ts) {
   return arr;
 }
 
-export function points(arr, ts) {
+export function points(arr, ts, xscale = 1.0, yscale = 1.0) {
   arr.forEach((_, i) => {
     const x = i / (arr.length - 1);
-    arr[i] = [x, height(x, ts)];
+    arr[i] = [xscale * x, yscale * height(x, ts)];
   });
   return arr;
 }

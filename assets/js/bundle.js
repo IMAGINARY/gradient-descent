@@ -692,7 +692,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
     var wavesPoints = Array(NUM_WATER_POINTS).fill(null);
 
     _this.wavesPoints = function (ts) {
-      return waves.points(wavesPoints, ts);
+      return waves.points(wavesPoints, ts, game.draw.width(), WATER_HEIGHT_SCALE);
     };
 
     return _this;
@@ -771,14 +771,14 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                     probing: false
                   };
                 });
-                this.water = modeGroup.polyline(this.wavesPoints(0)).addClass('water').scale(draw.width(), WATER_HEIGHT_SCALE, 0, 0);
+                this.water = modeGroup.polyline(this.wavesPoints(0)).addClass('water');
                 this.groundGroup = modeGroup.group();
                 terrainOptions = {
                   marginWidth: TERRAIN_MARGIN_WIDTH
                 };
                 terrainHeights = (0, _terrain["default"])(MAX_TERRAIN_EXTREMA, NUM_TERRAIN_POINTS, terrainOptions);
                 terrainPoints = terrainHeights.map(function (h, i) {
-                  return [i / (terrainHeights.length - 1), h];
+                  return [draw.width() * (i / (terrainHeights.length - 1)), TERRAIN_HEIGHT_SCALE * h];
                 });
                 this.terrainHeights = terrainHeights;
                 this.treasureLocation = this.locateTreasure();
@@ -787,7 +787,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                   translateX: this.treasureLocation.x * draw.width(),
                   translateY: TERRAIN_DISTANCE + this.treasureLocation.y * TERRAIN_HEIGHT_SCALE
                 });
-                this.ground = this.groundGroup.polyline(terrainPoints).addClass('ground').scale(draw.width(), TERRAIN_HEIGHT_SCALE, 0, 0).translate(0, TERRAIN_DISTANCE);
+                this.ground = this.groundGroup.polyline(terrainPoints).addClass('ground').translate(0, TERRAIN_DISTANCE);
                 behindGroundGroup.clipWith(this.groundGroup.use(this.ground));
                 this.groundClip = this.groundGroup.clip();
                 this.groundGroup.clipWith(this.groundClip);
@@ -1353,7 +1353,8 @@ var GradientDescentGame = /*#__PURE__*/function () {
             switch (_context.prev = _context.next) {
               case 0:
                 width = 1920, height = 1080;
-                this.svgDoc = SVG().addTo(this.container).size(width, height);
+                this.svgDoc = SVG().addTo(this.container);
+                this.svgDoc.viewbox(0, 0, width, height).attr("preserveAspectRatio", "xMinYMin meet");
                 this.draw = this.svgDoc.nested().size(width, height);
                 this.overlay = document.createElement('div');
                 this.overlay.classList.add('overlay');
@@ -1379,39 +1380,39 @@ var GradientDescentGame = /*#__PURE__*/function () {
                   this.container.appendChild(this.debugControlsPane);
                 }
 
-                _context.next = 12;
+                _context.next = 13;
                 return this.registerMode('title', new _gameModeTitle["default"](this));
 
-              case 12:
-                _context.next = 14;
+              case 13:
+                _context.next = 15;
                 return this.registerMode('numplayers', new _gameModeNumplayers["default"](this));
 
-              case 14:
-                _context.next = 16;
+              case 15:
+                _context.next = 17;
                 return this.registerMode('play', new _gameModePlay["default"](this));
 
-              case 16:
+              case 17:
                 if (!this.config.continuousGame) {
-                  _context.next = 22;
+                  _context.next = 23;
                   break;
                 }
 
                 this.transition('play', 'done', 'play');
-                _context.next = 20;
+                _context.next = 21;
                 return this.setMode('play');
 
-              case 20:
-                _context.next = 27;
+              case 21:
+                _context.next = 28;
                 break;
 
-              case 22:
+              case 23:
                 this.transition('title', 'done', this.config.maxPlayers > 1 ? 'numplayers' : 'play');
                 this.transition('numplayers', 'done', 'play');
                 this.transition('play', 'done', 'title');
-                _context.next = 27;
+                _context.next = 28;
                 return this.setMode('title');
 
-              case 27:
+              case 28:
               case "end":
                 return _context.stop();
             }
@@ -2030,9 +2031,11 @@ function heights(arr, ts) {
 }
 
 function points(arr, ts) {
+  var xscale = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1.0;
+  var yscale = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1.0;
   arr.forEach(function (_, i) {
     var x = i / (arr.length - 1);
-    arr[i] = [x, height(x, ts)];
+    arr[i] = [xscale * x, yscale * height(x, ts)];
   });
   return arr;
 }

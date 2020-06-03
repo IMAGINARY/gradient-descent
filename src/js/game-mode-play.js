@@ -25,7 +25,7 @@ export default class PlayMode extends GameMode {
   constructor(game) {
     super(game);
     const wavesPoints = Array(NUM_WATER_POINTS).fill(null);
-    this.wavesPoints = ts => waves.points(wavesPoints, ts);
+    this.wavesPoints = ts => waves.points(wavesPoints, ts, game.draw.width(), WATER_HEIGHT_SCALE);
   }
 
   async preLoadAssets() {
@@ -77,12 +77,14 @@ export default class PlayMode extends GameMode {
 
     this.water = modeGroup.polyline(this.wavesPoints(0))
       .addClass('water')
-      .scale(draw.width(), WATER_HEIGHT_SCALE, 0, 0);
 
     this.groundGroup = modeGroup.group();
     const terrainOptions = { marginWidth: TERRAIN_MARGIN_WIDTH };
     const terrainHeights = terrain(MAX_TERRAIN_EXTREMA, NUM_TERRAIN_POINTS, terrainOptions);
-    const terrainPoints = terrainHeights.map((h, i) => [i / (terrainHeights.length - 1), h]);
+    const terrainPoints = terrainHeights.map((h, i) => [
+      draw.width() * (i / (terrainHeights.length - 1)),
+      TERRAIN_HEIGHT_SCALE * h,
+    ]);
     this.terrainHeights = terrainHeights;
     this.treasureLocation = this.locateTreasure();
 
@@ -97,7 +99,6 @@ export default class PlayMode extends GameMode {
 
     this.ground = this.groundGroup.polyline(terrainPoints)
       .addClass('ground')
-      .scale(draw.width(), TERRAIN_HEIGHT_SCALE, 0, 0)
       .translate(0, TERRAIN_DISTANCE);
 
     behindGroundGroup.clipWith(this.groundGroup.use(this.ground));

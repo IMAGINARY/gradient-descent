@@ -196,11 +196,9 @@ body {
     stroke: #ffec02; }
 
 .water {
-  stroke: #9999ff;
-  vector-effect: non-scaling-stroke; }
+  stroke: #9999ff; }
 
 .ground {
-  stroke: #ffe699;
-  vector-effect: non-scaling-stroke; }
+  stroke: #ffe699; }
 
 /*# sourceMappingURL=default.css.map */

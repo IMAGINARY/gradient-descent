@@ -40,7 +40,11 @@ export default class GradientDescentGame {
    */
   async init() {
     const [width, height] = [1920, 1080];
-    this.svgDoc = SVG().addTo(this.container).size(width, height);
+    this.svgDoc = SVG().addTo(this.container);
+    this.svgDoc
+      .viewbox(0, 0, width, height)
+      .attr("preserveAspectRatio", "xMinYMin meet");
+
     this.draw = this.svgDoc.nested().size(width, height);
 
     this.overlay = document.createElement('div');
