@@ -665,6 +665,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 
 var WATER_HEIGHT_SCALE = 10;
 var NUM_WATER_POINTS = 300;
+var BOAT_DRAFT = 18;
 var TERRAIN_HEIGHT_SCALE = 300;
 var NUM_TERRAIN_POINTS = 300;
 var MAX_TERRAIN_EXTREMA = 20;
@@ -752,8 +753,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                   group.addClass("boat-".concat(playerIndex)).transform({
                     translateX: x * draw.width()
                   });
-                  var boat = group.use(_this2.shipSymbol);
-                  boat.size(300, 200).center(0, -35);
+                  var boat = group.use(_this2.shipSymbol).center(0, BOAT_DRAFT);
                   var probeParent = group.group();
                   var probe = probeParent.group();
                   probe.line(0, -draw.height(), 0, -PROBE_SIZE / 2);
@@ -762,7 +762,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                     translateY: TERRAIN_DISTANCE * PROBE_DISTANCE_AT_REST
                   }); // Clip the probe such that only the part below the boat is visible.
 
-                  var probeClip = probeParent.rect(PROBE_SIZE * 4, draw.height()).move(-PROBE_SIZE * 2, 20);
+                  var probeClip = probeParent.rect(PROBE_SIZE * 4, draw.height()).move(-PROBE_SIZE * 2, BOAT_DRAFT);
                   probeParent.clipWith(probeClip);
                   return {
                     id: playerIndex,

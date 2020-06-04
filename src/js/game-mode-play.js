@@ -5,6 +5,8 @@ import * as waves from './waves';
 const WATER_HEIGHT_SCALE = 10;
 const NUM_WATER_POINTS = 300;
 
+const BOAT_DRAFT = 18;
+
 const TERRAIN_HEIGHT_SCALE = 300;
 const NUM_TERRAIN_POINTS = 300;
 const MAX_TERRAIN_EXTREMA = 20;
@@ -55,9 +57,8 @@ export default class PlayMode extends GameMode {
           .addClass(`boat-${playerIndex}`)
           .transform({ translateX: x * draw.width() });
 
-        const boat = group.use(this.shipSymbol);
-        boat.size(300, 200)
-          .center(0, -35)
+        const boat = group.use(this.shipSymbol)
+          .center(0, BOAT_DRAFT);
 
         const probeParent = group.group();
         const probe = probeParent.group();
@@ -67,7 +68,7 @@ export default class PlayMode extends GameMode {
 
         // Clip the probe such that only the part below the boat is visible.
         const probeClip = probeParent.rect(PROBE_SIZE * 4, draw.height())
-          .move(-PROBE_SIZE * 2, 20);
+          .move(-PROBE_SIZE * 2, BOAT_DRAFT);
         probeParent.clipWith(probeClip);
 
         return {

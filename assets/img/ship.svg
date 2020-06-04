@@ -1,16 +1,49 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Generator: Adobe Illustrator 24.1.0, SVG Export Plug-In . SVG Version: 6.00 Build 0)  -->
-<svg version="1.1" id="Layer_3" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 361.3 137.5" style="enable-background:new 0 0 361.3 137.5;" xml:space="preserve" overflow="visible">
-<style type="text/css">
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   overflow="visible"
+   xml:space="preserve"
+   viewBox="0 0 325.20192 123.75275"
+   height="123.75275"
+   width="325.2019"
+   y="-122"
+   x="-174.15"
+   id="Layer_3"
+   version="1.1"><metadata
+   id="metadata1962"><rdf:RDF><cc:Work
+       rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
+         rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+   id="defs1960" />
+<style
+   id="style1945"
+   type="text/css">
 	.st0{fill:none;stroke:#FF9D27;stroke-miterlimit:10;}
 </style>
-<g>
-	<polygon class="st0" points="0.5,86.6 0.5,114.2 47.6,125.1 54.1,134.3 327.5,137 360.5,71.5 253.9,77.4 185.1,80.7 173.7,97.4 
-		105.5,97.4 30.3,95.3 27,86.6 	"/>
-	<polygon class="st0" points="105.5,79 105.5,97.4 173.7,97.4 185.1,80.7 256.6,77.4 256.6,44.9 211.1,44.9 211.1,62.3 166.7,62.3 
-		167,79 	"/>
-	<polygon class="st0" points="138.5,44.9 157.5,41.7 157,79 130,79 	"/>
-	<line class="st0" x1="222.5" y1="0" x2="222.5" y2="44.7"/>
+<g
+   transform="scale(0.9)"
+   id="g1955">
+	<polygon
+   id="polygon1947"
+   points="54.1,134.3 327.5,137 360.5,71.5 253.9,77.4 185.1,80.7 173.7,97.4 105.5,97.4 30.3,95.3 27,86.6 0.5,86.6 0.5,114.2 47.6,125.1 "
+   class="st0" />
+	<polygon
+   id="polygon1949"
+   points="185.1,80.7 256.6,77.4 256.6,44.9 211.1,44.9 211.1,62.3 166.7,62.3 167,79 105.5,79 105.5,97.4 173.7,97.4 "
+   class="st0" />
+	<polygon
+   id="polygon1951"
+   points="130,79 138.5,44.9 157.5,41.7 157,79 "
+   class="st0" />
+	<line
+   id="line1953"
+   y2="44.700001"
+   x2="222.5"
+   y1="0"
+   x1="222.5"
+   class="st0" />
 </g>
 </svg>
