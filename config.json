@@ -3,7 +3,7 @@
   "useGamepads": true,
   "useScreenControls": true,
   "useKeyboardControls": true,
-  "maxPlayers": 4,
+  "maxPlayers": 2,
   "continuousGame": true,
   "debugControls": true
 }

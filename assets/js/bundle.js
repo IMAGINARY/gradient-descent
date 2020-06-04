@@ -717,8 +717,24 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 this.shipSymbol.attr({
                   overflow: 'visible'
                 });
+                _context.next = 6;
+                return this.game.loadSVGSymbol('assets/img/treasure-closed.svg');
 
-              case 4:
+              case 6:
+                this.treasureClosedSymbol = _context.sent;
+                this.treasureClosedSymbol.attr({
+                  overflow: 'visible'
+                });
+                _context.next = 10;
+                return this.game.loadSVGSymbol('assets/img/treasure-opened.svg');
+
+              case 10:
+                this.treasureOpenedSymbol = _context.sent;
+                this.treasureOpenedSymbol.attr({
+                  overflow: 'visible'
+                });
+
+              case 12:
               case "end":
                 return _context.stop();
             }
@@ -787,7 +803,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 this.treasureLocation = this.locateTreasure();
                 console.log("Treasure location:", this.treasureLocation);
                 behindGroundGroup = this.groundGroup.group();
-                treasure = behindGroundGroup.rect(40, 20).move(-20, -20).fill('red').transform({
+                treasure = behindGroundGroup.use(this.treasureClosedSymbol).addClass('treasure').transform({
                   translateX: this.treasureLocation.x * draw.width(),
                   translateY: TERRAIN_DISTANCE + this.treasureLocation.y * TERRAIN_HEIGHT_SCALE
                 });

@@ -38,6 +38,10 @@ export default class PlayMode extends GameMode {
   async preLoadAssets() {
     this.shipSymbol = await this.game.loadSVGSymbol('assets/img/ship.svg');
     this.shipSymbol.attr({ overflow: 'visible' });
+    this.treasureClosedSymbol = await this.game.loadSVGSymbol('assets/img/treasure-closed.svg');
+    this.treasureClosedSymbol.attr({ overflow: 'visible' });
+    this.treasureOpenedSymbol = await this.game.loadSVGSymbol('assets/img/treasure-opened.svg');
+    this.treasureOpenedSymbol.attr({ overflow: 'visible' });
   }
 
   async handleEnterMode() {
@@ -98,9 +102,8 @@ export default class PlayMode extends GameMode {
     console.log("Treasure location:", this.treasureLocation);
 
     const behindGroundGroup = this.groundGroup.group();
-    const treasure = behindGroundGroup.rect(40, 20)
-      .move(-20, -20)
-      .fill('red')
+    const treasure = behindGroundGroup.use(this.treasureClosedSymbol)
+      .addClass('treasure')
       .transform({
         translateX: this.treasureLocation.x * draw.width(),
         translateY: TERRAIN_DISTANCE + this.treasureLocation.y * TERRAIN_HEIGHT_SCALE,
