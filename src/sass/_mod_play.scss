@@ -37,12 +37,10 @@ $player-colors: $color-player-0, $color-player-1, $color-player-2, $color-player
 .ending-sequences-text {
   text-align: center;
   text-transform: uppercase;
-  position: relative;
-  left: -50%;
+  font-size: 1.5vw;
+  padding-bottom: 1vw;
 }
 
-.ending-sequences-text-container {
+.ending-sequences-text-anchor {
   position: absolute;
-  width: 100vw;
-  font-size: 1.5vw;
 }

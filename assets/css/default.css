@@ -231,12 +231,10 @@ body {
 .ending-sequences-text {
   text-align: center;
   text-transform: uppercase;
-  position: relative;
-  left: -50%; }
+  font-size: 1.5vw;
+  padding-bottom: 1vw; }
 
-.ending-sequences-text-container {
-  position: absolute;
-  width: 100vw;
-  font-size: 1.5vw; }
+.ending-sequences-text-anchor {
+  position: absolute; }
 
 /*# sourceMappingURL=default.css.map */

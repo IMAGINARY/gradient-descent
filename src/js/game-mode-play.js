@@ -1,4 +1,5 @@
 import EventEmitter from 'events';
+import { createPopper } from '@popperjs/core';
 
 import GameMode from './game-mode';
 import terrain from './terrain';
@@ -306,6 +307,10 @@ export default class PlayMode extends GameMode {
     // curve, but rather at the treasure chest
     treasureSpotlight.dy(-2 * 0.3 * TREASURE_SIZE * draw.width());
 
+    // Add at least a clipping rectangle at the treasure location such that this method also
+    // works when no player probed yet.
+    this.addGroundClip(this.treasureLocation.x);
+
     const uncoverGround = clip => new Promise(resolve => {
       clip.animate(UNCOVER_DURATION)
         .ease(pos => -(Math.sqrt(1 - (pos * pos)) - 1))
@@ -334,17 +339,31 @@ export default class PlayMode extends GameMode {
     const $restartDiv = $('<div class="blinking">').text(restartString)
       .css('visibility', 'hidden');
 
-    const $inner = $(`<div class="ending-sequences-text player-${winner.id}" />`)
+    const $endingSequenceDiv = $(`<div class="ending-sequences-text player-${winner.id}" />`)
       .append([$treasureAnnouncementDiv, $treasureDiv, $('<br>'), $restartDiv]);
 
     const left = 100 * this.treasureLocation.x;
-    const bottom = 100 - 100 * (WATER_DISTANCE + TERRAIN_DISTANCE) / draw.height();
-    const $outer = $('<div class="ending-sequences-text-container">')
-      .css({ left: `${left}%`, bottom: `${bottom}%` })
-      .append($inner);
+    const top = 100 * (WATER_DISTANCE + TERRAIN_DISTANCE) / draw.height();
+    const $announcementAnchor = $('<div class="ending-sequences-text-anchor">')
+      .css({
+        left: `${left}%`,
+        top: `${top}%`,
+        width: "0px",
+        height: "0px",
+      });
 
     await delay(ENDING_SEQUENCE_DELAY);
-    $overlay.empty().append($outer);
+    $overlay.empty().append([$announcementAnchor, $endingSequenceDiv]);
+
+    // popper.js places the ending sequence text in a popup-like fashion above the announcement
+    // anchor and makes sure that is does not move off the screen if the anchor is to close to a
+    // screen edge.
+    createPopper(
+      $announcementAnchor.get(0),
+      $endingSequenceDiv.get(0),
+      {
+        placement: 'top',
+      });
 
     await delay(ENDING_SEQUENCE_TREASURE_DELAY);
     $treasureDiv.css("visibility", "visible");
