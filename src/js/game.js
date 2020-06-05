@@ -23,6 +23,7 @@ export default class GradientDescentGame {
     this.inputs = this.createInputs();
     this.inputsLast = this.createInputs();
 
+    this.gameLoop = null;
     this.isPaused = false;
     this.modes = {};
     this.currentMode = null;
@@ -159,24 +160,26 @@ export default class GradientDescentGame {
    * Game loop
    */
   run() {
-    let lastTs = 0;
-    let lag = 0;
-    const MAX_DELTA = 125;
+    if (!this.gameLoop) {
+      let lastTs = 0;
+      let lag = 0;
+      const MAX_DELTA = 125;
 
-    const gameLoop = (ts) => {
-      if (!this.isPaused) {
-        this.readInputs();
-        lag += Math.max(0, (ts - lag) - lastTs - MAX_DELTA);
-        ts -= lag;
-        const delta = ts - lastTs;
-        this.currentMode.handleInputs(this.inputs, this.inputsLast, delta, ts);
-        this.currentMode.draw(delta, ts);
-        lastTs = ts;
+      this.gameLoop = (ts) => {
+        if (!this.isPaused) {
+          this.readInputs();
+          lag += Math.max(0, (ts - lag) - lastTs - MAX_DELTA);
+          ts -= lag;
+          const delta = ts - lastTs;
+          this.currentMode.handleInputs(this.inputs, this.inputsLast, delta, ts);
+          this.currentMode.draw(delta, ts);
+          lastTs = ts;
 
-        window.requestAnimationFrame(gameLoop);
-      }
-    };
-    window.requestAnimationFrame(gameLoop);
+          window.requestAnimationFrame(this.gameLoop);
+        }
+      };
+    }
+    window.requestAnimationFrame(this.gameLoop);
   }
 
   /**

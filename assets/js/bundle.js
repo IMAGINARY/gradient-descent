@@ -1497,6 +1497,7 @@ var GradientDescentGame = /*#__PURE__*/function () {
     this.config = config;
     this.inputs = this.createInputs();
     this.inputsLast = this.createInputs();
+    this.gameLoop = null;
     this.isPaused = false;
     this.modes = {};
     this.currentMode = null;
@@ -1731,28 +1732,30 @@ var GradientDescentGame = /*#__PURE__*/function () {
     value: function run() {
       var _this = this;
 
-      var lastTs = 0;
-      var lag = 0;
-      var MAX_DELTA = 125;
+      if (!this.gameLoop) {
+        var lastTs = 0;
+        var lag = 0;
+        var MAX_DELTA = 125;
 
-      var gameLoop = function gameLoop(ts) {
-        if (!_this.isPaused) {
-          _this.readInputs();
+        this.gameLoop = function (ts) {
+          if (!_this.isPaused) {
+            _this.readInputs();
 
-          lag += Math.max(0, ts - lag - lastTs - MAX_DELTA);
-          ts -= lag;
-          var delta = ts - lastTs;
+            lag += Math.max(0, ts - lag - lastTs - MAX_DELTA);
+            ts -= lag;
+            var delta = ts - lastTs;
 
-          _this.currentMode.handleInputs(_this.inputs, _this.inputsLast, delta, ts);
+            _this.currentMode.handleInputs(_this.inputs, _this.inputsLast, delta, ts);
 
-          _this.currentMode.draw(delta, ts);
+            _this.currentMode.draw(delta, ts);
 
-          lastTs = ts;
-          window.requestAnimationFrame(gameLoop);
-        }
-      };
+            lastTs = ts;
+            window.requestAnimationFrame(_this.gameLoop);
+          }
+        };
+      }
 
-      window.requestAnimationFrame(gameLoop);
+      window.requestAnimationFrame(this.gameLoop);
     }
     /**
      * Pauses the game.
