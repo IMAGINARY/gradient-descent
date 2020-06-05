@@ -2189,6 +2189,7 @@ exports.height = height;
 exports.slope = slope;
 exports.heights = heights;
 exports.points = points;
+exports.animatedSVG = animatedSVG;
 // The water surface consists of superimposed sin waves that are moving with respect to ts.
 // Fixing x, the frequency factors with respect to ts are [1,-1,2,3].
 // Since the lowest common denominator of these factors is 6 and the base frequency is 1 / (2 * PI),
@@ -2222,6 +2223,33 @@ function points(arr, t) {
     arr[i] = [xScale * x, yScale * height(x, t)];
   });
   return arr;
+}
+/*
+ * Experimental: Create an SVG wave shape that animates via the <animate> tag.
+ * This will probably doesn't work in a lot of browsers.
+ * Problems: It's not possible to the the timestamp (progress) of the animation,
+ * which would be needed to keep it in sync with other elements in the scene.
+ */
+
+
+function animatedSVG(svgContainer, numPoints, numSteps, xScale, yScale, duration) {
+  var p = Array(numPoints).fill(null);
+  var keyframes = Array(numSteps).fill(null).map(function (_, i) {
+    return Array.from(points(p, i / (numSteps - 1), xScale, yScale));
+  });
+  var waves = svgContainer.polyline(keyframes[0]);
+  var keyframesSvg = keyframes.map(function (p) {
+    return waves.plot(p).attr('points');
+  });
+  var keyframesString = keyframesSvg.join(';\n').replace(/;[[:space:]]*;]/g, ';');
+  var animate = waves.element('animate');
+  animate.attr({
+    attributeName: 'points',
+    dur: "".concat(duration, "ms"),
+    repeatCount: 'indefinite',
+    values: keyframesString
+  });
+  return waves;
 }
 
 },{}],13:[function(require,module,exports){
