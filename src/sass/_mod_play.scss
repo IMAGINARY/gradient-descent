@@ -1,29 +1,24 @@
 .play {
   stroke-width: 3;
+  stroke: none;
   fill: none;
 }
 
-.boat {
-  fill: none;
+$player-colors: $color-player-0, $color-player-1, $color-player-2, $color-player-3;
 
-  &-0 {
-    @extend .boat;
-    stroke: $color-blue;
-  }
+@for $i from 0 through 3 {
+  .player-#{$i} {
+    $player-color: nth($player-colors, 1 + $i);
 
-  &-1 {
-    @extend .boat;
-    stroke: $color-red;
-  }
+    color: $player-color;
 
-  &-2 {
-    @extend .boat;
-    stroke: $color-green;
-  }
+    .draw &, &.draw {
+      stroke: $player-color;
+    }
 
-  &-3 {
-    @extend .boat;
-    stroke: $color-yellow;
+    .fill &, &.fill {
+      fill: $player-color;
+    }
   }
 }
 

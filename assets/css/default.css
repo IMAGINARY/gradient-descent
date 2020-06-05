@@ -188,18 +188,36 @@ body {
 
 .play {
   stroke-width: 3;
+  stroke: none;
   fill: none; }
 
-.boat, .boat-0, .boat-1, .boat-2, .boat-3 {
-  fill: none; }
-  .boat-0 {
+.player-0 {
+  color: #2197ff; }
+  .draw .player-0, .player-0.draw {
     stroke: #2197ff; }
-  .boat-1 {
+  .fill .player-0, .player-0.fill {
+    fill: #2197ff; }
+
+.player-1 {
+  color: #ff2d2d; }
+  .draw .player-1, .player-1.draw {
     stroke: #ff2d2d; }
-  .boat-2 {
+  .fill .player-1, .player-1.fill {
+    fill: #ff2d2d; }
+
+.player-2 {
+  color: #29da29; }
+  .draw .player-2, .player-2.draw {
     stroke: #29da29; }
-  .boat-3 {
+  .fill .player-2, .player-2.fill {
+    fill: #29da29; }
+
+.player-3 {
+  color: #ffec02; }
+  .draw .player-3, .player-3.draw {
     stroke: #ffec02; }
+  .fill .player-3, .player-3.fill {
+    fill: #ffec02; }
 
 .water {
   stroke: #9999ff; }

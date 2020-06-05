@@ -665,6 +665,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 
 var WATER_HEIGHT_SCALE = 10;
 var NUM_WATER_POINTS = 300;
+var WATER_DISTANCE = 200;
 var BOAT_DRAFT = 18;
 var TERRAIN_HEIGHT_SCALE = 300;
 var NUM_TERRAIN_POINTS = 300;
@@ -761,12 +762,12 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
             switch (_context2.prev = _context2.next) {
               case 0:
                 _this$game = this.game, draw = _this$game.draw, numPlayers = _this$game.numPlayers;
-                modeGroup = draw.group().addClass('play').translate(0, 200); // Create a boat for each player
+                modeGroup = draw.group().addClass('play').addClass('draw').translate(0, WATER_DISTANCE); // Create a boat for each player
 
                 this.players = Array(numPlayers).fill(null).map(function (_, playerIndex) {
                   var x = (playerIndex + 1) / (numPlayers + 1);
                   var group = modeGroup.group();
-                  group.addClass("boat-".concat(playerIndex)).transform({
+                  group.addClass("player-".concat(playerIndex)).transform({
                     translateX: x * draw.width()
                   });
                   var boat = group.use(_this2.shipSymbol).center(0, BOAT_DRAFT);
@@ -969,7 +970,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
           slope = _this$terrainHeightEx.slope;
 
       var angle = 180 * Math.atan2(slope * TERRAIN_HEIGHT_SCALE, width) / Math.PI;
-      this.tangents.line(-width * TANGENT_LENGTH / 2, 0, width * TANGENT_LENGTH / 2, 0).addClass("boat-".concat(player.id)).transform({
+      this.tangents.line(-width * TANGENT_LENGTH / 2, 0, width * TANGENT_LENGTH / 2, 0).addClass("player-".concat(player.id)).transform({
         translateX: width * player.x,
         translateY: TERRAIN_HEIGHT_SCALE * value,
         rotate: angle

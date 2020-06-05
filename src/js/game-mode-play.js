@@ -4,6 +4,7 @@ import * as waves from './waves';
 
 const WATER_HEIGHT_SCALE = 10;
 const NUM_WATER_POINTS = 300;
+const WATER_DISTANCE = 200;
 
 const BOAT_DRAFT = 18;
 
@@ -49,7 +50,8 @@ export default class PlayMode extends GameMode {
 
     const modeGroup = draw.group()
       .addClass('play')
-      .translate(0, 200);
+      .addClass('draw')
+      .translate(0, WATER_DISTANCE);
 
     // Create a boat for each player
     this.players = Array(numPlayers)
@@ -58,7 +60,7 @@ export default class PlayMode extends GameMode {
         const x = (playerIndex + 1) / (numPlayers + 1);
         const group = modeGroup.group();
         group
-          .addClass(`boat-${playerIndex}`)
+          .addClass(`player-${playerIndex}`)
           .transform({ translateX: x * draw.width() });
 
         const boat = group.use(this.shipSymbol)
@@ -221,7 +223,7 @@ export default class PlayMode extends GameMode {
     const { value, slope } = this.terrainHeightExt(player.x);
     const angle = 180 * Math.atan2(slope * TERRAIN_HEIGHT_SCALE, width) / Math.PI;
     this.tangents.line(-width * TANGENT_LENGTH / 2, 0, width * TANGENT_LENGTH / 2, 0,)
-      .addClass(`boat-${player.id}`)
+      .addClass(`player-${player.id}`)
       .transform({
         translateX: width * player.x,
         translateY: TERRAIN_HEIGHT_SCALE * value,

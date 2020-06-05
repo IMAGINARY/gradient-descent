@@ -18,6 +18,11 @@ $color-water: #9999ff;
 $color-ground: #ffe699;
 $color-treasure: #F99C2D;
 
+$color-player-0: $color-blue;
+$color-player-1: $color-red;
+$color-player-2: $color-green;
+$color-player-3: $color-yellow;
+
 @mixin neg {
   -webkit-font-smoothing: antialiased;
 }
