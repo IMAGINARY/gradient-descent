@@ -145,7 +145,7 @@ export default class PlayMode extends GameMode {
           player.x += SPEED_FACTOR * (delta * input.direction);
           player.x = Math.min(Math.max(TERRAIN_MARGIN_WIDTH, player.x), 1.0 - TERRAIN_MARGIN_WIDTH);
           player.flipX = input.direction === 0 ? player.flipX : input.direction === -1;
-          if (input.action) {
+          if (input.action && !lastInputs[playerIndex].action) {
             // Switch to probe mode
             player.probing = true;
             // Lower the probe, wait and raise it again
