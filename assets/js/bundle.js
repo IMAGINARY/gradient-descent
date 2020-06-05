@@ -990,12 +990,17 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
     key: "uncoverGround",
     value: function () {
       var _uncoverGround = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4() {
-        var uncoverGround;
+        var draw, treasureSpotlight, uncoverGround;
         return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
+                draw = this.game.draw;
                 this.ground.show();
+                treasureSpotlight = this.groundClip.circle(2 * TREASURE_SIZE * draw.width()).center(draw.width() * this.treasureLocation.x, TERRAIN_DISTANCE + TERRAIN_HEIGHT_SCALE * this.treasureLocation.y); // Move the treasure spotlight up a bit so it doesn't point at the treasure location on the
+                // curve, but rather at the treasure chest
+
+                treasureSpotlight.dy(-2 * 0.3 * TREASURE_SIZE * draw.width());
 
                 uncoverGround = function uncoverGround(clip) {
                   return new Promise(function (resolve) {
@@ -1007,7 +1012,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
 
                 return _context4.abrupt("return", Promise.all(this.groundClip.children().map(uncoverGround)));
 
-              case 3:
+              case 6:
               case "end":
                 return _context4.stop();
             }

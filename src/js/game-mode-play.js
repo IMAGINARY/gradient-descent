@@ -241,7 +241,18 @@ export default class PlayMode extends GameMode {
   }
 
   async uncoverGround() {
+    const { draw } = this.game;
     this.ground.show();
+    const treasureSpotlight = this.groundClip.circle(2 * TREASURE_SIZE * draw.width())
+      .center(
+        draw.width() * this.treasureLocation.x,
+        TERRAIN_DISTANCE + TERRAIN_HEIGHT_SCALE * this.treasureLocation.y
+      );
+
+    // Move the treasure spotlight up a bit so it doesn't point at the treasure location on the
+    // curve, but rather at the treasure chest
+    treasureSpotlight.dy(-2 * 0.3 * TREASURE_SIZE * draw.width());
+
     const uncoverGround = clip => new Promise(resolve => {
       clip.animate(UNCOVER_DURATION)
         .transform({ scaleX: 1.0 })
