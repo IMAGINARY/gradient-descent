@@ -37,7 +37,6 @@ $player-colors: $color-player-0, $color-player-1, $color-player-2, $color-player
 .ending-sequences-text {
   text-align: center;
   text-transform: uppercase;
-  margin-bottom: 2vw;
   position: relative;
   left: -50%;
 }
@@ -45,4 +44,5 @@ $player-colors: $color-player-0, $color-player-1, $color-player-2, $color-player
 .ending-sequences-text-container {
   position: absolute;
   width: 100vw;
+  font-size: 1.5vw;
 }

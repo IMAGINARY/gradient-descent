@@ -635,6 +635,8 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
+var _events = _interopRequireDefault(require("events"));
+
 var _gameMode = _interopRequireDefault(require("./game-mode"));
 
 var _terrain = _interopRequireDefault(require("./terrain"));
@@ -694,6 +696,7 @@ var TREASURE_SIZE = 0.03;
 var UNCOVER_DURATION = 2000;
 var ENDING_SEQUENCE_DELAY = 0;
 var ENDING_SEQUENCE_TREASURE_DELAY = 1000;
+var ENDING_SEQUENCE_RESTART_DELAY = 2000;
 
 var PlayMode = /*#__PURE__*/function (_GameMode) {
   _inherits(PlayMode, _GameMode);
@@ -765,16 +768,18 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
   }, {
     key: "handleEnterMode",
     value: function () {
-      var _handleEnterMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+      var _handleEnterMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
         var _this2 = this;
 
         var _this$game, draw, numPlayers, modeGroup, terrainOptions, terrainHeights, terrainPoints, behindGroundGroup, treasure;
 
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
-            switch (_context2.prev = _context2.next) {
+            switch (_context3.prev = _context3.next) {
               case 0:
                 _this$game = this.game, draw = _this$game.draw, numPlayers = _this$game.numPlayers;
+                this.gameOver = false;
+                this.discardInputs = false;
                 modeGroup = draw.group().addClass('play').addClass('draw').translate(0, WATER_DISTANCE); // Create a boat for each player
 
                 this.players = Array(numPlayers).fill(null).map(function (_, playerIndex) {
@@ -801,7 +806,54 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                     probe: probe,
                     x: x,
                     flipX: false,
-                    probing: false
+                    _probing: false,
+                    _probeEventEmitter: new _events["default"](),
+
+                    set probing(p) {
+                      var probeTurnedOff = this._probing && !p;
+                      this._probing = p;
+                      if (probeTurnedOff) this._probeEventEmitter.emit("probe-off");
+                    },
+
+                    get probing() {
+                      return this._probing;
+                    },
+
+                    probingDone: function () {
+                      var _probingDone = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+                        var _this3 = this;
+
+                        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+                          while (1) {
+                            switch (_context2.prev = _context2.next) {
+                              case 0:
+                                if (this.probing) {
+                                  _context2.next = 2;
+                                  break;
+                                }
+
+                                return _context2.abrupt("return");
+
+                              case 2:
+                                _context2.next = 4;
+                                return new Promise(function (resolve) {
+                                  return _this3._probeEventEmitter.addListener("probe-off", resolve);
+                                });
+
+                              case 4:
+                              case "end":
+                                return _context2.stop();
+                            }
+                          }
+                        }, _callee2, this);
+                      }));
+
+                      function probingDone() {
+                        return _probingDone.apply(this, arguments);
+                      }
+
+                      return probingDone;
+                    }()
                   };
                 });
                 this.water = modeGroup.group().polyline(this.wavesPoints(0)).addClass('water');
@@ -829,12 +881,12 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 this.groundGroup.clipWith(this.groundClip);
                 this.tangents = modeGroup.group().translate(0, TERRAIN_DISTANCE);
 
-              case 20:
+              case 22:
               case "end":
-                return _context2.stop();
+                return _context3.stop();
             }
           }
-        }, _callee2, this);
+        }, _callee3, this);
       }));
 
       function handleEnterMode() {
@@ -846,16 +898,16 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
   }, {
     key: "handleExitMode",
     value: function () {
-      var _handleExitMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
-        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+      var _handleExitMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4() {
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context4.prev = _context4.next) {
               case 0:
               case "end":
-                return _context3.stop();
+                return _context4.stop();
             }
           }
-        }, _callee3);
+        }, _callee4);
       }));
 
       function handleExitMode() {
@@ -867,51 +919,84 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
   }, {
     key: "handleInputs",
     value: function handleInputs(inputs, lastInputs, delta, ts) {
-      var _this3 = this;
+      var _this4 = this;
 
       // Move the boats or check if they're lowering the probe
+      if (this.discardInputs) return;
       var _this$game2 = this.game,
           draw = _this$game2.draw,
           numPlayers = _this$game2.numPlayers;
       inputs.slice(0, numPlayers) // discard inputs that don't belong to an active player
       .forEach(function (input, playerIndex) {
-        var player = _this3.players[playerIndex];
+        var lastInput = lastInputs[playerIndex];
+        var actionDown = input.action && !lastInput.action;
+        if (_this4.gameOver && actionDown) _this4.triggerEvent('done');
+        var player = _this4.players[playerIndex];
 
-        if (!player.probing) {
+        if (!player.probing && !_this4.gameOver) {
           player.x += SPEED_FACTOR * (delta * input.direction);
           player.x = Math.min(Math.max(TERRAIN_MARGIN_WIDTH, player.x), 1.0 - TERRAIN_MARGIN_WIDTH);
           player.flipX = input.direction === 0 ? player.flipX : input.direction === -1;
 
-          if (input.action && !lastInputs[playerIndex].action) {
+          if (actionDown) {
             // Switch to probe mode
             player.probing = true; // Lower the probe, wait and raise it again
 
-            var terrainHeight = _this3.terrainHeight(player.x);
+            var terrainHeight = _this4.terrainHeight(player.x);
 
             var probeHeight = TERRAIN_DISTANCE + TERRAIN_HEIGHT_SCALE * terrainHeight;
             var probeDuration = probeHeight * (PROBE_MIN_DURATION / TERRAIN_DISTANCE);
             var runnerDown = player.probe.animate(probeDuration, 0, 'now').transform({
               translateY: probeHeight
             }).after(function () {
-              return _this3.addGroundClip(player.x);
+              return _this4.addGroundClip(player.x);
             }).after(function () {
-              return _this3.addTangent(player);
+              return _this4.addTangent(player);
             });
             var runnerUp = runnerDown.animate(probeDuration, PROBE_DELAY).transform({
               translateY: TERRAIN_DISTANCE * PROBE_DISTANCE_AT_REST
             }).after(function () {
               return player.probing = false;
             });
+            var treasureFound = Math.abs(player.x - _this4.treasureLocation.x) <= TREASURE_SIZE / 2;
+            runnerDown.after( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
+              var uncoverGroundPromise;
+              return regeneratorRuntime.wrap(function _callee5$(_context5) {
+                while (1) {
+                  switch (_context5.prev = _context5.next) {
+                    case 0:
+                      if (!(treasureFound && !_this4.gameOver)) {
+                        _context5.next = 12;
+                        break;
+                      }
 
-            if (Math.abs(player.x - _this3.treasureLocation.x) <= TREASURE_SIZE / 2) {
-              runnerDown.after(function () {
-                return _this3.uncoverGround();
-              });
-              runnerUp.after(function () {
-                return _this3.showGameOverSequence(player);
-              });
-            }
+                      console.log("Treasure found - GAME OVER!"); // The game is now over, so a player that lowered the probe later can not win anymore.
 
+                      _this4.gameOver = true; // Disable all inputs until the ending sequence is over.
+
+                      _this4.discardInputs = true;
+                      uncoverGroundPromise = _this4.uncoverGround();
+                      _context5.next = 7;
+                      return Promise.all(_this4.players.map(function (p) {
+                        return p.probingDone();
+                      }));
+
+                    case 7:
+                      _context5.next = 9;
+                      return _this4.showGameOverSequence(player);
+
+                    case 9:
+                      _this4.discardInputs = false;
+                      _context5.next = 12;
+                      return uncoverGroundPromise;
+
+                    case 12:
+                    case "end":
+                      return _context5.stop();
+                  }
+                }
+              }, _callee5);
+            })));
             console.log("Player ".concat(playerIndex, " is probing at:"), {
               x: player.x,
               y: terrainHeight
@@ -1012,11 +1097,11 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
   }, {
     key: "uncoverGround",
     value: function () {
-      var _uncoverGround = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4() {
+      var _uncoverGround = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6() {
         var draw, treasureSpotlight, uncoverGround;
-        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+        return regeneratorRuntime.wrap(function _callee6$(_context6) {
           while (1) {
-            switch (_context4.prev = _context4.next) {
+            switch (_context6.prev = _context6.next) {
               case 0:
                 draw = this.game.draw;
                 this.ground.show();
@@ -1035,14 +1120,14 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                   });
                 };
 
-                return _context4.abrupt("return", Promise.all(this.groundClip.children().map(uncoverGround)));
+                return _context6.abrupt("return", Promise.all(this.groundClip.children().map(uncoverGround)));
 
               case 6:
               case "end":
-                return _context4.stop();
+                return _context6.stop();
             }
           }
-        }, _callee4, this);
+        }, _callee6, this);
       }));
 
       function uncoverGround() {
@@ -1054,11 +1139,11 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
   }, {
     key: "showGameOverSequence",
     value: function () {
-      var _showGameOverSequence = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(winner) {
-        var draw, $overlay, delay, treasureAnnouncement, randomElement, treasureString, $treasureAnnouncement, $treasureString, $inner, left, bottom, $outer;
-        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+      var _showGameOverSequence = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7(winner) {
+        var draw, $overlay, delay, treasureAnnouncement, randomElement, treasureString, restartString, $treasureAnnouncementDiv, $treasureDiv, $restartDiv, $inner, left, bottom, $outer;
+        return regeneratorRuntime.wrap(function _callee7$(_context7) {
           while (1) {
-            switch (_context5.prev = _context5.next) {
+            switch (_context7.prev = _context7.next) {
               case 0:
                 draw = this.game.draw;
                 $overlay = $(this.game.overlay);
@@ -1076,34 +1161,41 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 };
 
                 treasureString = randomElement(IMAGINARY.i18n.t('treasures'));
-                $treasureAnnouncement = $("<div>").text(treasureAnnouncement);
-                $treasureString = $("<div>").text(treasureString).css("visibility", "visible").css('visibility', 'hidden');
-                $inner = $("<div class=\"ending-sequences-text player-".concat(winner.id, "\" />")).append([$treasureAnnouncement, $treasureString]);
+                restartString = IMAGINARY.i18n.t('press-to-restart');
+                $treasureAnnouncementDiv = $('<div>').text(treasureAnnouncement);
+                $treasureDiv = $('<div>').text(treasureString).css('visibility', 'hidden');
+                $restartDiv = $('<div class="blinking">').text(restartString).css('visibility', 'hidden');
+                $inner = $("<div class=\"ending-sequences-text player-".concat(winner.id, "\" />")).append([$treasureAnnouncementDiv, $treasureDiv, $('<br>'), $restartDiv]);
                 left = 100 * this.treasureLocation.x;
                 bottom = 100 - 100 * (WATER_DISTANCE + TERRAIN_DISTANCE) / draw.height();
                 $outer = $('<div class="ending-sequences-text-container">').css({
                   left: "".concat(left, "%"),
                   bottom: "".concat(bottom, "%")
                 }).append($inner);
-                _context5.next = 14;
+                _context7.next = 16;
                 return delay(ENDING_SEQUENCE_DELAY);
 
-              case 14:
+              case 16:
                 $overlay.empty().append($outer);
-                _context5.next = 17;
+                _context7.next = 19;
                 return delay(ENDING_SEQUENCE_TREASURE_DELAY);
 
-              case 17:
-                $treasureString.css("visibility", "visible");
+              case 19:
+                $treasureDiv.css("visibility", "visible");
                 this.treasureOpened.show();
                 this.treasureClosed.hide();
+                _context7.next = 24;
+                return delay(ENDING_SEQUENCE_RESTART_DELAY);
 
-              case 20:
+              case 24:
+                $restartDiv.css("visibility", "visible");
+
+              case 25:
               case "end":
-                return _context5.stop();
+                return _context7.stop();
             }
           }
-        }, _callee5, this);
+        }, _callee7, this);
       }));
 
       function showGameOverSequence(_x) {
@@ -1119,7 +1211,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = PlayMode;
 
-},{"./game-mode":8,"./terrain":11,"./waves":12}],7:[function(require,module,exports){
+},{"./game-mode":8,"./terrain":11,"./waves":12,"events":14}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
