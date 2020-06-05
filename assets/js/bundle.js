@@ -1004,7 +1004,9 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
 
                 uncoverGround = function uncoverGround(clip) {
                   return new Promise(function (resolve) {
-                    clip.animate(UNCOVER_DURATION).transform({
+                    clip.animate(UNCOVER_DURATION).ease(function (pos) {
+                      return -(Math.sqrt(1 - pos * pos) - 1);
+                    }).transform({
                       scaleX: 1.0
                     }).after(resolve);
                   });

@@ -255,6 +255,7 @@ export default class PlayMode extends GameMode {
 
     const uncoverGround = clip => new Promise(resolve => {
       clip.animate(UNCOVER_DURATION)
+        .ease(pos => -(Math.sqrt(1 - (pos * pos)) - 1))
         .transform({ scaleX: 1.0 })
         .after(resolve);
     });
