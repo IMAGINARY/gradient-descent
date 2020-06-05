@@ -28,7 +28,7 @@ const TANGENT_LENGTH = 0.02;
 const TREASURE_SIZE = 0.03;
 
 const UNCOVER_DURATION = 2000;
-const ENDING_SEQUENCE_DELAY = 1000;
+const ENDING_SEQUENCE_DELAY = 0;
 const ENDING_SEQUENCE_TREASURE_DELAY = 1000;
 
 export default class PlayMode extends GameMode {
@@ -158,13 +158,14 @@ export default class PlayMode extends GameMode {
               .transform({ translateY: probeHeight })
               .after(() => this.addGroundClip(player.x))
               .after(() => this.addTangent(player));
-            if (Math.abs(player.x - this.treasureLocation.x) <= TREASURE_SIZE / 2)
-              runnerDown
-                .after(() => this.uncoverGround())
-                .after(() => this.showGameOverSequence(player));
             const runnerUp = runnerDown.animate(probeDuration, PROBE_DELAY)
               .transform({ translateY: TERRAIN_DISTANCE * PROBE_DISTANCE_AT_REST })
               .after(() => player.probing = false);
+            if (Math.abs(player.x - this.treasureLocation.x) <= TREASURE_SIZE / 2) {
+              runnerDown.after(() => this.uncoverGround());
+              runnerUp.after(() => this.showGameOverSequence(player));
+            }
+
             console.log(`Player ${playerIndex} is probing at:`, { x: player.x, y: terrainHeight });
           }
         }

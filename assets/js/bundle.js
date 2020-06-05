@@ -692,7 +692,7 @@ var PROBE_DELAY = 500;
 var TANGENT_LENGTH = 0.02;
 var TREASURE_SIZE = 0.03;
 var UNCOVER_DURATION = 2000;
-var ENDING_SEQUENCE_DELAY = 1000;
+var ENDING_SEQUENCE_DELAY = 0;
 var ENDING_SEQUENCE_TREASURE_DELAY = 1000;
 
 var PlayMode = /*#__PURE__*/function (_GameMode) {
@@ -897,16 +897,21 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
             }).after(function () {
               return _this3.addTangent(player);
             });
-            if (Math.abs(player.x - _this3.treasureLocation.x) <= TREASURE_SIZE / 2) runnerDown.after(function () {
-              return _this3.uncoverGround();
-            }).after(function () {
-              return _this3.showGameOverSequence(player);
-            });
             var runnerUp = runnerDown.animate(probeDuration, PROBE_DELAY).transform({
               translateY: TERRAIN_DISTANCE * PROBE_DISTANCE_AT_REST
             }).after(function () {
               return player.probing = false;
             });
+
+            if (Math.abs(player.x - _this3.treasureLocation.x) <= TREASURE_SIZE / 2) {
+              runnerDown.after(function () {
+                return _this3.uncoverGround();
+              });
+              runnerUp.after(function () {
+                return _this3.showGameOverSequence(player);
+              });
+            }
+
             console.log("Player ".concat(playerIndex, " is probing at:"), {
               x: player.x,
               y: terrainHeight
