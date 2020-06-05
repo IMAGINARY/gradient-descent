@@ -5,6 +5,7 @@ import * as waves from './waves';
 const WATER_HEIGHT_SCALE = 10;
 const NUM_WATER_POINTS = 300;
 const WATER_DISTANCE = 200;
+const WATER_LOOP_DURATION = 20 * 1000;
 
 const BOAT_DRAFT = 18;
 
@@ -35,7 +36,7 @@ export default class PlayMode extends GameMode {
   constructor(game) {
     super(game);
     const wavesPoints = Array(NUM_WATER_POINTS).fill(null);
-    this.wavesPoints = ts => waves.points(wavesPoints, ts, game.draw.width(), WATER_HEIGHT_SCALE);
+    this.wavesPoints = t => waves.points(wavesPoints, t, game.draw.width(), WATER_HEIGHT_SCALE);
   }
 
   async preLoadAssets() {
@@ -92,7 +93,7 @@ export default class PlayMode extends GameMode {
 
     this.water = modeGroup.group()
       .polyline(this.wavesPoints(0))
-      .addClass('water')
+      .addClass('water');
 
     this.groundGroup = modeGroup.group();
     const terrainOptions = { marginWidth: TERRAIN_MARGIN_WIDTH };
@@ -176,12 +177,12 @@ export default class PlayMode extends GameMode {
     // Draw bottom
     // etc...
 
-    this.water.plot(this.wavesPoints(ts));
+    this.water.plot(this.wavesPoints(ts / WATER_LOOP_DURATION));
 
     this.players.forEach((player, playerIndex) => {
       const x = player.x;
-      const y = WATER_HEIGHT_SCALE * waves.height(x, ts);
-      const slope = WATER_HEIGHT_SCALE * waves.slope(x, ts);
+      const y = WATER_HEIGHT_SCALE * waves.height(x, ts / WATER_LOOP_DURATION);
+      const slope = WATER_HEIGHT_SCALE * waves.slope(x, ts / WATER_LOOP_DURATION);
       const angle = 0.25 * 180 * Math.atan2(slope, draw.width()) / Math.PI;
       const boatTransform = {
         rotate: angle,

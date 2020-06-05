@@ -666,6 +666,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 var WATER_HEIGHT_SCALE = 10;
 var NUM_WATER_POINTS = 300;
 var WATER_DISTANCE = 200;
+var WATER_LOOP_DURATION = 20 * 1000;
 var BOAT_DRAFT = 18;
 var TERRAIN_HEIGHT_SCALE = 300;
 var NUM_TERRAIN_POINTS = 300;
@@ -697,8 +698,8 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
     _this = _super.call(this, game);
     var wavesPoints = Array(NUM_WATER_POINTS).fill(null);
 
-    _this.wavesPoints = function (ts) {
-      return waves.points(wavesPoints, ts, game.draw.width(), WATER_HEIGHT_SCALE);
+    _this.wavesPoints = function (t) {
+      return waves.points(wavesPoints, t, game.draw.width(), WATER_HEIGHT_SCALE);
     };
 
     return _this;
@@ -913,11 +914,11 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       // Draw bottom
       // etc...
 
-      this.water.plot(this.wavesPoints(ts));
+      this.water.plot(this.wavesPoints(ts / WATER_LOOP_DURATION));
       this.players.forEach(function (player, playerIndex) {
         var x = player.x;
-        var y = WATER_HEIGHT_SCALE * waves.height(x, ts);
-        var slope = WATER_HEIGHT_SCALE * waves.slope(x, ts);
+        var y = WATER_HEIGHT_SCALE * waves.height(x, ts / WATER_LOOP_DURATION);
+        var slope = WATER_HEIGHT_SCALE * waves.slope(x, ts / WATER_LOOP_DURATION);
         var angle = 0.25 * 180 * Math.atan2(slope, draw.width()) / Math.PI;
         var boatTransform = {
           rotate: angle
@@ -2188,30 +2189,37 @@ exports.height = height;
 exports.slope = slope;
 exports.heights = heights;
 exports.points = points;
+// The water surface consists of superimposed sin waves that are moving with respect to ts.
+// Fixing x, the frequency factors with respect to ts are [1,-1,2,3].
+// Since the lowest common denominator of these factors is 6 and the base frequency is 1 / (2 * PI),
+// the period of the water animation is 6 / (1 / (2 * PI)) = 12 * PI.
+var PERIOD = 12 * Math.PI;
 
-function height(x, ts) {
-  ts = ts / 500;
-  return (Math.sin(x * 100 + ts) + Math.sin(x * 50 - 1 * ts) + Math.sin(x * 30 + 2 * ts) + Math.sin(x * 10 - 3 * ts)) / 4;
+function height(x, t) {
+  t = t * PERIOD % PERIOD;
+  return (Math.sin(x * 100 + t) + Math.sin(x * 50 - 1 * t) + Math.sin(x * 30 + 2 * t) + Math.sin(x * 10 - 3 * t)) / 4;
 }
 
-function slope(x, ts) {
-  ts = ts / 500;
-  return (100 * Math.cos(100 * x + ts) + 50 * Math.cos(50 * x - ts) + 30 * Math.cos(30 * x + 2 * ts) + 10 * Math.cos(10 * x - 3 * ts)) / 4;
+function slope(x, t) {
+  t = t * PERIOD % PERIOD;
+  return (100 * Math.cos(100 * x + t) + 50 * Math.cos(50 * x - t) + 30 * Math.cos(30 * x + 2 * t) + 10 * Math.cos(10 * x - 3 * t)) / 4;
 }
 
-function heights(arr, ts) {
+function heights(arr, t) {
+  var xScale = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1.0;
+  var yScale = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1.0;
   arr.forEach(function (_, i) {
-    return arr[i] = height(i / (arr.length - 1), ts);
+    return arr[i] = height(i / (arr.length - 1), t);
   });
   return arr;
 }
 
-function points(arr, ts) {
-  var xscale = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1.0;
-  var yscale = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1.0;
+function points(arr, t) {
+  var xScale = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : 1.0;
+  var yScale = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : 1.0;
   arr.forEach(function (_, i) {
     var x = i / (arr.length - 1);
-    arr[i] = [xscale * x, yscale * height(x, ts)];
+    arr[i] = [xScale * x, yScale * height(x, t)];
   });
   return arr;
 }
