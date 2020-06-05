@@ -8,11 +8,20 @@ const keyMap = {
   'KeyD': { id: 1, prop: 'right' },
   'KeyS': { id: 1, prop: 'action' },
 };
+const keyCodes = Object.keys(keyMap);
 
 /**
- * Component that handles on-screen controls
+ * Certain default actions like scrolling should be prevented for the keys used for the game.
+ */
+function preventDefaultActionForKeys(e) {
+  if (keyCodes.includes(e.code))
+    e.preventDefault();
+}
+
+/**
+ * Component that handles keyboard controls
  *
- * Supports both mouse and multitouch input.
+ * Supports up to two players at the moment.
  *
  */
 export default class KeyboardControls extends Controls {
@@ -33,5 +42,6 @@ export default class KeyboardControls extends Controls {
 
     window.addEventListener('keydown', keyCallback);
     window.addEventListener('keyup', keyCallback);
+    window.addEventListener("keydown", preventDefaultActionForKeys, false);
   }
 }

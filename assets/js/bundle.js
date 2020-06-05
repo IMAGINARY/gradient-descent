@@ -255,12 +255,21 @@ var keyMap = {
     prop: 'action'
   }
 };
+var keyCodes = Object.keys(keyMap);
 /**
- * Component that handles on-screen controls
+ * Certain default actions like scrolling should be prevented for the keys used for the game.
+ */
+
+function preventDefaultActionForKeys(e) {
+  if (keyCodes.includes(e.code)) e.preventDefault();
+}
+/**
+ * Component that handles keyboard controls
  *
- * Supports both mouse and multitouch input.
+ * Supports up to two players at the moment.
  *
  */
+
 
 var KeyboardControls = /*#__PURE__*/function (_Controls) {
   _inherits(KeyboardControls, _Controls);
@@ -287,6 +296,7 @@ var KeyboardControls = /*#__PURE__*/function (_Controls) {
 
     window.addEventListener('keydown', keyCallback);
     window.addEventListener('keyup', keyCallback);
+    window.addEventListener("keydown", preventDefaultActionForKeys, false);
     return _this;
   }
 
