@@ -1,4 +1,14 @@
 {
   "press-to-start": "Press to start",
-  "choose-num-players": "Choose number of players"
+  "choose-num-players": "Choose number of players",
+  "treasure-announcement-begin": "Player ",
+  "treasure-announcement-end": " found the treasure: ",
+  "treasures": [
+    "Fermat’s Lost Proof",
+    "The last digit of Pi",
+    "The last pair of twin primes",
+    "A perpetual motion machine",
+    "Instructions for squaring the circle",
+    "Pythagoras’ guitar pick"
+  ]
 }

@@ -6,7 +6,7 @@
     position: absolute;
     top: 0;
     width: 100%;
-    height: 80vh;
+    height: calc(1080.0 / 1920.0 * 80vw);
     text-align: center;
 
     & > svg {
@@ -22,7 +22,7 @@
     display: block;
     position: absolute;
     width: 100%;
-    height: 80vh;
+    height: calc(1080.0 / 1920.0 * 80vw);
     top: 0;
     background-color: transparent;
     pointer-events: none;

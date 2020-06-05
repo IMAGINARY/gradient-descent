@@ -680,7 +680,9 @@ var PROBE_MIN_DURATION = 500;
 var PROBE_DELAY = 500;
 var TANGENT_LENGTH = 0.02;
 var TREASURE_SIZE = 0.03;
-var UNCOVER_DURATION = 3000;
+var UNCOVER_DURATION = 2000;
+var ENDING_SEQUENCE_DELAY = 1000;
+var ENDING_SEQUENCE_TREASURE_DELAY = 1000;
 
 var PlayMode = /*#__PURE__*/function (_GameMode) {
   _inherits(PlayMode, _GameMode);
@@ -804,17 +806,19 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 this.treasureLocation = this.locateTreasure();
                 console.log("Treasure location:", this.treasureLocation);
                 behindGroundGroup = this.groundGroup.group();
-                treasure = behindGroundGroup.use(this.treasureClosedSymbol).addClass('treasure').transform({
+                treasure = behindGroundGroup.group().addClass('treasure').transform({
                   translateX: this.treasureLocation.x * draw.width(),
                   translateY: TERRAIN_DISTANCE + this.treasureLocation.y * TERRAIN_HEIGHT_SCALE
                 });
+                this.treasureClosed = treasure.use(this.treasureClosedSymbol);
+                this.treasureOpened = treasure.use(this.treasureOpenedSymbol).hide();
                 this.ground = this.groundGroup.polyline(terrainPoints).addClass('ground').translate(0, TERRAIN_DISTANCE).hide();
                 behindGroundGroup.clipWith(this.groundGroup.use(this.ground));
                 this.groundClip = this.groundGroup.clip();
                 this.groundGroup.clipWith(this.groundClip);
                 this.tangents = modeGroup.group().translate(0, TERRAIN_DISTANCE);
 
-              case 18:
+              case 20:
               case "end":
                 return _context2.stop();
             }
@@ -882,8 +886,10 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
             }).after(function () {
               return _this3.addTangent(player);
             });
-            if (Math.abs(player.x - _this3.treasureLocation.x) <= TREASURE_SIZE / 2) runnerDown.animate(PROBE_DELAY / 2).after(function () {
+            if (Math.abs(player.x - _this3.treasureLocation.x) <= TREASURE_SIZE / 2) runnerDown.after(function () {
               return _this3.uncoverGround();
+            }).after(function () {
+              return _this3.showGameOverSequence(player);
             });
             var runnerUp = runnerDown.animate(probeDuration, PROBE_DELAY).transform({
               translateY: TERRAIN_DISTANCE * PROBE_DISTANCE_AT_REST
@@ -1028,6 +1034,67 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       }
 
       return uncoverGround;
+    }()
+  }, {
+    key: "showGameOverSequence",
+    value: function () {
+      var _showGameOverSequence = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5(winner) {
+        var draw, $overlay, delay, treasureAnnouncement, randomElement, treasureString, $treasureAnnouncement, $treasureString, $inner, left, bottom, $outer;
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                draw = this.game.draw;
+                $overlay = $(this.game.overlay);
+
+                delay = function delay(ms) {
+                  return new Promise(function (resolve) {
+                    return setTimeout(resolve, ms);
+                  });
+                };
+
+                treasureAnnouncement = IMAGINARY.i18n.t('treasure-announcement-begin') + (winner.id + 1) + IMAGINARY.i18n.t('treasure-announcement-end');
+
+                randomElement = function randomElement(arr) {
+                  return arr[Math.floor(Math.random() * (arr.length - 1))];
+                };
+
+                treasureString = randomElement(IMAGINARY.i18n.t('treasures'));
+                $treasureAnnouncement = $("<div>").text(treasureAnnouncement);
+                $treasureString = $("<div>").text(treasureString).css("visibility", "visible").css('visibility', 'hidden');
+                $inner = $("<div class=\"ending-sequences-text player-".concat(winner.id, "\" />")).append([$treasureAnnouncement, $treasureString]);
+                left = 100 * this.treasureLocation.x;
+                bottom = 100 - 100 * (WATER_DISTANCE + TERRAIN_DISTANCE) / draw.height();
+                $outer = $('<div class="ending-sequences-text-container">').css({
+                  left: "".concat(left, "%"),
+                  bottom: "".concat(bottom, "%")
+                }).append($inner);
+                _context5.next = 14;
+                return delay(ENDING_SEQUENCE_DELAY);
+
+              case 14:
+                $overlay.empty().append($outer);
+                _context5.next = 17;
+                return delay(ENDING_SEQUENCE_TREASURE_DELAY);
+
+              case 17:
+                $treasureString.css("visibility", "visible");
+                this.treasureOpened.show();
+                this.treasureClosed.hide();
+
+              case 20:
+              case "end":
+                return _context5.stop();
+            }
+          }
+        }, _callee5, this);
+      }));
+
+      function showGameOverSequence(_x) {
+        return _showGameOverSequence.apply(this, arguments);
+      }
+
+      return showGameOverSequence;
     }()
   }]);
 

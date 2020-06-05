@@ -26,7 +26,9 @@ const TANGENT_LENGTH = 0.02;
 
 const TREASURE_SIZE = 0.03;
 
-const UNCOVER_DURATION = 3000;
+const UNCOVER_DURATION = 2000;
+const ENDING_SEQUENCE_DELAY = 1000;
+const ENDING_SEQUENCE_TREASURE_DELAY = 1000;
 
 export default class PlayMode extends GameMode {
 
@@ -104,12 +106,15 @@ export default class PlayMode extends GameMode {
     console.log("Treasure location:", this.treasureLocation);
 
     const behindGroundGroup = this.groundGroup.group();
-    const treasure = behindGroundGroup.use(this.treasureClosedSymbol)
+    const treasure = behindGroundGroup.group()
       .addClass('treasure')
       .transform({
         translateX: this.treasureLocation.x * draw.width(),
         translateY: TERRAIN_DISTANCE + this.treasureLocation.y * TERRAIN_HEIGHT_SCALE,
       });
+    this.treasureClosed = treasure.use(this.treasureClosedSymbol);
+    this.treasureOpened = treasure.use(this.treasureOpenedSymbol).hide();
+
 
     this.ground = this.groundGroup.polyline(terrainPoints)
       .addClass('ground')
@@ -153,8 +158,9 @@ export default class PlayMode extends GameMode {
               .after(() => this.addGroundClip(player.x))
               .after(() => this.addTangent(player));
             if (Math.abs(player.x - this.treasureLocation.x) <= TREASURE_SIZE / 2)
-              runnerDown.animate(PROBE_DELAY / 2)
-                .after(() => this.uncoverGround());
+              runnerDown
+                .after(() => this.uncoverGround())
+                .after(() => this.showGameOverSequence(player));
             const runnerUp = runnerDown.animate(probeDuration, PROBE_DELAY)
               .transform({ translateY: TERRAIN_DISTANCE * PROBE_DISTANCE_AT_REST })
               .after(() => player.probing = false);
@@ -262,5 +268,39 @@ export default class PlayMode extends GameMode {
         .after(resolve);
     });
     return Promise.all(this.groundClip.children().map(uncoverGround));
+  }
+
+  async showGameOverSequence(winner) {
+    const { draw } = this.game;
+    const $overlay = $(this.game.overlay);
+
+    const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+    const treasureAnnouncement = IMAGINARY.i18n.t('treasure-announcement-begin')
+      + (winner.id + 1)
+      + IMAGINARY.i18n.t('treasure-announcement-end');
+    const randomElement = arr => arr[Math.floor(Math.random() * (arr.length - 1))];
+    const treasureString = randomElement(IMAGINARY.i18n.t('treasures'));
+
+    const $treasureAnnouncement = $("<div>").text(treasureAnnouncement);
+    const $treasureString = $("<div>").text(treasureString).css("visibility", "visible")
+      .css('visibility', 'hidden');
+
+    const $inner = $(`<div class="ending-sequences-text player-${winner.id}" />`)
+      .append([$treasureAnnouncement, $treasureString]);
+
+    const left = 100 * this.treasureLocation.x;
+    const bottom = 100 - 100 * (WATER_DISTANCE + TERRAIN_DISTANCE) / draw.height();
+    const $outer = $('<div class="ending-sequences-text-container">')
+      .css({ left: `${left}%`, bottom: `${bottom}%` })
+      .append($inner);
+
+    await delay(ENDING_SEQUENCE_DELAY);
+    $overlay.empty().append($outer);
+
+    await delay(ENDING_SEQUENCE_TREASURE_DELAY);
+    $treasureString.css("visibility", "visible");
+    this.treasureOpened.show();
+    this.treasureClosed.hide();
   }
 }
