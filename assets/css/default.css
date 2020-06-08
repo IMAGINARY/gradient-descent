@@ -31,7 +31,7 @@ html, body {
 body {
   background-color: #151515;
   color: #ffec02;
-  font-size: 3vh; }
+  font-size: calc(3vw * 1080 / 1920); }
 
 .screen-controls {
   width: 100%;

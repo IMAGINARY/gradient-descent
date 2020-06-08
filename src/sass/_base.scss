@@ -8,6 +8,6 @@ html, body {
 body {
   background-color: $color-black;
   color: $color-yellow;
-  font-size: 3vh;
+  font-size: calc(3vw * 1080 / 1920);
 }
 
