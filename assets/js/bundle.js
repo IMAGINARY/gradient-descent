@@ -916,8 +916,8 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 this.treasureOpened = treasure.use(this.treasureOpenedSymbol).hide();
                 this.ground = this.groundGroup.polygon(terrainPoints).fill('black').addClass('ground').translate(0, TERRAIN_DISTANCE);
                 groundCover = this.groundGroup.group();
-                this.groundCoverLeft = groundCover.rect(draw.width(), draw.height()).addClass('cover').move(draw.width() * (this.treasureLocation.x - 1), -TERRAIN_HEIGHT_SCALE / 2);
-                this.groundCoverRight = groundCover.rect(draw.width(), draw.height()).addClass('cover').move(draw.width() * this.treasureLocation.x, -TERRAIN_HEIGHT_SCALE / 2);
+                this.groundCoverLeft = groundCover.rect(draw.width(), draw.height()).addClass('ground-cover').move(draw.width() * (this.treasureLocation.x - 1), -TERRAIN_HEIGHT_SCALE / 2);
+                this.groundCoverRight = groundCover.rect(draw.width(), draw.height()).addClass('ground-cover').move(draw.width() * this.treasureLocation.x, -TERRAIN_HEIGHT_SCALE / 2);
                 this.groundGroup.back();
                 this.tangents = modeGroup.group().translate(0, TERRAIN_DISTANCE);
 

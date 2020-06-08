@@ -202,10 +202,10 @@ export default class PlayMode extends GameMode {
 
     const groundCover = this.groundGroup.group();
     this.groundCoverLeft = groundCover.rect(draw.width(), draw.height())
-      .addClass('cover')
+      .addClass('ground-cover')
       .move(draw.width() * (this.treasureLocation.x - 1), -TERRAIN_HEIGHT_SCALE / 2);
     this.groundCoverRight = groundCover.rect(draw.width(), draw.height())
-      .addClass('cover')
+      .addClass('ground-cover')
       .move(draw.width() * this.treasureLocation.x, -TERRAIN_HEIGHT_SCALE / 2);
 
     this.groundGroup.back();

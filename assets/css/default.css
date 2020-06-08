@@ -227,7 +227,7 @@ body {
   .fill .player-3, .player-3.fill {
     fill: #ffec02; }
 
-.cover {
+.cover, .ground-cover {
   stroke: none;
   fill: #151515; }
 
@@ -237,6 +237,10 @@ body {
 .ground {
   stroke: #ffe699;
   fill: #151515; }
+
+.ground-cover {
+  stroke: #151515;
+  stroke-width: 10px; }
 
 .treasure {
   stroke: #F99C2D; }
