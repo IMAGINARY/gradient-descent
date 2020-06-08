@@ -15,13 +15,21 @@ export default class TitleMode extends GameMode {
     pressToStart.textContent = IMAGINARY.i18n.t('press-to-start');
     this.game.overlay.append(pressToStart);
 
+    const colorBegin = '#00368a';
+    const colorEnd = '#34c6ff';
+
     const gradientLogo = draw.use(this.logoSprite)
       .size(1200, 400)
-      .stroke({ color: '#00368a', width: 2 })
+      .stroke({ color: colorBegin, width: 2 })
       .fill('transparent')
       .center(1920 / 2, 1080 / 2.5);
+    const gradientText = this.logoSprite.findOne('#gradient')
+      .stroke('none')
+      .fill(colorBegin);
 
-    gradientLogo.animate({ duration: 5000 }).stroke({ color: '#34c6ff' });
+    const options = { duration: 5000 };
+    gradientText.animate(options).fill(colorEnd);
+    gradientLogo.animate(options).stroke({ color: colorEnd });
     this.wavyStep = WavyAnimation(this.logoSprite, { duration: 3500 });
 
     this.animCounter = 0;

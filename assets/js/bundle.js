@@ -1526,7 +1526,7 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
     key: "handleEnterMode",
     value: function () {
       var _handleEnterMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
-        var draw, pressToStart, gradientLogo;
+        var draw, pressToStart, colorBegin, colorEnd, gradientLogo, gradientText, options;
         return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
             switch (_context2.prev = _context2.next) {
@@ -1536,21 +1536,26 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
                 pressToStart.classList.add('blinking', 'text', 'text-center', 'text-vcenter');
                 pressToStart.textContent = IMAGINARY.i18n.t('press-to-start');
                 this.game.overlay.append(pressToStart);
+                colorBegin = '#00368a';
+                colorEnd = '#34c6ff';
                 gradientLogo = draw.use(this.logoSprite).size(1200, 400).stroke({
-                  color: '#00368a',
+                  color: colorBegin,
                   width: 2
                 }).fill('transparent').center(1920 / 2, 1080 / 2.5);
-                gradientLogo.animate({
+                gradientText = this.logoSprite.findOne('#gradient').stroke('none').fill(colorBegin);
+                options = {
                   duration: 5000
-                }).stroke({
-                  color: '#34c6ff'
+                };
+                gradientText.animate(options).fill(colorEnd);
+                gradientLogo.animate(options).stroke({
+                  color: colorEnd
                 });
                 this.wavyStep = (0, _wavyAnimation["default"])(this.logoSprite, {
                   duration: 3500
                 });
                 this.animCounter = 0;
 
-              case 9:
+              case 14:
               case "end":
                 return _context2.stop();
             }

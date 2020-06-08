@@ -174,7 +174,8 @@ body {
 .title-logo {
   font-family: 'gradient-vector', sans-serif;
   font-weight: 300;
-  text-transform: uppercase; }
+  text-transform: uppercase;
+  font-size: 30px; }
 
 .numPlayers-title {
   margin-top: 20vh; }
