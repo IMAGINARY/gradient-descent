@@ -2267,6 +2267,7 @@ var defaultConfig = {
   defaultLanguage: 'en',
   useGamepads: true,
   useScreenControls: true,
+  useKeyboardControls: true,
   maxPlayers: 2,
   maxTime: Number.POSITIVE_INFINITY,
   maxProbes: Number.POSITIVE_INFINITY,
