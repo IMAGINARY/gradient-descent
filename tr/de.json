@@ -1,0 +1,20 @@
+{
+  "press-to-start": "Start mit Knopfdruck",
+  "press-to-restart": "Neustart mit Knopfdruck",
+  "choose-num-players": "Wähle die Anzahl der Spieler*innen",
+  "remaining-time": "Verbleibende Spielzeit:",
+  "remaining-probes": "Verbleibende Sonden:",
+  "win-announcement-begin": "Spieler*in ",
+  "win-announcement-end": " hat den Schatz gefunden:",
+  "time-is-up": "Die Zeit ist abgelaufen!",
+  "no-probes-left": "Keine Sonden übrig!",
+  "game-over": "Game over!",
+  "treasures": [
+    "Fermats verlorener Beweis",
+    "Die letzte Stelle von Pi",
+    "Der letzte Primzahlzwilling",
+    "Ein Perpetuum Mobile",
+    "Anleitung zum Quadrieren des Kreises",
+    "Reisetasche von Paul Erdös"
+  ]
+}
