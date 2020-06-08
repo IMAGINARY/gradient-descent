@@ -989,11 +989,12 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
         }
       }
 
-      inputs.slice(0, numPlayers) // discard inputs that don't belong to an active player
-      .forEach(function (input, playerIndex) {
+      inputs.forEach(function (input, playerIndex) {
         var lastInput = lastInputs[playerIndex];
         var actionDown = input.action && !lastInput.action;
-        if (_this4.isGameOver && actionDown) _this4.triggerEvent('done');
+        if (_this4.isGameOver && actionDown) _this4.triggerEvent('done'); // discard inputs that don't belong to an active player
+
+        if (playerIndex >= numPlayers) return;
         var player = _this4.players[playerIndex];
 
         if (!player.probing && !_this4.isGameOver) {

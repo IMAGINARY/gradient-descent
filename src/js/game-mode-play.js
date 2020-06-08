@@ -208,12 +208,15 @@ export default class PlayMode extends GameMode {
     }
 
     inputs
-      .slice(0, numPlayers) // discard inputs that don't belong to an active player
       .forEach((input, playerIndex) => {
         const lastInput = lastInputs[playerIndex];
         const actionDown = input.action && !lastInput.action;
         if (this.isGameOver && actionDown)
           this.triggerEvent('done');
+
+        // discard inputs that don't belong to an active player
+        if (playerIndex >= numPlayers)
+          return;
 
         const player = this.players[playerIndex];
         if (!player.probing && !this.isGameOver) {
