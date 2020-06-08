@@ -30,6 +30,11 @@
   }
 }
 
+.title-logo {
+  @include lightText;
+  text-transform: uppercase;
+}
+
 .numPlayers-title {
   margin-top: 20vh;
 }
