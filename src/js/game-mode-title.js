@@ -29,6 +29,10 @@ export default class TitleMode extends GameMode {
 
   async handleExitMode() {
     // Cleanup timers, etc. created on handleEnterMode
+
+    // The animation must be set to its final state such that it can restart properly
+    // when this mode is re-entered.
+    this.wavyStep(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
   }
 
   handleInputs(inputs, lastInputs, delta, ts0) {

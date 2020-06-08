@@ -1572,11 +1572,17 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
+                // Cleanup timers, etc. created on handleEnterMode
+                // The animation must be set to its final state such that it can restart properly
+                // when this mode is re-entered.
+                this.wavyStep(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
+
+              case 1:
               case "end":
                 return _context3.stop();
             }
           }
-        }, _callee3);
+        }, _callee3, this);
       }));
 
       function handleExitMode() {
