@@ -23,12 +23,18 @@ $player-colors: $color-player-0, $color-player-1, $color-player-2, $color-player
   }
 }
 
+.cover {
+  stroke: none;
+  fill: $color-black;
+}
+
 .water {
   stroke: $color-water;
 }
 
 .ground {
   stroke: $color-ground;
+  fill: $color-black;
 }
 
 .treasure {

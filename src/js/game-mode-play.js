@@ -100,24 +100,48 @@ export default class PlayMode extends GameMode {
 
         const probeParent = group.group();
         const probe = probeParent.group();
-        probe.line(0, -draw.height(), 0, -PROBE_SIZE / 2);
-        probe.circle(PROBE_SIZE).center(0, 0);
-        probe.transform({ translateY: TERRAIN_DISTANCE * PROBE_DISTANCE_AT_REST });
+        const probeY = TERRAIN_DISTANCE * PROBE_DISTANCE_AT_REST;
+        const probeRope = probe.line(0, BOAT_DRAFT, 0, probeY - PROBE_SIZE / 2);
+        const probeCircle = probe.circle(PROBE_SIZE).center(0, probeY);
 
-        // Clip the probe such that only the part below the boat is visible.
-        const probeClip = probeParent.rect(PROBE_SIZE * 4, draw.height())
-          .move(-PROBE_SIZE * 2, BOAT_DRAFT);
-        probeParent.clipWith(probeClip);
+        const doProbe = function (terrainHeight) {
+          this.probing = true;
+          this.remainingProbes = Math.max(0, this.remainingProbes - 1);
+          const probeHeight = TERRAIN_DISTANCE + TERRAIN_HEIGHT_SCALE * terrainHeight;
+          const probeDuration = probeHeight * (PROBE_MIN_DURATION / TERRAIN_DISTANCE);
+
+          const probeDown = probeCircle.animate(probeDuration, 0, 'now')
+            .cy(probeHeight);
+          const probeRopeDown = probeRope.animate(probeDuration, 0, 'now')
+            .plot(0, BOAT_DRAFT, 0, probeHeight - PROBE_SIZE / 2);
+
+          const yUp = this.remainingProbes > 0 ? TERRAIN_DISTANCE
+            * PROBE_DISTANCE_AT_REST : BOAT_DRAFT + PROBE_SIZE;
+          const probeUp = probeDown.animate(probeDuration, PROBE_DELAY)
+            .cy(yUp)
+            .after(() => this.probing = false);
+          const probeRopeUp = probeRopeDown.animate(probeDuration, PROBE_DELAY)
+            .plot(0, BOAT_DRAFT, 0, yUp - PROBE_SIZE / 2);
+
+          return {
+            down: new Promise(resolve => probeDown.after(resolve)),
+            up: new Promise(resolve => probeUp.after(resolve)),
+          }
+        }
 
         // Add an element for displaying the number of remaining probes
         const $remainingProbes = $(`<span class="counter player-${playerIndex}"/>`)
           .appendTo(this.$remainingProbes);
+
+        // Move boat in front of the probe
+        boat.front();
 
         return {
           id: playerIndex,
           group: group,
           boat: boat,
           probe: probe,
+          doProbe: doProbe,
           x: x,
           flipX: false,
           _probing: false,
@@ -151,6 +175,11 @@ export default class PlayMode extends GameMode {
     const terrainPoints = terrainHeights.map((h, i) => [
       draw.width() * (i / (terrainHeights.length - 1)),
       TERRAIN_HEIGHT_SCALE * h,
+    ]).concat([
+      [2 * draw.width(), 0],
+      [2 * draw.width(), draw.height()],
+      [-draw.width(), draw.height()],
+      [-draw.width(), 0],
     ]);
     this.terrainHeights = terrainHeights;
     this.treasureLocation = this.locateTreasure();
@@ -166,16 +195,20 @@ export default class PlayMode extends GameMode {
     this.treasureClosed = treasure.use(this.treasureClosedSymbol);
     this.treasureOpened = treasure.use(this.treasureOpenedSymbol).hide();
 
-
-    this.ground = this.groundGroup.polyline(terrainPoints)
+    this.ground = this.groundGroup.polygon(terrainPoints)
+      .fill('black')
       .addClass('ground')
-      .translate(0, TERRAIN_DISTANCE)
-      .hide();
+      .translate(0, TERRAIN_DISTANCE);
 
-    behindGroundGroup.clipWith(this.groundGroup.use(this.ground));
+    const groundCover = this.groundGroup.group();
+    this.groundCoverLeft = groundCover.rect(draw.width(), draw.height())
+      .addClass('cover')
+      .move(draw.width() * (this.treasureLocation.x - 1), -TERRAIN_HEIGHT_SCALE / 2);
+    this.groundCoverRight = groundCover.rect(draw.width(), draw.height())
+      .addClass('cover')
+      .move(draw.width() * this.treasureLocation.x, -TERRAIN_HEIGHT_SCALE / 2);
 
-    this.groundClip = this.groundGroup.clip();
-    this.groundGroup.clipWith(this.groundClip);
+    this.groundGroup.back();
 
     this.tangents = modeGroup.group()
       .translate(0, TERRAIN_DISTANCE);
@@ -225,24 +258,13 @@ export default class PlayMode extends GameMode {
           player.flipX = input.direction === 0 ? player.flipX : input.direction === -1;
           if (actionDown && player.remainingProbes > 0) {
             // Switch to probe mode
-            player.probing = true;
-            player.remainingProbes = Math.max(0, player.remainingProbes - 1);
             // Lower the probe, wait and raise it again
             const terrainHeight = this.terrainHeight(player.x);
-            const probeHeight = TERRAIN_DISTANCE + TERRAIN_HEIGHT_SCALE * terrainHeight;
-            const probeDuration = probeHeight * (PROBE_MIN_DURATION / TERRAIN_DISTANCE);
-            const runnerDown = player.probe
-              .animate(probeDuration, 0, 'now')
-              .transform({ translateY: probeHeight })
-              .after(() => this.addGroundClip(player.x))
-              .after(() => this.addTangent(player));
-            const yUp = TERRAIN_DISTANCE * (player.remainingProbes > 0 ? PROBE_DISTANCE_AT_REST : 0)
-            const runnerUp = runnerDown.animate(probeDuration, PROBE_DELAY)
-              .transform({ translateY: yUp })
-              .after(() => player.probing = false);
+            const { down, up } = player.doProbe(terrainHeight);
+            down.then(() => this.addTangent(player));
             const treasureFound = Math.abs(player.x - this.treasureLocation.x) <= TREASURE_SIZE
               / 2;
-            runnerDown.after(async () => {
+            down.then(async () => {
               if (treasureFound && !this.isGameOver) {
                 console.log("Treasure found - GAME OVER!");
                 await this.gameOver(async () => this.showWinSequence(player));
@@ -335,17 +357,6 @@ export default class PlayMode extends GameMode {
       });
   }
 
-  addGroundClip(x) {
-    const { draw } = this.game;
-    const w = draw.width();
-    const h = draw.height();
-    const rect = this.groundClip
-      .polygon([[-w, -h], [w, -h], [w, h], [-w, h]])
-      .center(draw.width() * x, 0)
-      .transform({ scaleX: 0.001 });
-    this.groundClip.add(rect);
-  }
-
   async gameOver(endingSequenceCallback) {
     // The game is now over, so a player that lowered the probe later can not win anymore.
     this.isGameOver = true;
@@ -361,28 +372,14 @@ export default class PlayMode extends GameMode {
 
   async uncoverGround() {
     const { draw } = this.game;
-    this.ground.show();
-    const treasureSpotlight = this.groundClip.circle(2 * TREASURE_SIZE * draw.width())
-      .center(
-        draw.width() * this.treasureLocation.x,
-        TERRAIN_DISTANCE + TERRAIN_HEIGHT_SCALE * this.treasureLocation.y
-      );
 
-    // Move the treasure spotlight up a bit so it doesn't point at the treasure location on the
-    // curve, but rather at the treasure chest
-    treasureSpotlight.dy(-2 * 0.3 * TREASURE_SIZE * draw.width());
-
-    // Add at least a clipping rectangle at the treasure location such that this method also
-    // works when no player probed yet.
-    this.addGroundClip(this.treasureLocation.x);
-
-    const uncoverGround = clip => new Promise(resolve => {
-      clip.animate(UNCOVER_DURATION)
-        .ease(pos => -(Math.sqrt(1 - (pos * pos)) - 1))
-        .transform({ scaleX: 1.0 })
-        .after(resolve);
-    });
-    return Promise.all(this.groundClip.children().map(uncoverGround));
+    const circularEaseIn = pos => -(Math.sqrt(1 - (pos * pos)) - 1);
+    const animateDx = (e, dx) => e.animate(UNCOVER_DURATION).ease(circularEaseIn).dx(dx);
+    const animateDxPromise = (e, dx) => new Promise(resolve => animateDx(e, dx).after(resolve));
+    return Promise.all([
+      animateDxPromise(this.groundCoverLeft, -draw.width()),
+      animateDxPromise(this.groundCoverRight, draw.width())
+    ]);
   }
 
   async showWinSequence(winner) {

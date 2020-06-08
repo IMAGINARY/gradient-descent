@@ -227,11 +227,16 @@ body {
   .fill .player-3, .player-3.fill {
     fill: #ffec02; }
 
+.cover {
+  stroke: none;
+  fill: #151515; }
+
 .water {
   stroke: #9999ff; }
 
 .ground {
-  stroke: #ffe699; }
+  stroke: #ffe699;
+  fill: #151515; }
 
 .treasure {
   stroke: #F99C2D; }

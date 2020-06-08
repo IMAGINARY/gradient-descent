@@ -773,7 +773,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       var _handleEnterMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
         var _this2 = this;
 
-        var _this$game, draw, config, numPlayers, $gameStats, $remainingTimeContainer, $remainingProbesContainer, modeGroup, terrainOptions, terrainHeights, terrainPoints, behindGroundGroup, treasure;
+        var _this$game, draw, config, numPlayers, $gameStats, $remainingTimeContainer, $remainingProbesContainer, modeGroup, terrainOptions, terrainHeights, terrainPoints, behindGroundGroup, treasure, groundCover;
 
         return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
@@ -803,21 +803,44 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                   var boat = group.use(_this2.shipSymbol).center(0, BOAT_DRAFT);
                   var probeParent = group.group();
                   var probe = probeParent.group();
-                  probe.line(0, -draw.height(), 0, -PROBE_SIZE / 2);
-                  probe.circle(PROBE_SIZE).center(0, 0);
-                  probe.transform({
-                    translateY: TERRAIN_DISTANCE * PROBE_DISTANCE_AT_REST
-                  }); // Clip the probe such that only the part below the boat is visible.
+                  var probeY = TERRAIN_DISTANCE * PROBE_DISTANCE_AT_REST;
+                  var probeRope = probe.line(0, BOAT_DRAFT, 0, probeY - PROBE_SIZE / 2);
+                  var probeCircle = probe.circle(PROBE_SIZE).center(0, probeY);
 
-                  var probeClip = probeParent.rect(PROBE_SIZE * 4, draw.height()).move(-PROBE_SIZE * 2, BOAT_DRAFT);
-                  probeParent.clipWith(probeClip); // Add an element for displaying the number of remaining probes
+                  var doProbe = function doProbe(terrainHeight) {
+                    var _this3 = this;
 
-                  var $remainingProbes = $("<span class=\"counter player-".concat(playerIndex, "\"/>")).appendTo(_this2.$remainingProbes);
+                    this.probing = true;
+                    this.remainingProbes = Math.max(0, this.remainingProbes - 1);
+                    var probeHeight = TERRAIN_DISTANCE + TERRAIN_HEIGHT_SCALE * terrainHeight;
+                    var probeDuration = probeHeight * (PROBE_MIN_DURATION / TERRAIN_DISTANCE);
+                    var probeDown = probeCircle.animate(probeDuration, 0, 'now').cy(probeHeight);
+                    var probeRopeDown = probeRope.animate(probeDuration, 0, 'now').plot(0, BOAT_DRAFT, 0, probeHeight - PROBE_SIZE / 2);
+                    var yUp = this.remainingProbes > 0 ? TERRAIN_DISTANCE * PROBE_DISTANCE_AT_REST : BOAT_DRAFT + PROBE_SIZE;
+                    var probeUp = probeDown.animate(probeDuration, PROBE_DELAY).cy(yUp).after(function () {
+                      return _this3.probing = false;
+                    });
+                    var probeRopeUp = probeRopeDown.animate(probeDuration, PROBE_DELAY).plot(0, BOAT_DRAFT, 0, yUp - PROBE_SIZE / 2);
+                    return {
+                      down: new Promise(function (resolve) {
+                        return probeDown.after(resolve);
+                      }),
+                      up: new Promise(function (resolve) {
+                        return probeUp.after(resolve);
+                      })
+                    };
+                  }; // Add an element for displaying the number of remaining probes
+
+
+                  var $remainingProbes = $("<span class=\"counter player-".concat(playerIndex, "\"/>")).appendTo(_this2.$remainingProbes); // Move boat in front of the probe
+
+                  boat.front();
                   return {
                     id: playerIndex,
                     group: group,
                     boat: boat,
                     probe: probe,
+                    doProbe: doProbe,
                     x: x,
                     flipX: false,
                     _probing: false,
@@ -835,7 +858,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
 
                     probingDone: function () {
                       var _probingDone = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
-                        var _this3 = this;
+                        var _this4 = this;
 
                         return regeneratorRuntime.wrap(function _callee2$(_context2) {
                           while (1) {
@@ -851,7 +874,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                               case 2:
                                 _context2.next = 4;
                                 return new Promise(function (resolve) {
-                                  return _this3._probeEventEmitter.addListener("probe-off", resolve);
+                                  return _this4._probeEventEmitter.addListener("probe-off", resolve);
                                 });
 
                               case 4:
@@ -880,7 +903,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 terrainHeights = (0, _terrain["default"])(MAX_TERRAIN_EXTREMA, NUM_TERRAIN_POINTS, terrainOptions);
                 terrainPoints = terrainHeights.map(function (h, i) {
                   return [draw.width() * (i / (terrainHeights.length - 1)), TERRAIN_HEIGHT_SCALE * h];
-                });
+                }).concat([[2 * draw.width(), 0], [2 * draw.width(), draw.height()], [-draw.width(), draw.height()], [-draw.width(), 0]]);
                 this.terrainHeights = terrainHeights;
                 this.treasureLocation = this.locateTreasure();
                 console.log("Treasure location:", this.treasureLocation);
@@ -891,13 +914,14 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 });
                 this.treasureClosed = treasure.use(this.treasureClosedSymbol);
                 this.treasureOpened = treasure.use(this.treasureOpenedSymbol).hide();
-                this.ground = this.groundGroup.polyline(terrainPoints).addClass('ground').translate(0, TERRAIN_DISTANCE).hide();
-                behindGroundGroup.clipWith(this.groundGroup.use(this.ground));
-                this.groundClip = this.groundGroup.clip();
-                this.groundGroup.clipWith(this.groundClip);
+                this.ground = this.groundGroup.polygon(terrainPoints).fill('black').addClass('ground').translate(0, TERRAIN_DISTANCE);
+                groundCover = this.groundGroup.group();
+                this.groundCoverLeft = groundCover.rect(draw.width(), draw.height()).addClass('cover').move(draw.width() * (this.treasureLocation.x - 1), -TERRAIN_HEIGHT_SCALE / 2);
+                this.groundCoverRight = groundCover.rect(draw.width(), draw.height()).addClass('cover').move(draw.width() * this.treasureLocation.x, -TERRAIN_HEIGHT_SCALE / 2);
+                this.groundGroup.back();
                 this.tangents = modeGroup.group().translate(0, TERRAIN_DISTANCE);
 
-              case 32:
+              case 33:
               case "end":
                 return _context3.stop();
             }
@@ -935,7 +959,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
   }, {
     key: "handleInputs",
     value: function handleInputs(inputs, lastInputs, delta, ts) {
-      var _this4 = this;
+      var _this5 = this;
 
       // Move the boats or check if they're lowering the probe
       var _this$game2 = this.game,
@@ -954,7 +978,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
               while (1) {
                 switch (_context5.prev = _context5.next) {
                   case 0:
-                    return _context5.abrupt("return", _this4.showLoseSequenceTimeIsUp());
+                    return _context5.abrupt("return", _this5.showLoseSequenceTimeIsUp());
 
                   case 1:
                   case "end":
@@ -977,7 +1001,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 while (1) {
                   switch (_context6.prev = _context6.next) {
                     case 0:
-                      return _context6.abrupt("return", _this4.showLoseSequenceNoProbesLeft());
+                      return _context6.abrupt("return", _this5.showLoseSequenceNoProbesLeft());
 
                     case 1:
                     case "end":
@@ -993,57 +1017,47 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       inputs.forEach(function (input, playerIndex) {
         var lastInput = lastInputs[playerIndex];
         var actionDown = input.action && !lastInput.action;
-        if (_this4.isGameOver && actionDown) _this4.triggerEvent('done'); // discard inputs that don't belong to an active player
+        if (_this5.isGameOver && actionDown) _this5.triggerEvent('done'); // discard inputs that don't belong to an active player
 
         if (playerIndex >= numPlayers) return;
-        var player = _this4.players[playerIndex];
+        var player = _this5.players[playerIndex];
 
-        if (!player.probing && !_this4.isGameOver) {
+        if (!player.probing && !_this5.isGameOver) {
           player.x += SPEED_FACTOR * (delta * input.direction);
           player.x = Math.min(Math.max(TERRAIN_MARGIN_WIDTH, player.x), 1.0 - TERRAIN_MARGIN_WIDTH);
           player.flipX = input.direction === 0 ? player.flipX : input.direction === -1;
 
           if (actionDown && player.remainingProbes > 0) {
             // Switch to probe mode
-            player.probing = true;
-            player.remainingProbes = Math.max(0, player.remainingProbes - 1); // Lower the probe, wait and raise it again
+            // Lower the probe, wait and raise it again
+            var terrainHeight = _this5.terrainHeight(player.x);
 
-            var terrainHeight = _this4.terrainHeight(player.x);
+            var _player$doProbe = player.doProbe(terrainHeight),
+                down = _player$doProbe.down,
+                up = _player$doProbe.up;
 
-            var probeHeight = TERRAIN_DISTANCE + TERRAIN_HEIGHT_SCALE * terrainHeight;
-            var probeDuration = probeHeight * (PROBE_MIN_DURATION / TERRAIN_DISTANCE);
-            var runnerDown = player.probe.animate(probeDuration, 0, 'now').transform({
-              translateY: probeHeight
-            }).after(function () {
-              return _this4.addGroundClip(player.x);
-            }).after(function () {
-              return _this4.addTangent(player);
+            down.then(function () {
+              return _this5.addTangent(player);
             });
-            var yUp = TERRAIN_DISTANCE * (player.remainingProbes > 0 ? PROBE_DISTANCE_AT_REST : 0);
-            var runnerUp = runnerDown.animate(probeDuration, PROBE_DELAY).transform({
-              translateY: yUp
-            }).after(function () {
-              return player.probing = false;
-            });
-            var treasureFound = Math.abs(player.x - _this4.treasureLocation.x) <= TREASURE_SIZE / 2;
-            runnerDown.after( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee8() {
+            var treasureFound = Math.abs(player.x - _this5.treasureLocation.x) <= TREASURE_SIZE / 2;
+            down.then( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee8() {
               return regeneratorRuntime.wrap(function _callee8$(_context8) {
                 while (1) {
                   switch (_context8.prev = _context8.next) {
                     case 0:
-                      if (!(treasureFound && !_this4.isGameOver)) {
+                      if (!(treasureFound && !_this5.isGameOver)) {
                         _context8.next = 4;
                         break;
                       }
 
                       console.log("Treasure found - GAME OVER!");
                       _context8.next = 4;
-                      return _this4.gameOver( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7() {
+                      return _this5.gameOver( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7() {
                         return regeneratorRuntime.wrap(function _callee7$(_context7) {
                           while (1) {
                             switch (_context7.prev = _context7.next) {
                               case 0:
-                                return _context7.abrupt("return", _this4.showWinSequence(player));
+                                return _context7.abrupt("return", _this5.showWinSequence(player));
 
                               case 1:
                               case "end":
@@ -1071,7 +1085,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
   }, {
     key: "draw",
     value: function draw(delta, ts) {
-      var _this5 = this;
+      var _this6 = this;
 
       var _this$game3 = this.game,
           draw = _this$game3.draw,
@@ -1086,11 +1100,11 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       };
 
       var padRemainingProbes = function padRemainingProbes(num) {
-        return pad(num, String(_this5.game.config.maxProbes).length, ' ');
+        return pad(num, String(_this6.game.config.maxProbes).length, ' ');
       };
 
       var padRemainingTime = function padRemainingTime(num) {
-        return pad(num, String(_this5.game.config.maxTime).length, ' ');
+        return pad(num, String(_this6.game.config.maxTime).length, ' ');
       };
 
       this.players.forEach(function (player, playerIndex) {
@@ -1166,17 +1180,6 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       });
     }
   }, {
-    key: "addGroundClip",
-    value: function addGroundClip(x) {
-      var draw = this.game.draw;
-      var w = draw.width();
-      var h = draw.height();
-      var rect = this.groundClip.polygon([[-w, -h], [w, -h], [w, h], [-w, h]]).center(draw.width() * x, 0).transform({
-        scaleX: 0.001
-      });
-      this.groundClip.add(rect);
-    }
-  }, {
     key: "gameOver",
     value: function () {
       var _gameOver = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee9(endingSequenceCallback) {
@@ -1222,34 +1225,30 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
     key: "uncoverGround",
     value: function () {
       var _uncoverGround = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee10() {
-        var draw, treasureSpotlight, uncoverGround;
+        var draw, circularEaseIn, animateDx, animateDxPromise;
         return regeneratorRuntime.wrap(function _callee10$(_context10) {
           while (1) {
             switch (_context10.prev = _context10.next) {
               case 0:
                 draw = this.game.draw;
-                this.ground.show();
-                treasureSpotlight = this.groundClip.circle(2 * TREASURE_SIZE * draw.width()).center(draw.width() * this.treasureLocation.x, TERRAIN_DISTANCE + TERRAIN_HEIGHT_SCALE * this.treasureLocation.y); // Move the treasure spotlight up a bit so it doesn't point at the treasure location on the
-                // curve, but rather at the treasure chest
 
-                treasureSpotlight.dy(-2 * 0.3 * TREASURE_SIZE * draw.width()); // Add at least a clipping rectangle at the treasure location such that this method also
-                // works when no player probed yet.
+                circularEaseIn = function circularEaseIn(pos) {
+                  return -(Math.sqrt(1 - pos * pos) - 1);
+                };
 
-                this.addGroundClip(this.treasureLocation.x);
+                animateDx = function animateDx(e, dx) {
+                  return e.animate(UNCOVER_DURATION).ease(circularEaseIn).dx(dx);
+                };
 
-                uncoverGround = function uncoverGround(clip) {
+                animateDxPromise = function animateDxPromise(e, dx) {
                   return new Promise(function (resolve) {
-                    clip.animate(UNCOVER_DURATION).ease(function (pos) {
-                      return -(Math.sqrt(1 - pos * pos) - 1);
-                    }).transform({
-                      scaleX: 1.0
-                    }).after(resolve);
+                    return animateDx(e, dx).after(resolve);
                   });
                 };
 
-                return _context10.abrupt("return", Promise.all(this.groundClip.children().map(uncoverGround)));
+                return _context10.abrupt("return", Promise.all([animateDxPromise(this.groundCoverLeft, -draw.width()), animateDxPromise(this.groundCoverRight, draw.width())]));
 
-              case 7:
+              case 5:
               case "end":
                 return _context10.stop();
             }
@@ -1267,7 +1266,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
     key: "showWinSequence",
     value: function () {
       var _showWinSequence = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee11(winner) {
-        var _this6 = this;
+        var _this7 = this;
 
         var winAnnouncement, randomElement, treasure, openTreaureChest;
         return regeneratorRuntime.wrap(function _callee11$(_context11) {
@@ -1283,9 +1282,9 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 treasure = randomElement(IMAGINARY.i18n.t('treasures'));
 
                 openTreaureChest = function openTreaureChest() {
-                  _this6.treasureOpened.show();
+                  _this7.treasureOpened.show();
 
-                  _this6.treasureClosed.hide();
+                  _this7.treasureClosed.hide();
                 };
 
                 _context11.next = 6;
