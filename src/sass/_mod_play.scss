@@ -1,4 +1,5 @@
 .play {
+  color: lightgray;
   stroke-width: 3;
   stroke: none;
   fill: none;
@@ -43,4 +44,14 @@ $player-colors: $color-player-0, $color-player-1, $color-player-2, $color-player
 
 .ending-sequences-text-anchor {
   position: absolute;
+}
+
+.game-stats {
+  text-align: right;
+  margin: 1ex;
+  font-size: 1.5vw;
+
+  .counter {
+    margin-left: 1ex;
+  }
 }

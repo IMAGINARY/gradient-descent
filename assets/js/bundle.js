@@ -773,15 +773,25 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       var _handleEnterMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
         var _this2 = this;
 
-        var _this$game, draw, numPlayers, modeGroup, terrainOptions, terrainHeights, terrainPoints, behindGroundGroup, treasure;
+        var _this$game, draw, config, numPlayers, $gameStats, $remainingTimeContainer, $remainingProbesContainer, modeGroup, terrainOptions, terrainHeights, terrainPoints, behindGroundGroup, treasure;
 
         return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                _this$game = this.game, draw = _this$game.draw, numPlayers = _this$game.numPlayers;
-                this.gameOver = false;
+                _this$game = this.game, draw = _this$game.draw, config = _this$game.config, numPlayers = _this$game.numPlayers;
+                this.isGameOver = false;
                 this.discardInputs = false;
+                this.remainingTime = config.maxTime * 1000;
+                this.$overlay = $('<div class="play" />').appendTo(this.game.overlay);
+                $gameStats = $('<div class="game-stats"/>').appendTo(this.$overlay);
+                $remainingTimeContainer = $('<div />').text(IMAGINARY.i18n.t('remaining-time')).appendTo($gameStats);
+                if (config.maxTime === Number.POSITIVE_INFINITY) $remainingTimeContainer.hide();
+                $remainingProbesContainer = $('<div />').text(IMAGINARY.i18n.t('remaining-probes')).appendTo($gameStats);
+                this.$remainingTime = $('<span class="counter"/>').appendTo($remainingTimeContainer);
+                this.$remainingProbes = $('<span />').appendTo($remainingProbesContainer);
+                if (config.maxProbes === Number.POSITIVE_INFINITY) $remainingProbesContainer.hide();
+                this.$endingSequenceContainer = $('<div />').appendTo(this.$overlay);
                 modeGroup = draw.group().addClass('play').addClass('draw').translate(0, WATER_DISTANCE); // Create a boat for each player
 
                 this.players = Array(numPlayers).fill(null).map(function (_, playerIndex) {
@@ -800,7 +810,9 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                   }); // Clip the probe such that only the part below the boat is visible.
 
                   var probeClip = probeParent.rect(PROBE_SIZE * 4, draw.height()).move(-PROBE_SIZE * 2, BOAT_DRAFT);
-                  probeParent.clipWith(probeClip);
+                  probeParent.clipWith(probeClip); // Add an element for displaying the number of remaining probes
+
+                  var $remainingProbes = $("<span class=\"counter player-".concat(playerIndex, "\"/>")).appendTo(_this2.$remainingProbes);
                   return {
                     id: playerIndex,
                     group: group,
@@ -855,7 +867,9 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                       }
 
                       return probingDone;
-                    }()
+                    }(),
+                    remainingProbes: config.maxProbes,
+                    $remainingProbes: $remainingProbes
                   };
                 });
                 this.water = modeGroup.group().polyline(this.wavesPoints(0)).addClass('water');
@@ -883,7 +897,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 this.groundGroup.clipWith(this.groundClip);
                 this.tangents = modeGroup.group().translate(0, TERRAIN_DISTANCE);
 
-              case 22:
+              case 32:
               case "end":
                 return _context3.stop();
             }
@@ -924,25 +938,73 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       var _this4 = this;
 
       // Move the boats or check if they're lowering the probe
-      if (this.discardInputs) return;
       var _this$game2 = this.game,
           draw = _this$game2.draw,
+          config = _this$game2.config,
           numPlayers = _this$game2.numPlayers;
+      this.remainingTime = Math.max(0, this.remainingTime - delta);
+      if (this.discardInputs) return;
+
+      if (!this.isGameOver) {
+        if (this.remainingTime === 0) {
+          console.log("Time is up - GAME OVER!");
+          this.gameOver( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
+            return regeneratorRuntime.wrap(function _callee5$(_context5) {
+              while (1) {
+                switch (_context5.prev = _context5.next) {
+                  case 0:
+                    return _context5.abrupt("return", _this4.showLoseSequenceTimeIsUp());
+
+                  case 1:
+                  case "end":
+                    return _context5.stop();
+                }
+              }
+            }, _callee5);
+          })));
+        } else if (this.players.reduce(function (a, c) {
+          return a + c.remainingProbes;
+        }, 0) === 0) {
+          var anyoneProbing = this.players.reduce(function (a, c) {
+            return a || c.probing;
+          }, false);
+
+          if (!anyoneProbing) {
+            console.log("No probes left - GAME OVER!");
+            this.gameOver( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6() {
+              return regeneratorRuntime.wrap(function _callee6$(_context6) {
+                while (1) {
+                  switch (_context6.prev = _context6.next) {
+                    case 0:
+                      return _context6.abrupt("return", _this4.showLoseSequenceNoProbesLeft());
+
+                    case 1:
+                    case "end":
+                      return _context6.stop();
+                  }
+                }
+              }, _callee6);
+            })));
+          }
+        }
+      }
+
       inputs.slice(0, numPlayers) // discard inputs that don't belong to an active player
       .forEach(function (input, playerIndex) {
         var lastInput = lastInputs[playerIndex];
         var actionDown = input.action && !lastInput.action;
-        if (_this4.gameOver && actionDown) _this4.triggerEvent('done');
+        if (_this4.isGameOver && actionDown) _this4.triggerEvent('done');
         var player = _this4.players[playerIndex];
 
-        if (!player.probing && !_this4.gameOver) {
+        if (!player.probing && !_this4.isGameOver) {
           player.x += SPEED_FACTOR * (delta * input.direction);
           player.x = Math.min(Math.max(TERRAIN_MARGIN_WIDTH, player.x), 1.0 - TERRAIN_MARGIN_WIDTH);
           player.flipX = input.direction === 0 ? player.flipX : input.direction === -1;
 
-          if (actionDown) {
+          if (actionDown && player.remainingProbes > 0) {
             // Switch to probe mode
-            player.probing = true; // Lower the probe, wait and raise it again
+            player.probing = true;
+            player.remainingProbes = Math.max(0, player.remainingProbes - 1); // Lower the probe, wait and raise it again
 
             var terrainHeight = _this4.terrainHeight(player.x);
 
@@ -955,49 +1017,46 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
             }).after(function () {
               return _this4.addTangent(player);
             });
+            var yUp = TERRAIN_DISTANCE * (player.remainingProbes > 0 ? PROBE_DISTANCE_AT_REST : 0);
             var runnerUp = runnerDown.animate(probeDuration, PROBE_DELAY).transform({
-              translateY: TERRAIN_DISTANCE * PROBE_DISTANCE_AT_REST
+              translateY: yUp
             }).after(function () {
               return player.probing = false;
             });
             var treasureFound = Math.abs(player.x - _this4.treasureLocation.x) <= TREASURE_SIZE / 2;
-            runnerDown.after( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
-              var uncoverGroundPromise;
-              return regeneratorRuntime.wrap(function _callee5$(_context5) {
+            runnerDown.after( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee8() {
+              return regeneratorRuntime.wrap(function _callee8$(_context8) {
                 while (1) {
-                  switch (_context5.prev = _context5.next) {
+                  switch (_context8.prev = _context8.next) {
                     case 0:
-                      if (!(treasureFound && !_this4.gameOver)) {
-                        _context5.next = 12;
+                      if (!(treasureFound && !_this4.isGameOver)) {
+                        _context8.next = 4;
                         break;
                       }
 
-                      console.log("Treasure found - GAME OVER!"); // The game is now over, so a player that lowered the probe later can not win anymore.
+                      console.log("Treasure found - GAME OVER!");
+                      _context8.next = 4;
+                      return _this4.gameOver( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7() {
+                        return regeneratorRuntime.wrap(function _callee7$(_context7) {
+                          while (1) {
+                            switch (_context7.prev = _context7.next) {
+                              case 0:
+                                return _context7.abrupt("return", _this4.showWinSequence(player));
 
-                      _this4.gameOver = true; // Disable all inputs until the ending sequence is over.
+                              case 1:
+                              case "end":
+                                return _context7.stop();
+                            }
+                          }
+                        }, _callee7);
+                      })));
 
-                      _this4.discardInputs = true;
-                      uncoverGroundPromise = _this4.uncoverGround();
-                      _context5.next = 7;
-                      return Promise.all(_this4.players.map(function (p) {
-                        return p.probingDone();
-                      }));
-
-                    case 7:
-                      _context5.next = 9;
-                      return _this4.showWinSequence(player);
-
-                    case 9:
-                      _this4.discardInputs = false;
-                      _context5.next = 12;
-                      return uncoverGroundPromise;
-
-                    case 12:
+                    case 4:
                     case "end":
-                      return _context5.stop();
+                      return _context8.stop();
                   }
                 }
-              }, _callee5);
+              }, _callee8);
             })));
             console.log("Player ".concat(playerIndex, " is probing at:"), {
               x: player.x,
@@ -1010,6 +1069,8 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
   }, {
     key: "draw",
     value: function draw(delta, ts) {
+      var _this5 = this;
+
       var _this$game3 = this.game,
           draw = _this$game3.draw,
           numPlayers = _this$game3.numPlayers; // Move boats
@@ -1017,6 +1078,19 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       // etc...
 
       this.water.plot(this.wavesPoints(ts / WATER_LOOP_DURATION));
+
+      var pad = function pad(num, places, _char) {
+        return String(num).padStart(places, _char);
+      };
+
+      var padRemainingProbes = function padRemainingProbes(num) {
+        return pad(num, String(_this5.game.config.maxProbes).length, ' ');
+      };
+
+      var padRemainingTime = function padRemainingTime(num) {
+        return pad(num, String(_this5.game.config.maxTime).length, ' ');
+      };
+
       this.players.forEach(function (player, playerIndex) {
         var x = player.x;
         var y = WATER_HEIGHT_SCALE * waves.height(x, ts / WATER_LOOP_DURATION);
@@ -1031,7 +1105,11 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
           translateX: x * draw.width(),
           translateY: y
         });
+        player.$remainingProbes.text(padRemainingProbes(player.remainingProbes));
+        if (player.remainingProbes === 0) player.$remainingProbes.addClass("blinking");
       });
+      this.$remainingTime.text(padRemainingTime(Math.ceil(this.remainingTime / 1000.0)));
+      if (this.remainingTime === 0) this.$remainingTime.addClass("blinking");
     }
   }, {
     key: "terrainHeight",
@@ -1097,13 +1175,55 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       this.groundClip.add(rect);
     }
   }, {
+    key: "gameOver",
+    value: function () {
+      var _gameOver = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee9(endingSequenceCallback) {
+        var uncoverGroundPromise;
+        return regeneratorRuntime.wrap(function _callee9$(_context9) {
+          while (1) {
+            switch (_context9.prev = _context9.next) {
+              case 0:
+                // The game is now over, so a player that lowered the probe later can not win anymore.
+                this.isGameOver = true; // Disable all inputs until the ending sequence is over.
+
+                this.discardInputs = true;
+                uncoverGroundPromise = this.uncoverGround();
+                _context9.next = 5;
+                return Promise.all(this.players.map(function (p) {
+                  return p.probingDone();
+                }));
+
+              case 5:
+                _context9.next = 7;
+                return endingSequenceCallback();
+
+              case 7:
+                this.discardInputs = false;
+                _context9.next = 10;
+                return uncoverGroundPromise;
+
+              case 10:
+              case "end":
+                return _context9.stop();
+            }
+          }
+        }, _callee9, this);
+      }));
+
+      function gameOver(_x) {
+        return _gameOver.apply(this, arguments);
+      }
+
+      return gameOver;
+    }()
+  }, {
     key: "uncoverGround",
     value: function () {
-      var _uncoverGround = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6() {
+      var _uncoverGround = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee10() {
         var draw, treasureSpotlight, uncoverGround;
-        return regeneratorRuntime.wrap(function _callee6$(_context6) {
+        return regeneratorRuntime.wrap(function _callee10$(_context10) {
           while (1) {
-            switch (_context6.prev = _context6.next) {
+            switch (_context10.prev = _context10.next) {
               case 0:
                 draw = this.game.draw;
                 this.ground.show();
@@ -1125,14 +1245,14 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                   });
                 };
 
-                return _context6.abrupt("return", Promise.all(this.groundClip.children().map(uncoverGround)));
+                return _context10.abrupt("return", Promise.all(this.groundClip.children().map(uncoverGround)));
 
               case 7:
               case "end":
-                return _context6.stop();
+                return _context10.stop();
             }
           }
-        }, _callee6, this);
+        }, _callee10, this);
       }));
 
       function uncoverGround() {
@@ -1144,13 +1264,13 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
   }, {
     key: "showWinSequence",
     value: function () {
-      var _showWinSequence = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7(winner) {
-        var _this5 = this;
+      var _showWinSequence = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee11(winner) {
+        var _this6 = this;
 
         var winAnnouncement, randomElement, treasure, openTreaureChest;
-        return regeneratorRuntime.wrap(function _callee7$(_context7) {
+        return regeneratorRuntime.wrap(function _callee11$(_context11) {
           while (1) {
-            switch (_context7.prev = _context7.next) {
+            switch (_context11.prev = _context11.next) {
               case 0:
                 winAnnouncement = IMAGINARY.i18n.t('win-announcement-begin') + (winner.id + 1) + IMAGINARY.i18n.t('win-announcement-end');
 
@@ -1161,39 +1281,102 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 treasure = randomElement(IMAGINARY.i18n.t('treasures'));
 
                 openTreaureChest = function openTreaureChest() {
-                  _this5.treasureOpened.show();
+                  _this6.treasureOpened.show();
 
-                  _this5.treasureClosed.hide();
+                  _this6.treasureClosed.hide();
                 };
 
-                _context7.next = 6;
+                _context11.next = 6;
                 return this.showGameOverSequence(winAnnouncement, treasure, openTreaureChest, ["player-".concat(winner.id)]);
 
               case 6:
               case "end":
-                return _context7.stop();
+                return _context11.stop();
             }
           }
-        }, _callee7, this);
+        }, _callee11, this);
       }));
 
-      function showWinSequence(_x) {
+      function showWinSequence(_x2) {
         return _showWinSequence.apply(this, arguments);
       }
 
       return showWinSequence;
     }()
   }, {
+    key: "showLoseSequenceTimeIsUp",
+    value: function () {
+      var _showLoseSequenceTimeIsUp = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee12() {
+        return regeneratorRuntime.wrap(function _callee12$(_context12) {
+          while (1) {
+            switch (_context12.prev = _context12.next) {
+              case 0:
+                _context12.next = 2;
+                return this.showGameOverSequence(IMAGINARY.i18n.t('time-is-up'), IMAGINARY.i18n.t('game-over'));
+
+              case 2:
+              case "end":
+                return _context12.stop();
+            }
+          }
+        }, _callee12, this);
+      }));
+
+      function showLoseSequenceTimeIsUp() {
+        return _showLoseSequenceTimeIsUp.apply(this, arguments);
+      }
+
+      return showLoseSequenceTimeIsUp;
+    }()
+  }, {
+    key: "showLoseSequenceNoProbesLeft",
+    value: function () {
+      var _showLoseSequenceNoProbesLeft = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee13() {
+        return regeneratorRuntime.wrap(function _callee13$(_context13) {
+          while (1) {
+            switch (_context13.prev = _context13.next) {
+              case 0:
+                _context13.next = 2;
+                return this.showGameOverSequence(IMAGINARY.i18n.t('no-probes-left'), IMAGINARY.i18n.t('game-over'));
+
+              case 2:
+              case "end":
+                return _context13.stop();
+            }
+          }
+        }, _callee13, this);
+      }));
+
+      function showLoseSequenceNoProbesLeft() {
+        return _showLoseSequenceNoProbesLeft.apply(this, arguments);
+      }
+
+      return showLoseSequenceNoProbesLeft;
+    }()
+  }, {
     key: "showGameOverSequence",
     value: function () {
-      var _showGameOverSequence = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee8(firstMessage, secondMessage, secondMessageCallback, cssClasses) {
-        var draw, $overlay, delay, restartMessage, $firstMessageDiv, $secondMessageDiv, $restartDiv, $endingSequenceDiv, left, top, $announcementAnchor;
-        return regeneratorRuntime.wrap(function _callee8$(_context8) {
+      var _showGameOverSequence = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee14(firstMessage, secondMessage) {
+        var secondMessageCallback,
+            cssClasses,
+            draw,
+            delay,
+            restartMessage,
+            $firstMessageDiv,
+            $secondMessageDiv,
+            $restartDiv,
+            $endingSequenceDiv,
+            left,
+            top,
+            $announcementAnchor,
+            _args14 = arguments;
+        return regeneratorRuntime.wrap(function _callee14$(_context14) {
           while (1) {
-            switch (_context8.prev = _context8.next) {
+            switch (_context14.prev = _context14.next) {
               case 0:
+                secondMessageCallback = _args14.length > 2 && _args14[2] !== undefined ? _args14[2] : Function.prototype;
+                cssClasses = _args14.length > 3 && _args14[3] !== undefined ? _args14[3] : [];
                 draw = this.game.draw;
-                $overlay = $(this.game.overlay);
 
                 delay = function delay(ms) {
                   return new Promise(function (resolve) {
@@ -1208,44 +1391,44 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 $endingSequenceDiv = $('<div class="ending-sequences-text" />').addClass(cssClasses).append([$firstMessageDiv, $secondMessageDiv, $('<br>'), $restartDiv]);
                 left = 100 * this.treasureLocation.x;
                 top = 100 * (WATER_DISTANCE + TERRAIN_DISTANCE) / draw.height();
-                $announcementAnchor = $('<div class="ending-sequences-text-anchor">').css({
+                $announcementAnchor = $('<div class="ending-sequences-text-anchor" />').css({
                   left: "".concat(left, "%"),
                   top: "".concat(top, "%"),
                   width: "0px",
                   height: "0px"
                 });
-                _context8.next = 13;
+                _context14.next = 14;
                 return delay(ENDING_SEQUENCE_FST_DELAY);
 
-              case 13:
-                $overlay.empty().append([$announcementAnchor, $endingSequenceDiv]); // popper.js places the ending sequence text in a popup-like fashion above the announcement
+              case 14:
+                this.$endingSequenceContainer.empty().append([$announcementAnchor, $endingSequenceDiv]); // popper.js places the ending sequence text in a popup-like fashion above the announcement
                 // anchor and makes sure that is does not move off the screen if the anchor is to close to a
                 // screen edge.
 
                 (0, _core.createPopper)($announcementAnchor.get(0), $endingSequenceDiv.get(0), {
                   placement: 'top'
                 });
-                _context8.next = 17;
+                _context14.next = 18;
                 return delay(ENDING_SEQUENCE_SND_DELAY);
 
-              case 17:
+              case 18:
                 $secondMessageDiv.css("visibility", "visible");
                 secondMessageCallback();
-                _context8.next = 21;
+                _context14.next = 22;
                 return delay(ENDING_SEQUENCE_RESTART_DELAY);
 
-              case 21:
+              case 22:
                 $restartDiv.css("visibility", "visible");
 
-              case 22:
+              case 23:
               case "end":
-                return _context8.stop();
+                return _context14.stop();
             }
           }
-        }, _callee8, this);
+        }, _callee14, this);
       }));
 
-      function showGameOverSequence(_x2, _x3, _x4, _x5) {
+      function showGameOverSequence(_x3, _x4) {
         return _showGameOverSequence.apply(this, arguments);
       }
 
@@ -2085,6 +2268,8 @@ var defaultConfig = {
   useGamepads: true,
   useScreenControls: true,
   maxPlayers: 2,
+  maxTime: Number.POSITIVE_INFINITY,
+  maxProbes: Number.POSITIVE_INFINITY,
   continuousGame: false,
   debugControls: false
 };
@@ -2105,7 +2290,7 @@ function loadConfig(_x) {
 
 function _loadConfig() {
   _loadConfig = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(uri) {
-    var response;
+    var response, config, titleCase;
     return regeneratorRuntime.wrap(function _callee2$(_context2) {
       while (1) {
         switch (_context2.prev = _context2.next) {
@@ -2117,7 +2302,7 @@ function _loadConfig() {
             response = _context2.sent;
 
             if (!(response.status >= 200 && response.status < 300)) {
-              _context2.next = 13;
+              _context2.next = 17;
               break;
             }
 
@@ -2126,22 +2311,33 @@ function _loadConfig() {
             return response.json();
 
           case 7:
-            return _context2.abrupt("return", _context2.sent);
+            config = _context2.sent;
 
-          case 10:
-            _context2.prev = 10;
+            // Take into account the INFINITY is a valid value for maxTime and maxProbes
+            titleCase = function titleCase(s) {
+              return function (l) {
+                return l.charAt(0).toUpperCase() + l.slice(1);
+              }(String(s).toLowerCase());
+            };
+
+            if (Number(titleCase(config.maxTime)) === Number.POSITIVE_INFINITY) config.maxTime = Number.POSITIVE_INFINITY;
+            if (Number(titleCase(config.maxProbes)) === Number.POSITIVE_INFINITY) config.maxProbes = Number.POSITIVE_INFINITY;
+            return _context2.abrupt("return", config);
+
+          case 14:
+            _context2.prev = 14;
             _context2.t0 = _context2["catch"](4);
             throw new Error("Error parsing config file: ".concat(_context2.t0.message));
 
-          case 13:
+          case 17:
             throw new Error("Server returned status ".concat(response.status, " (").concat(response.statusText, ") loading config file."));
 
-          case 14:
+          case 18:
           case "end":
             return _context2.stop();
         }
       }
-    }, _callee2, null, [[4, 10]]);
+    }, _callee2, null, [[4, 14]]);
   }));
   return _loadConfig.apply(this, arguments);
 }

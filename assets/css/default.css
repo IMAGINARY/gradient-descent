@@ -194,6 +194,7 @@ body {
       left: 0; }
 
 .play {
+  color: lightgray;
   stroke-width: 3;
   stroke: none;
   fill: none; }
@@ -243,5 +244,12 @@ body {
 
 .ending-sequences-text-anchor {
   position: absolute; }
+
+.game-stats {
+  text-align: right;
+  margin: 1ex;
+  font-size: 1.5vw; }
+  .game-stats .counter {
+    margin-left: 1ex; }
 
 /*# sourceMappingURL=default.css.map */

@@ -13,6 +13,8 @@ The `config.json` file is loaded when opening the application. It supports the f
 - **useGamepads** (boolean, default: true): Enables gamepad use.
 - **useScreenControls** (boolean, default: true): Shows on-screen controllers.
 - **maxPlayers** (integer, default: 2): Maximum number of players (between 1 and 4).
+- **maxTime** (integer or string "Infinity", default: "Infinity"): Maximum number seconds until the game is over.
+- **maxProbes** (integer or string "Infinity", default: "Infinity"): Maximum number of probes until the game is over.
 - **continuousGame** (boolean, default: false): Skip the title screen and time limit, auto-restart.
 - **debugControls** (boolean, default: false): Shows debugging data for controls.
 

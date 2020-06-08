@@ -2,8 +2,13 @@
   "press-to-start": "Press to start",
   "press-to-restart": "Press to restart",
   "choose-num-players": "Choose number of players",
+  "remaining-time": "Remaining time:",
+  "remaining-probes": "Remaining probes:",
   "win-announcement-begin": "Player ",
   "win-announcement-end": " found the treasure:",
+  "time-is-up": "Time is up!",
+  "no-probes-left": "No probes left!",
+  "game-over": "Game over!",
   "treasures": [
     "Fermat’s Lost Proof",
     "The last digit of Pi",

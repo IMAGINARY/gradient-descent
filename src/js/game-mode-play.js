@@ -53,10 +53,32 @@ export default class PlayMode extends GameMode {
   }
 
   async handleEnterMode() {
-    const { draw, numPlayers } = this.game;
+    const { draw, config, numPlayers } = this.game;
 
-    this.gameOver = false;
+    this.isGameOver = false;
     this.discardInputs = false;
+
+    this.remainingTime = config.maxTime * 1000;
+
+    this.$overlay = $('<div class="play" />').appendTo(this.game.overlay);
+    const $gameStats = $('<div class="game-stats"/>').appendTo(this.$overlay);
+
+    const $remainingTimeContainer = $('<div />')
+      .text(IMAGINARY.i18n.t('remaining-time'))
+      .appendTo($gameStats);
+    if (config.maxTime === Number.POSITIVE_INFINITY)
+      $remainingTimeContainer.hide()
+
+    const $remainingProbesContainer = $('<div />')
+      .text(IMAGINARY.i18n.t('remaining-probes'))
+      .appendTo($gameStats);
+    this.$remainingTime = $('<span class="counter"/>')
+      .appendTo($remainingTimeContainer);
+    this.$remainingProbes = $('<span />').appendTo($remainingProbesContainer);
+    if (config.maxProbes === Number.POSITIVE_INFINITY)
+      $remainingProbesContainer.hide()
+
+    this.$endingSequenceContainer = $('<div />').appendTo(this.$overlay);
 
     const modeGroup = draw.group()
       .addClass('play')
@@ -87,6 +109,10 @@ export default class PlayMode extends GameMode {
           .move(-PROBE_SIZE * 2, BOAT_DRAFT);
         probeParent.clipWith(probeClip);
 
+        // Add an element for displaying the number of remaining probes
+        const $remainingProbes = $(`<span class="counter player-${playerIndex}"/>`)
+          .appendTo(this.$remainingProbes);
+
         return {
           id: playerIndex,
           group: group,
@@ -109,7 +135,9 @@ export default class PlayMode extends GameMode {
             if (!this.probing)
               return;
             await new Promise(resolve => this._probeEventEmitter.addListener("probe-off", resolve));
-          }
+          },
+          remainingProbes: config.maxProbes,
+          $remainingProbes: $remainingProbes,
         };
       });
 
@@ -159,27 +187,44 @@ export default class PlayMode extends GameMode {
 
   handleInputs(inputs, lastInputs, delta, ts) {
     // Move the boats or check if they're lowering the probe
+    const { draw, config, numPlayers } = this.game;
+
+    this.remainingTime = Math.max(0, this.remainingTime - delta);
 
     if (this.discardInputs)
       return;
 
-    const { draw, numPlayers } = this.game;
+    if (!this.isGameOver) {
+      if (this.remainingTime === 0) {
+        console.log("Time is up - GAME OVER!");
+        this.gameOver(async () => this.showLoseSequenceTimeIsUp());
+      } else if (this.players.reduce((a, c) => a + c.remainingProbes, 0) === 0) {
+        const anyoneProbing = this.players.reduce((a, c) => a || c.probing, false);
+        if (!anyoneProbing) {
+          console.log("No probes left - GAME OVER!");
+          this.gameOver(async () => this.showLoseSequenceNoProbesLeft());
+        }
+      }
+    }
+
     inputs
       .slice(0, numPlayers) // discard inputs that don't belong to an active player
       .forEach((input, playerIndex) => {
         const lastInput = lastInputs[playerIndex];
         const actionDown = input.action && !lastInput.action;
-        if (this.gameOver && actionDown)
+        if (this.isGameOver && actionDown)
           this.triggerEvent('done');
 
         const player = this.players[playerIndex];
-        if (!player.probing && !this.gameOver) {
+        if (!player.probing && !this.isGameOver) {
           player.x += SPEED_FACTOR * (delta * input.direction);
-          player.x = Math.min(Math.max(TERRAIN_MARGIN_WIDTH, player.x), 1.0 - TERRAIN_MARGIN_WIDTH);
+          player.x = Math.min(Math.max(TERRAIN_MARGIN_WIDTH, player.x),
+            1.0 - TERRAIN_MARGIN_WIDTH);
           player.flipX = input.direction === 0 ? player.flipX : input.direction === -1;
-          if (actionDown) {
+          if (actionDown && player.remainingProbes > 0) {
             // Switch to probe mode
             player.probing = true;
+            player.remainingProbes = Math.max(0, player.remainingProbes - 1);
             // Lower the probe, wait and raise it again
             const terrainHeight = this.terrainHeight(player.x);
             const probeHeight = TERRAIN_DISTANCE + TERRAIN_HEIGHT_SCALE * terrainHeight;
@@ -189,28 +234,21 @@ export default class PlayMode extends GameMode {
               .transform({ translateY: probeHeight })
               .after(() => this.addGroundClip(player.x))
               .after(() => this.addTangent(player));
+            const yUp = TERRAIN_DISTANCE * (player.remainingProbes > 0 ? PROBE_DISTANCE_AT_REST : 0)
             const runnerUp = runnerDown.animate(probeDuration, PROBE_DELAY)
-              .transform({ translateY: TERRAIN_DISTANCE * PROBE_DISTANCE_AT_REST })
+              .transform({ translateY: yUp })
               .after(() => player.probing = false);
-            const treasureFound = Math.abs(player.x - this.treasureLocation.x) <= TREASURE_SIZE / 2;
+            const treasureFound = Math.abs(player.x - this.treasureLocation.x) <= TREASURE_SIZE
+              / 2;
             runnerDown.after(async () => {
-              if (treasureFound && !this.gameOver) {
+              if (treasureFound && !this.isGameOver) {
                 console.log("Treasure found - GAME OVER!");
-                // The game is now over, so a player that lowered the probe later can not win anymore.
-                this.gameOver = true;
-
-                // Disable all inputs until the ending sequence is over.
-                this.discardInputs = true;
-                const uncoverGroundPromise = this.uncoverGround();
-                await Promise.all(this.players.map(p => p.probingDone()));
-                await this.showWinSequence(player);
-                this.discardInputs = false;
-                await uncoverGroundPromise;
+                await this.gameOver(async () => this.showWinSequence(player));
               }
             });
 
-
-            console.log(`Player ${playerIndex} is probing at:`, { x: player.x, y: terrainHeight });
+            console.log(`Player ${playerIndex} is probing at:`,
+              { x: player.x, y: terrainHeight });
           }
         }
       });
@@ -223,6 +261,10 @@ export default class PlayMode extends GameMode {
     // etc...
 
     this.water.plot(this.wavesPoints(ts / WATER_LOOP_DURATION));
+
+    const pad = (num, places, char) => String(num).padStart(places, char);
+    const padRemainingProbes = num => pad(num, String(this.game.config.maxProbes).length, ' ');
+    const padRemainingTime = num => pad(num, String(this.game.config.maxTime).length, ' ');
 
     this.players.forEach((player, playerIndex) => {
       const x = player.x;
@@ -239,7 +281,15 @@ export default class PlayMode extends GameMode {
         translateX: x * draw.width(),
         translateY: y
       });
+
+      player.$remainingProbes.text(padRemainingProbes(player.remainingProbes));
+      if (player.remainingProbes === 0)
+        player.$remainingProbes.addClass("blinking");
     });
+
+    this.$remainingTime.text(padRemainingTime(Math.ceil(this.remainingTime / 1000.0)));
+    if (this.remainingTime === 0)
+      this.$remainingTime.addClass("blinking");
   }
 
   terrainHeight(x) {
@@ -294,6 +344,19 @@ export default class PlayMode extends GameMode {
     this.groundClip.add(rect);
   }
 
+  async gameOver(endingSequenceCallback) {
+    // The game is now over, so a player that lowered the probe later can not win anymore.
+    this.isGameOver = true;
+
+    // Disable all inputs until the ending sequence is over.
+    this.discardInputs = true;
+    const uncoverGroundPromise = this.uncoverGround();
+    await Promise.all(this.players.map(p => p.probingDone()));
+    await endingSequenceCallback();
+    this.discardInputs = false;
+    await uncoverGroundPromise;
+  }
+
   async uncoverGround() {
     const { draw } = this.game;
     this.ground.show();
@@ -340,9 +403,25 @@ export default class PlayMode extends GameMode {
     );
   }
 
-  async showGameOverSequence(firstMessage, secondMessage, secondMessageCallback, cssClasses) {
+  async showLoseSequenceTimeIsUp() {
+    await this.showGameOverSequence(
+      IMAGINARY.i18n.t('time-is-up'),
+      IMAGINARY.i18n.t('game-over'),
+    );
+  }
+
+  async showLoseSequenceNoProbesLeft() {
+    await this.showGameOverSequence(
+      IMAGINARY.i18n.t('no-probes-left'),
+      IMAGINARY.i18n.t('game-over'),
+    );
+  }
+
+  async showGameOverSequence(firstMessage,
+                             secondMessage,
+                             secondMessageCallback = Function.prototype,
+                             cssClasses = []) {
     const { draw } = this.game;
-    const $overlay = $(this.game.overlay);
 
     const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -360,7 +439,7 @@ export default class PlayMode extends GameMode {
 
     const left = 100 * this.treasureLocation.x;
     const top = 100 * (WATER_DISTANCE + TERRAIN_DISTANCE) / draw.height();
-    const $announcementAnchor = $('<div class="ending-sequences-text-anchor">')
+    const $announcementAnchor = $('<div class="ending-sequences-text-anchor" />')
       .css({
         left: `${left}%`,
         top: `${top}%`,
@@ -369,7 +448,7 @@ export default class PlayMode extends GameMode {
       });
 
     await delay(ENDING_SEQUENCE_FST_DELAY);
-    $overlay.empty().append([$announcementAnchor, $endingSequenceDiv]);
+    this.$endingSequenceContainer.empty().append([$announcementAnchor, $endingSequenceDiv]);
 
     // popper.js places the ending sequence text in a popup-like fashion above the announcement
     // anchor and makes sure that is does not move off the screen if the anchor is to close to a

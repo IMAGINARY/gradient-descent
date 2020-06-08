@@ -3,7 +3,9 @@
   "useGamepads": true,
   "useScreenControls": true,
   "useKeyboardControls": true,
-  "maxPlayers": 2,
-  "continuousGame": true,
-  "debugControls": true
+  "maxPlayers": 4,
+  "maxTime": "Infinity",
+  "maxProbes": "Infinity",
+  "continuousGame": false,
+  "debugControls": false
 }
