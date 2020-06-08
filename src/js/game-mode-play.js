@@ -31,8 +31,8 @@ const TANGENT_LENGTH = 0.02;
 const TREASURE_SIZE = 0.03;
 
 const UNCOVER_DURATION = 2000;
-const ENDING_SEQUENCE_DELAY = 0;
-const ENDING_SEQUENCE_TREASURE_DELAY = 1000;
+const ENDING_SEQUENCE_FST_DELAY = 0;
+const ENDING_SEQUENCE_SND_DELAY = 1000;
 const ENDING_SEQUENCE_RESTART_DELAY = 2000;
 
 export default class PlayMode extends GameMode {
@@ -203,7 +203,7 @@ export default class PlayMode extends GameMode {
                 this.discardInputs = true;
                 const uncoverGroundPromise = this.uncoverGround();
                 await Promise.all(this.players.map(p => p.probingDone()));
-                await this.showGameOverSequence(player);
+                await this.showWinSequence(player);
                 this.discardInputs = false;
                 await uncoverGroundPromise;
               }
@@ -320,27 +320,43 @@ export default class PlayMode extends GameMode {
     return Promise.all(this.groundClip.children().map(uncoverGround));
   }
 
-  async showGameOverSequence(winner) {
+  async showWinSequence(winner) {
+    const winAnnouncement = IMAGINARY.i18n.t('win-announcement-begin')
+      + (winner.id + 1)
+      + IMAGINARY.i18n.t('win-announcement-end');
+    const randomElement = arr => arr[Math.floor(Math.random() * (arr.length - 1))];
+    const treasure = randomElement(IMAGINARY.i18n.t('treasures'));
+
+    const openTreaureChest = () => {
+      this.treasureOpened.show();
+      this.treasureClosed.hide();
+    }
+
+    await this.showGameOverSequence(
+      winAnnouncement,
+      treasure,
+      openTreaureChest,
+      [`player-${winner.id}`]
+    );
+  }
+
+  async showGameOverSequence(firstMessage, secondMessage, secondMessageCallback, cssClasses) {
     const { draw } = this.game;
     const $overlay = $(this.game.overlay);
 
     const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-    const treasureAnnouncement = IMAGINARY.i18n.t('treasure-announcement-begin')
-      + (winner.id + 1)
-      + IMAGINARY.i18n.t('treasure-announcement-end');
-    const randomElement = arr => arr[Math.floor(Math.random() * (arr.length - 1))];
-    const treasureString = randomElement(IMAGINARY.i18n.t('treasures'));
-    const restartString = IMAGINARY.i18n.t('press-to-restart');
+    const restartMessage = IMAGINARY.i18n.t('press-to-restart');
 
-    const $treasureAnnouncementDiv = $('<div>').text(treasureAnnouncement);
-    const $treasureDiv = $('<div>').text(treasureString)
+    const $firstMessageDiv = $('<div>').text(firstMessage);
+    const $secondMessageDiv = $('<div>').text(secondMessage)
       .css('visibility', 'hidden');
-    const $restartDiv = $('<div class="blinking">').text(restartString)
+    const $restartDiv = $('<div class="blinking">').text(restartMessage)
       .css('visibility', 'hidden');
 
-    const $endingSequenceDiv = $(`<div class="ending-sequences-text player-${winner.id}" />`)
-      .append([$treasureAnnouncementDiv, $treasureDiv, $('<br>'), $restartDiv]);
+    const $endingSequenceDiv = $('<div class="ending-sequences-text" />')
+      .addClass(cssClasses)
+      .append([$firstMessageDiv, $secondMessageDiv, $('<br>'), $restartDiv]);
 
     const left = 100 * this.treasureLocation.x;
     const top = 100 * (WATER_DISTANCE + TERRAIN_DISTANCE) / draw.height();
@@ -352,7 +368,7 @@ export default class PlayMode extends GameMode {
         height: "0px",
       });
 
-    await delay(ENDING_SEQUENCE_DELAY);
+    await delay(ENDING_SEQUENCE_FST_DELAY);
     $overlay.empty().append([$announcementAnchor, $endingSequenceDiv]);
 
     // popper.js places the ending sequence text in a popup-like fashion above the announcement
@@ -365,10 +381,9 @@ export default class PlayMode extends GameMode {
         placement: 'top',
       });
 
-    await delay(ENDING_SEQUENCE_TREASURE_DELAY);
-    $treasureDiv.css("visibility", "visible");
-    this.treasureOpened.show();
-    this.treasureClosed.hide();
+    await delay(ENDING_SEQUENCE_SND_DELAY);
+    $secondMessageDiv.css("visibility", "visible");
+    secondMessageCallback();
 
     await delay(ENDING_SEQUENCE_RESTART_DELAY);
     $restartDiv.css("visibility", "visible");

@@ -696,8 +696,8 @@ var PROBE_DELAY = 500;
 var TANGENT_LENGTH = 0.02;
 var TREASURE_SIZE = 0.03;
 var UNCOVER_DURATION = 2000;
-var ENDING_SEQUENCE_DELAY = 0;
-var ENDING_SEQUENCE_TREASURE_DELAY = 1000;
+var ENDING_SEQUENCE_FST_DELAY = 0;
+var ENDING_SEQUENCE_SND_DELAY = 1000;
 var ENDING_SEQUENCE_RESTART_DELAY = 2000;
 
 var PlayMode = /*#__PURE__*/function (_GameMode) {
@@ -985,7 +985,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
 
                     case 7:
                       _context5.next = 9;
-                      return _this4.showGameOverSequence(player);
+                      return _this4.showWinSequence(player);
 
                     case 9:
                       _this4.discardInputs = false;
@@ -1142,13 +1142,55 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       return uncoverGround;
     }()
   }, {
-    key: "showGameOverSequence",
+    key: "showWinSequence",
     value: function () {
-      var _showGameOverSequence = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7(winner) {
-        var draw, $overlay, delay, treasureAnnouncement, randomElement, treasureString, restartString, $treasureAnnouncementDiv, $treasureDiv, $restartDiv, $endingSequenceDiv, left, top, $announcementAnchor;
+      var _showWinSequence = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7(winner) {
+        var _this5 = this;
+
+        var winAnnouncement, randomElement, treasure, openTreaureChest;
         return regeneratorRuntime.wrap(function _callee7$(_context7) {
           while (1) {
             switch (_context7.prev = _context7.next) {
+              case 0:
+                winAnnouncement = IMAGINARY.i18n.t('win-announcement-begin') + (winner.id + 1) + IMAGINARY.i18n.t('win-announcement-end');
+
+                randomElement = function randomElement(arr) {
+                  return arr[Math.floor(Math.random() * (arr.length - 1))];
+                };
+
+                treasure = randomElement(IMAGINARY.i18n.t('treasures'));
+
+                openTreaureChest = function openTreaureChest() {
+                  _this5.treasureOpened.show();
+
+                  _this5.treasureClosed.hide();
+                };
+
+                _context7.next = 6;
+                return this.showGameOverSequence(winAnnouncement, treasure, openTreaureChest, ["player-".concat(winner.id)]);
+
+              case 6:
+              case "end":
+                return _context7.stop();
+            }
+          }
+        }, _callee7, this);
+      }));
+
+      function showWinSequence(_x) {
+        return _showWinSequence.apply(this, arguments);
+      }
+
+      return showWinSequence;
+    }()
+  }, {
+    key: "showGameOverSequence",
+    value: function () {
+      var _showGameOverSequence = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee8(firstMessage, secondMessage, secondMessageCallback, cssClasses) {
+        var draw, $overlay, delay, restartMessage, $firstMessageDiv, $secondMessageDiv, $restartDiv, $endingSequenceDiv, left, top, $announcementAnchor;
+        return regeneratorRuntime.wrap(function _callee8$(_context8) {
+          while (1) {
+            switch (_context8.prev = _context8.next) {
               case 0:
                 draw = this.game.draw;
                 $overlay = $(this.game.overlay);
@@ -1159,18 +1201,11 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                   });
                 };
 
-                treasureAnnouncement = IMAGINARY.i18n.t('treasure-announcement-begin') + (winner.id + 1) + IMAGINARY.i18n.t('treasure-announcement-end');
-
-                randomElement = function randomElement(arr) {
-                  return arr[Math.floor(Math.random() * (arr.length - 1))];
-                };
-
-                treasureString = randomElement(IMAGINARY.i18n.t('treasures'));
-                restartString = IMAGINARY.i18n.t('press-to-restart');
-                $treasureAnnouncementDiv = $('<div>').text(treasureAnnouncement);
-                $treasureDiv = $('<div>').text(treasureString).css('visibility', 'hidden');
-                $restartDiv = $('<div class="blinking">').text(restartString).css('visibility', 'hidden');
-                $endingSequenceDiv = $("<div class=\"ending-sequences-text player-".concat(winner.id, "\" />")).append([$treasureAnnouncementDiv, $treasureDiv, $('<br>'), $restartDiv]);
+                restartMessage = IMAGINARY.i18n.t('press-to-restart');
+                $firstMessageDiv = $('<div>').text(firstMessage);
+                $secondMessageDiv = $('<div>').text(secondMessage).css('visibility', 'hidden');
+                $restartDiv = $('<div class="blinking">').text(restartMessage).css('visibility', 'hidden');
+                $endingSequenceDiv = $('<div class="ending-sequences-text" />').addClass(cssClasses).append([$firstMessageDiv, $secondMessageDiv, $('<br>'), $restartDiv]);
                 left = 100 * this.treasureLocation.x;
                 top = 100 * (WATER_DISTANCE + TERRAIN_DISTANCE) / draw.height();
                 $announcementAnchor = $('<div class="ending-sequences-text-anchor">').css({
@@ -1179,10 +1214,10 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                   width: "0px",
                   height: "0px"
                 });
-                _context7.next = 16;
-                return delay(ENDING_SEQUENCE_DELAY);
+                _context8.next = 13;
+                return delay(ENDING_SEQUENCE_FST_DELAY);
 
-              case 16:
+              case 13:
                 $overlay.empty().append([$announcementAnchor, $endingSequenceDiv]); // popper.js places the ending sequence text in a popup-like fashion above the announcement
                 // anchor and makes sure that is does not move off the screen if the anchor is to close to a
                 // screen edge.
@@ -1190,28 +1225,27 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 (0, _core.createPopper)($announcementAnchor.get(0), $endingSequenceDiv.get(0), {
                   placement: 'top'
                 });
-                _context7.next = 20;
-                return delay(ENDING_SEQUENCE_TREASURE_DELAY);
+                _context8.next = 17;
+                return delay(ENDING_SEQUENCE_SND_DELAY);
 
-              case 20:
-                $treasureDiv.css("visibility", "visible");
-                this.treasureOpened.show();
-                this.treasureClosed.hide();
-                _context7.next = 25;
+              case 17:
+                $secondMessageDiv.css("visibility", "visible");
+                secondMessageCallback();
+                _context8.next = 21;
                 return delay(ENDING_SEQUENCE_RESTART_DELAY);
 
-              case 25:
+              case 21:
                 $restartDiv.css("visibility", "visible");
 
-              case 26:
+              case 22:
               case "end":
-                return _context7.stop();
+                return _context8.stop();
             }
           }
-        }, _callee7, this);
+        }, _callee8, this);
       }));
 
-      function showGameOverSequence(_x) {
+      function showGameOverSequence(_x2, _x3, _x4, _x5) {
         return _showGameOverSequence.apply(this, arguments);
       }
 

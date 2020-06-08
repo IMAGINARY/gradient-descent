@@ -2,8 +2,8 @@
   "press-to-start": "Press to start",
   "press-to-restart": "Press to restart",
   "choose-num-players": "Choose number of players",
-  "treasure-announcement-begin": "Player ",
-  "treasure-announcement-end": " found the treasure: ",
+  "win-announcement-begin": "Player ",
+  "win-announcement-end": " found the treasure:",
   "treasures": [
     "Fermat’s Lost Proof",
     "The last digit of Pi",
