@@ -146,6 +146,8 @@ body {
   animation: blinking 1.25s infinite; }
 
 .main {
+  font-family: 'gradient-vector', sans-serif;
+  font-weight: 400;
   width: 100%;
   height: 100%; }
   .main .game-view {

@@ -1,0 +1,58 @@
+/* Override Bulma CSS */
+.hero-body {
+  padding-bottom: 1rem;
+}
+
+.section {
+  padding: 1rem 1.5rem;
+}
+
+pre {
+  padding: 0.5rem;
+}
+
+/* Custom CSS */
+th {
+  min-width: 9rem;
+}
+
+.glyphs-table {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-content: flex-start;
+  align-items: flex-start;
+  justify-content: flex-start;
+  padding: 1rem 2rem;
+}
+
+.glyphs-table-title {
+  font-size: 1rem;
+  color: #777;
+}
+
+.glyph-cell {
+  margin: 0.25rem 0.25rem 1rem 0.25rem;
+}
+
+.glyph-cell:hover > .glyph-char {
+  background-color: #fcfcfc;
+}
+
+.glyph-cell:hover > .glyph-name {
+  /*font-weight: 600;*/
+}
+
+.glyph-char {
+  font-size: 4rem;
+  line-height: 5rem;
+  text-align: center;
+  width: 6rem;
+  height: 6rem;
+  background-color: #f2f2f2;
+  overflow: hidden;
+}
+
+.glyph-name {
+  text-align: center;
+}
