@@ -189,12 +189,11 @@ export default class PlayMode extends GameMode {
     // Move the boats or check if they're lowering the probe
     const { draw, config, numPlayers } = this.game;
 
-    this.remainingTime = Math.max(0, this.remainingTime - delta);
-
     if (this.discardInputs)
       return;
 
     if (!this.isGameOver) {
+      this.remainingTime = Math.max(0, this.remainingTime - delta);
       if (this.remainingTime === 0) {
         console.log("Time is up - GAME OVER!");
         this.gameOver(async () => this.showLoseSequenceTimeIsUp());

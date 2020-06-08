@@ -942,10 +942,11 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
           draw = _this$game2.draw,
           config = _this$game2.config,
           numPlayers = _this$game2.numPlayers;
-      this.remainingTime = Math.max(0, this.remainingTime - delta);
       if (this.discardInputs) return;
 
       if (!this.isGameOver) {
+        this.remainingTime = Math.max(0, this.remainingTime - delta);
+
         if (this.remainingTime === 0) {
           console.log("Time is up - GAME OVER!");
           this.gameOver( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
