@@ -1533,7 +1533,7 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
               case 0:
                 draw = this.game.draw;
                 pressToStart = document.createElement('div');
-                pressToStart.classList.add('blinking', 'text', 'text-center', 'text-vcenter');
+                pressToStart.classList.add('title-press-to-start');
                 pressToStart.textContent = IMAGINARY.i18n.t('press-to-start');
                 this.game.overlay.append(pressToStart);
                 colorBegin = '#00368a';
@@ -1867,27 +1867,28 @@ var GradientDescentGame = /*#__PURE__*/function () {
     key: "init",
     value: function () {
       var _init = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
-        var width, height, viewContainer;
+        var width, height, minAspectRatioContainer, viewContainer;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
                 width = 1920, height = 864;
-                this.overlay = document.createElement('div');
-                this.overlay.classList.add('overlay');
+                minAspectRatioContainer = document.createElement('div');
+                minAspectRatioContainer.classList.add('min-aspect-ratio');
+                this.container.append(minAspectRatioContainer);
                 viewContainer = document.createElement('div');
                 viewContainer.classList.add('game-view');
-                this.container.append(viewContainer);
+                minAspectRatioContainer.append(viewContainer);
                 this.svgDoc = SVG().addTo(viewContainer);
                 this.svgDoc.viewbox(0, 0, width, height).attr('preserveAspectRatio', 'xMinYMin meet');
                 this.draw = this.svgDoc.nested().size(width, height);
                 this.overlay = document.createElement('div');
                 this.overlay.classList.add('overlay');
-                this.container.append(this.overlay);
+                minAspectRatioContainer.append(this.overlay);
 
                 if (this.config.useScreenControls) {
                   this.controls.screen = new _screen["default"](this.config.maxPlayers);
-                  this.container.appendChild(this.controls.screen.element);
+                  minAspectRatioContainer.appendChild(this.controls.screen.element);
                 }
 
                 if (this.config.useGamepads) {
@@ -1902,42 +1903,42 @@ var GradientDescentGame = /*#__PURE__*/function () {
                   this.debugControlsPane = document.createElement('div');
                   this.debugControlsPane.classList.add('debug-pane');
                   this.debugControlsPane.classList.add('debug-pane-controls');
-                  this.container.appendChild(this.debugControlsPane);
+                  minAspectRatioContainer.appendChild(this.debugControlsPane);
                 }
 
-                _context.next = 18;
+                _context.next = 19;
                 return this.registerMode('title', new _gameModeTitle["default"](this));
 
-              case 18:
-                _context.next = 20;
+              case 19:
+                _context.next = 21;
                 return this.registerMode('numplayers', new _gameModeNumplayers["default"](this));
 
-              case 20:
-                _context.next = 22;
+              case 21:
+                _context.next = 23;
                 return this.registerMode('play', new _gameModePlay["default"](this));
 
-              case 22:
+              case 23:
                 if (!this.config.continuousGame) {
-                  _context.next = 28;
+                  _context.next = 29;
                   break;
                 }
 
                 this.transition('play', 'done', 'play');
-                _context.next = 26;
+                _context.next = 27;
                 return this.setMode('play');
 
-              case 26:
-                _context.next = 33;
+              case 27:
+                _context.next = 34;
                 break;
 
-              case 28:
+              case 29:
                 this.transition('title', 'done', this.config.maxPlayers > 1 ? 'numplayers' : 'play');
                 this.transition('numplayers', 'done', 'play');
                 this.transition('play', 'done', 'title');
-                _context.next = 33;
+                _context.next = 34;
                 return this.setMode('title');
 
-              case 33:
+              case 34:
               case "end":
                 return _context.stop();
             }

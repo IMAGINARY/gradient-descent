@@ -1,3 +1,8 @@
+$width: 1920;
+$height: 1080;
+$aspect-ratio-wh: $width / $height;
+$aspect-ratio-hw: $height / $width;
+
 html, body {
   padding: 0;
   margin: 0;
@@ -6,8 +11,18 @@ html, body {
 }
 
 body {
-  background-color: $color-black;
   color: $color-yellow;
-  font-size: calc(3vw * 1080 / 1920);
+  background-color: $color-black-real;
 }
 
+@media (min-aspect-ratio: #{$width} / #{$height}), (aspect-ratio: #{$width} / #{$height}) {
+  body {
+    font-size: 3vh;
+  }
+}
+
+@media (max-aspect-ratio: #{$width} / #{$height}) {
+  body {
+    font-size: #{3 * $aspect-ratio-hw}vw;
+  }
+}

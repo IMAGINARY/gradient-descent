@@ -47,23 +47,23 @@ $player-colors: $color-player-0, $color-player-1, $color-player-2, $color-player
   stroke: $color-treasure;
 }
 
-.ending-sequences-text {
-  text-align: center;
-  text-transform: uppercase;
-  font-size: 1.5vw;
-  padding-bottom: 1vw;
-}
+.overlay {
+  .ending-sequences-text {
+    text-align: center;
+    text-transform: uppercase;
+    padding-bottom: 1ex;
+  }
 
-.ending-sequences-text-anchor {
-  position: absolute;
-}
+  .ending-sequences-text-anchor {
+    position: absolute;
+  }
 
-.game-stats {
-  text-align: right;
-  margin: 1ex;
-  font-size: 1.5vw;
+  .game-stats {
+    text-align: right;
+    margin: 1ex;
 
-  .counter {
-    margin-left: 1ex;
+    .counter {
+      margin-left: 1ex;
+    }
   }
 }

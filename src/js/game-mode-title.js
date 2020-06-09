@@ -11,7 +11,7 @@ export default class TitleMode extends GameMode {
   async handleEnterMode() {
     const { draw } = this.game;
     const pressToStart = document.createElement('div');
-    pressToStart.classList.add('blinking', 'text', 'text-center', 'text-vcenter');
+    pressToStart.classList.add('title-press-to-start');
     pressToStart.textContent = IMAGINARY.i18n.t('press-to-start');
     this.game.overlay.append(pressToStart);
 

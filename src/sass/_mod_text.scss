@@ -1,17 +1,12 @@
 .text {
-  width: 90vw;
-  margin: 0 5vw;
   text-transform: uppercase;
 }
 
 .text-center {
+  width: 100%;
   text-align: center;
 }
 
-.text-vcenter {
-  position: absolute;
-  top: 60vh;
-}
 
 @keyframes blinking{
   0%    {	opacity: 1;	}

@@ -3,30 +3,36 @@
   width: 100%;
   height: 100%;
 
-  .game-view {
-    position: absolute;
-    top: 0;
+  .min-aspect-ratio {
+    position: relative;
     width: 100%;
-    height: calc(1080.0 / 1920.0 * 80vw);
-    text-align: center;
+    height: 100%;
+    max-width: #{$aspect-ratio-wh * 100}vh;
+    margin: auto;
+    background-color: $color-bg;
+    overflow: hidden;
+    font-size: 100%;
 
-    & > svg {
-      display: inline-block;
-      height: 100%;
-      max-height: 100%;
-      max-width: 100%;
-      margin: auto;
+    .game-view, .overlay {
+      position: absolute;
+      top: 0px;
+      height: #{$aspect-ratio-hw * 80}vw;
+      max-height: 80vh;
+      width: 100%;
     }
-  }
 
-  .overlay {
-    display: block;
-    position: absolute;
-    width: 100%;
-    height: calc(1080.0 / 1920.0 * 80vw);
-    top: 0;
-    background-color: transparent;
-    pointer-events: none;
+    .game-view {
+      & > svg {
+        display: inline-block;
+        width: 100%;
+        height: 100%;
+      }
+    }
+
+    .overlay {
+      background-color: transparent;
+      pointer-events: none;
+    }
   }
 }
 
@@ -36,25 +42,33 @@
   font-size: 40px;
 }
 
+.title-press-to-start {
+  @extend .blinking;
+  @extend .text;
+  @extend .text-center;
+  position: absolute;
+  top: 80%;
+}
+
 .numPlayers-title {
-  margin-top: 20vh;
+  margin-top: 20%;
 }
 
 .numPlayers-selector {
   text-align: center;
-  margin-top: 10vh;
+  margin-top: 10%;
 
   .item {
     position: relative;
     display: inline-block;
-    margin: 0 5vw;
+    margin: 0 5%;
 
     &.selected {
       &:after {
         position: absolute;
         display: block;
         content: "^";
-        top: 5vh;
+        top: 5%;
         left: 0;
       }
     }

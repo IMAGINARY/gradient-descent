@@ -41,12 +41,14 @@ export default class GradientDescentGame {
    */
   async init() {
     const [width, height] = [1920, 864];
-    this.overlay = document.createElement('div');
-    this.overlay.classList.add('overlay');
+
+    const minAspectRatioContainer = document.createElement('div')
+    minAspectRatioContainer.classList.add('min-aspect-ratio');
+    this.container.append(minAspectRatioContainer);
 
     const viewContainer = document.createElement('div');
     viewContainer.classList.add('game-view');
-    this.container.append(viewContainer);
+    minAspectRatioContainer.append(viewContainer);
 
     this.svgDoc = SVG().addTo(viewContainer);
     this.svgDoc
@@ -57,11 +59,11 @@ export default class GradientDescentGame {
 
     this.overlay = document.createElement('div');
     this.overlay.classList.add('overlay');
-    this.container.append(this.overlay);
+    minAspectRatioContainer.append(this.overlay);
 
     if (this.config.useScreenControls) {
       this.controls.screen = new ScreenControls(this.config.maxPlayers);
-      this.container.appendChild(this.controls.screen.element);
+      minAspectRatioContainer.appendChild(this.controls.screen.element);
     }
 
     if (this.config.useGamepads) {
@@ -75,7 +77,7 @@ export default class GradientDescentGame {
       this.debugControlsPane = document.createElement('div');
       this.debugControlsPane.classList.add('debug-pane');
       this.debugControlsPane.classList.add('debug-pane-controls');
-      this.container.appendChild(this.debugControlsPane);
+      minAspectRatioContainer.appendChild(this.debugControlsPane);
     }
 
     await this.registerMode('title', new TitleMode(this));

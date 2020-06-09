@@ -1,13 +1,28 @@
 .debug-pane {
   font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
-  font-size: 3vh;
   color: $color-yellow;
   opacity: 0.6;
+  font-size: 1ex;
   pointer-events: none;
 }
 
 .debug-pane-controls {
   position: absolute;
-  bottom: 1vh;
-  left: 3vh;
 }
+
+@media (min-aspect-ratio: #{$width} / #{$height}), (aspect-ratio: #{$width} / #{$height}) {
+  .debug-pane-controls {
+    position: absolute;
+    bottom: 1vh;
+    left: 1vh;
+  }
+}
+
+@media (max-aspect-ratio: #{$width} / #{$height}) {
+  .debug-pane-controls {
+    position: absolute;
+    bottom: #{$aspect-ratio-hw}vh;
+    left: #{$aspect-ratio-hw}vh;
+  }
+}
+

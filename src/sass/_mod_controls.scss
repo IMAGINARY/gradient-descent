@@ -1,15 +1,16 @@
 .screen-controls {
   width: 100%;
-  height: 20vh;
+  height: 15vh;
+  max-height: #{15 * $aspect-ratio-hw}vw;
   position: absolute;
   bottom: 0;
   left: 0;
+  overflow: visible;
 
   .screen-control {
     display: inline-block;
-    width: 25vw;
-    height: 20vh;
-    line-height: 20vh;
+    width: 25%;
+    height: 100%;
     text-align: center;
     color: $color-yellow;
 
@@ -17,51 +18,74 @@
       border: none;
       background-color: transparent;
       color: inherit;
-      width: 8vmin;
-      height: 8vmin;
+      width: 1em;
       padding: 0;
-      font-size: 10vmin;
-      line-height: 8vmin;
+      font-size: 400%;
       text-align: center;
       vertical-align: middle;
       cursor: pointer;
+
       &:after {
         display: block;
         font-family: 'Font Awesome 5 Free', sans-serif;
         font-weight: 900;
       }
+
       &:focus {
         outline: none;
       }
     }
+
     .left {
       &:after {
         content: ""; // fa-caret-left
       }
     }
+
     .right {
       &:after {
         content: ""; // fa-caret-right
       }
     }
+
     .action {
-      font-size: 6vmin;
+      font-size: 250%;
+
       &:after {
         content: ""; // fa-circle
       }
     }
   }
 
-  &.with-1-controls { .screen-control { width: 100vw; } }
-  &.with-2-controls { .screen-control { width: 50vw; } }
-  &.with-3-controls { .screen-control { width: 33.33vw; } }
-  &.with-4-controls { .screen-control { width: 25vw; } }
+  &.with-1-controls {
+    .screen-control {
+      width: 100%;
+    }
+  }
+
+  &.with-2-controls {
+    .screen-control {
+      width: 50%;
+    }
+  }
+
+  &.with-3-controls {
+    .screen-control {
+      width: 33.33%;
+    }
+  }
+
+  &.with-4-controls {
+    .screen-control {
+      width: 25%;
+    }
+  }
 
   @mixin control-color($color, $color-lit) {
     color: $color;
     button.active {
       color: $color-lit;
-      text-shadow: 0 0 2.5vmin $color;
+      text-shadow: 0 0 1ex $color;
     }
   }
 
