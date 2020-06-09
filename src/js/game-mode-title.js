@@ -25,11 +25,11 @@ export default class TitleMode extends GameMode {
       .center(1920 / 2, 1080 / 2.5);
     const gradientText = this.logoSprite.findOne('#gradient')
       .stroke('none')
-      .fill(colorBegin);
+      .fill(colorEnd)
+      .opacity(0);
 
-    const options = { duration: 5000 };
-    gradientText.animate(options).fill(colorEnd);
-    gradientLogo.animate(options).stroke({ color: colorEnd });
+    gradientText.animate({ duration: 7000 }).opacity(1);
+    gradientLogo.animate({ duration: 5000 }).stroke({ color: colorEnd });
     this.wavyStep = WavyAnimation(this.logoSprite, { duration: 3500 });
 
     this.animCounter = 0;
