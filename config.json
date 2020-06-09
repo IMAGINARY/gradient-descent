@@ -4,8 +4,8 @@
   "useScreenControls": true,
   "useKeyboardControls": true,
   "maxPlayers": 4,
-  "maxTime": "Infinity",
-  "maxProbes": "Infinity",
+  "maxTime": 60,
+  "maxProbes": 10,
   "continuousGame": false,
   "debugControls": false
 }
