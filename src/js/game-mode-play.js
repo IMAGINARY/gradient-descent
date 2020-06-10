@@ -376,16 +376,23 @@ export default class PlayMode extends GameMode {
     await uncoverGroundPromise;
   }
 
-  async uncoverGround() {
+  async uncoverGround(duration = UNCOVER_DURATION) {
     const { draw } = this.game;
-
-    const circularEaseIn = pos => -(Math.sqrt(1 - (pos * pos)) - 1);
-    const animateDx = (e, dx) => e.animate(UNCOVER_DURATION).ease(circularEaseIn).dx(dx);
-    const animateDxPromise = (e, dx) => new Promise(resolve => animateDx(e, dx).after(resolve));
-    return Promise.all([
-      animateDxPromise(this.groundCoverLeft, -draw.width()),
-      animateDxPromise(this.groundCoverRight, draw.width())
-    ]);
+    if (duration === 0) {
+      // uncover immediately
+      this.groundCoverLeft.dx(-draw.width());
+      this.groundCoverRight.dx(draw.width());
+    } else {
+      // uncover using an animation
+      // (using an animation with duration 0 still takes > 0s for unknown reasons)
+      const circularEaseIn = pos => -(Math.sqrt(1 - (pos * pos)) - 1);
+      const animateDx = (e, dx) => e.animate(duration).dx(dx);
+      const animateDxPromise = (e, dx) => new Promise(resolve => animateDx(e, dx).after(resolve));
+      return Promise.all([
+        animateDxPromise(this.groundCoverLeft, -draw.width()),
+        animateDxPromise(this.groundCoverRight, draw.width())
+      ]);
+    }
   }
 
   async showWinSequence(winner) {

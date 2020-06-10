@@ -1232,19 +1232,39 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
     key: "uncoverGround",
     value: function () {
       var _uncoverGround = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee10() {
-        var draw, circularEaseIn, animateDx, animateDxPromise;
+        var duration,
+            draw,
+            circularEaseIn,
+            animateDx,
+            animateDxPromise,
+            _args10 = arguments;
         return regeneratorRuntime.wrap(function _callee10$(_context10) {
           while (1) {
             switch (_context10.prev = _context10.next) {
               case 0:
+                duration = _args10.length > 0 && _args10[0] !== undefined ? _args10[0] : UNCOVER_DURATION;
                 draw = this.game.draw;
 
+                if (!(duration === 0)) {
+                  _context10.next = 7;
+                  break;
+                }
+
+                // uncover immediately
+                this.groundCoverLeft.dx(-draw.width());
+                this.groundCoverRight.dx(draw.width());
+                _context10.next = 11;
+                break;
+
+              case 7:
+                // uncover using an animation
+                // (using an animation with duration 0 still takes > 0s for unknown reasons)
                 circularEaseIn = function circularEaseIn(pos) {
                   return -(Math.sqrt(1 - pos * pos) - 1);
                 };
 
                 animateDx = function animateDx(e, dx) {
-                  return e.animate(UNCOVER_DURATION).ease(circularEaseIn).dx(dx);
+                  return e.animate(duration).dx(dx);
                 };
 
                 animateDxPromise = function animateDxPromise(e, dx) {
@@ -1255,7 +1275,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
 
                 return _context10.abrupt("return", Promise.all([animateDxPromise(this.groundCoverLeft, -draw.width()), animateDxPromise(this.groundCoverRight, draw.width())]));
 
-              case 5:
+              case 11:
               case "end":
                 return _context10.stop();
             }
@@ -2282,6 +2302,53 @@ var GradientDescentGame = /*#__PURE__*/function () {
     value: function setMap(map) {
       this.map = !Array.isArray(map) || map.length < 2 ? null : map;
     }
+  }, {
+    key: "showSeaFloor",
+    value: function () {
+      var _showSeaFloor = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
+        var animate,
+            _args5 = arguments;
+        return regeneratorRuntime.wrap(function _callee5$(_context5) {
+          while (1) {
+            switch (_context5.prev = _context5.next) {
+              case 0:
+                animate = _args5.length > 0 && _args5[0] !== undefined ? _args5[0] : true;
+
+                if (!(this.currentMode && typeof this.currentMode.uncoverGround === 'function')) {
+                  _context5.next = 9;
+                  break;
+                }
+
+                if (!animate) {
+                  _context5.next = 7;
+                  break;
+                }
+
+                _context5.next = 5;
+                return this.currentMode.uncoverGround();
+
+              case 5:
+                _context5.next = 9;
+                break;
+
+              case 7:
+                _context5.next = 9;
+                return this.currentMode.uncoverGround(0);
+
+              case 9:
+              case "end":
+                return _context5.stop();
+            }
+          }
+        }, _callee5, this);
+      }));
+
+      function showSeaFloor() {
+        return _showSeaFloor.apply(this, arguments);
+      }
+
+      return showSeaFloor;
+    }()
   }]);
 
   return GradientDescentGame;

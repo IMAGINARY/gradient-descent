@@ -278,4 +278,13 @@ export default class GradientDescentGame {
   setMap(map) {
     this.map = (!Array.isArray(map) || map.length < 2) ? null : map;
   }
+
+  async showSeaFloor(animate = true) {
+    if (this.currentMode && typeof this.currentMode.uncoverGround === 'function') {
+      if (animate)
+        await this.currentMode.uncoverGround();
+      else
+        await this.currentMode.uncoverGround(0);
+    }
+  }
 }

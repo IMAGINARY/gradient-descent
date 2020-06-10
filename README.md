@@ -61,6 +61,12 @@ game.setMap(map);
 game.setMode('play');
 ```
 
+### Showing the sea floor
+
+If the game is in `play` mode, the sea floor of the current game round can be shown via
+`game.showSeaFloor(animate)`. If `animate` is true, the sea floor will be uncovered slowly.
+Otherwise, it will be shown immediately. This method has no effect in other game modes.
+
 ## Compilation
 
 This web application is built using several compilable languages:
