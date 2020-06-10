@@ -2528,6 +2528,11 @@ function convertPointsToHeights(points, numHeights) {
   return heights;
 }
 
+function restrictPrecision(number, decimalPlaces) {
+  var factor = Math.pow(10, decimalPlaces);
+  return Math.round(number * factor) / factor;
+}
+
 var defaultOptions = {
   marginWidth: 0.1,
   marginHeight: 0.1,
@@ -2541,7 +2546,9 @@ function terrain(numSamples, length) {
   var roughTerrainPoints = generateTerrainPoints(numSamples, options.marginWidth, options.marginHeight, options.jitter);
   var smoothTerrainPoints = smoothChaikin(roughTerrainPoints, options.smoothing);
   var smoothTerrainHeights = convertPointsToHeights(smoothTerrainPoints, length);
-  return smoothTerrainHeights;
+  return smoothTerrainHeights.map(function (n) {
+    return restrictPrecision(n, 5);
+  });
 }
 
 },{}],12:[function(require,module,exports){

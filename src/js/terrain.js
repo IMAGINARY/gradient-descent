@@ -88,6 +88,11 @@ function convertPointsToHeights(points, numHeights) {
   return heights;
 }
 
+function restrictPrecision(number, decimalPlaces) {
+  const factor = Math.pow(10, decimalPlaces);
+  return Math.round(number * factor) / factor;
+}
+
 const defaultOptions = {
   marginWidth: 0.1,
   marginHeight: 0.1,
@@ -105,5 +110,5 @@ export default function terrain(numSamples, length, options = {}) {
   );
   const smoothTerrainPoints = smoothChaikin(roughTerrainPoints, options.smoothing);
   const smoothTerrainHeights = convertPointsToHeights(smoothTerrainPoints, length);
-  return smoothTerrainHeights;
+  return smoothTerrainHeights.map(n => restrictPrecision(n, 5));
 }
