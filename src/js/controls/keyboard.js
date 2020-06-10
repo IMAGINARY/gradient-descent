@@ -4,6 +4,7 @@ const keyMap = {
   'ArrowLeft': { id: 0, prop: 'left' },
   'ArrowRight': { id: 0, prop: 'right' },
   'ArrowDown': { id: 0, prop: 'action' },
+  'Space': { id: 0, prop: 'action' },
   'KeyA': { id: 1, prop: 'left' },
   'KeyD': { id: 1, prop: 'right' },
   'KeyS': { id: 1, prop: 'action' },

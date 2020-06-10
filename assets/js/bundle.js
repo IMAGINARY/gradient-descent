@@ -242,6 +242,10 @@ var keyMap = {
     id: 0,
     prop: 'action'
   },
+  'Space': {
+    id: 0,
+    prop: 'action'
+  },
   'KeyA': {
     id: 1,
     prop: 'left'
