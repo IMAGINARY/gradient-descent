@@ -49,6 +49,17 @@ browser. This allows to store the current (possibly auto-generated) map elsewher
 
 Note that the map is only applied for new rounds of the game, not the current one.
 
+### Setting the game mode
+
+The game consists of the modes `title`, `numplayers` and `play`. You can switch to another mode or
+re-enter the current mode via `game.setMode(mode)`. E.g. to load a map and play a new round of the
+game, run
+```
+const map = ...;
+game.setMap(map);
+game.setMode('play');
+```
+
 ## Compilation
 
 This web application is built using several compilable languages:
