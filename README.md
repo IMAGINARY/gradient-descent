@@ -16,6 +16,7 @@ The `config.json` file is loaded when opening the application. It supports the f
 - **maxPlayers** (integer, default: 2): Maximum number of players (between 1 and 4).
 - **maxTime** (integer or string "Infinity", default: "Infinity"): Maximum number seconds until the game is over.
 - **maxProbes** (integer or string "Infinity", default: "Infinity"): Maximum number of probes until the game is over.
+- **showSeaFloor** (boolean, default: false): Make the sea floor visible from the very beginning.
 - **continuousGame** (boolean, default: false): Skip the title screen and time limit, auto-restart.
 - **debugControls** (boolean, default: false): Shows debugging data for controls.
 

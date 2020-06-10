@@ -10,6 +10,7 @@ const defaultConfig = {
   maxTime: Number.POSITIVE_INFINITY,
   maxProbes: Number.POSITIVE_INFINITY,
   continuousGame: false,
+  showSeaFloor: false,
   debugControls: false,
 };
 

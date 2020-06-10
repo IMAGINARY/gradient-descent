@@ -211,6 +211,8 @@ export default class PlayMode extends GameMode {
     this.groundCoverRight = groundCover.rect(draw.width(), draw.height())
       .addClass('ground-cover')
       .move(draw.width() * this.treasureLocation.x, -TERRAIN_HEIGHT_SCALE / 2);
+    if (config.showSeaFloor)
+      groundCover.hide();
 
     this.groundGroup.back();
 
