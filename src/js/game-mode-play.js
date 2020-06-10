@@ -170,8 +170,11 @@ export default class PlayMode extends GameMode {
       .addClass('water');
 
     this.groundGroup = modeGroup.group();
-    const terrainOptions = { marginWidth: TERRAIN_MARGIN_WIDTH };
-    const terrainHeights = terrain(MAX_TERRAIN_EXTREMA, NUM_TERRAIN_POINTS, terrainOptions);
+    const newTerrainHeights = () => {
+      const terrainOptions = { marginWidth: TERRAIN_MARGIN_WIDTH };
+      return terrain(MAX_TERRAIN_EXTREMA, NUM_TERRAIN_POINTS, terrainOptions);
+    }
+    const terrainHeights = game.map ? game.map : newTerrainHeights();
     const terrainPoints = terrainHeights.map((h, i) => [
       draw.width() * (i / (terrainHeights.length - 1)),
       TERRAIN_HEIGHT_SCALE * h,
@@ -183,6 +186,7 @@ export default class PlayMode extends GameMode {
     ]);
     this.terrainHeights = terrainHeights;
     this.treasureLocation = this.locateTreasure();
+    console.log("Map:", terrainHeights);
     console.log("Treasure location:", this.treasureLocation);
 
     const behindGroundGroup = this.groundGroup.group();

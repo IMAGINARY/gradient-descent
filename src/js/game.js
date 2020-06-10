@@ -32,6 +32,8 @@ export default class GradientDescentGame {
     this.debugControlsPane = null;
 
     this.numPlayers = this.config.maxPlayers;
+
+    this.map = null;
   }
 
   /**
@@ -262,5 +264,18 @@ export default class GradientDescentGame {
         callback();
       }
     });
+  }
+
+  /**
+   * Set a custom sea floor map that will be used the next time the play mode is entered.
+   *
+   * @param map {number[]|null} An array containing distance values between 0 and 1. 0 is closest
+   *  to the water surface, 1 is farthest away from the water surface. The map will only be used if
+   *  it contains at least distance values (distances at the left and right edge). If {null} is
+   *  provided, no custom map will be used and a new map will be generated each time the game
+   *  restarts.
+   */
+  setMap(map) {
+    this.map = (!Array.isArray(map) || map.length < 2) ? null : map;
   }
 }

@@ -773,7 +773,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       var _handleEnterMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
         var _this2 = this;
 
-        var _this$game, draw, config, numPlayers, $gameStats, $remainingTimeContainer, $remainingProbesContainer, modeGroup, terrainOptions, terrainHeights, terrainPoints, behindGroundGroup, treasure, groundCover;
+        var _this$game, draw, config, numPlayers, $gameStats, $remainingTimeContainer, $remainingProbesContainer, modeGroup, newTerrainHeights, terrainHeights, terrainPoints, behindGroundGroup, treasure, groundCover;
 
         return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
@@ -897,15 +897,21 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 });
                 this.water = modeGroup.group().polyline(this.wavesPoints(0)).addClass('water');
                 this.groundGroup = modeGroup.group();
-                terrainOptions = {
-                  marginWidth: TERRAIN_MARGIN_WIDTH
+
+                newTerrainHeights = function newTerrainHeights() {
+                  var terrainOptions = {
+                    marginWidth: TERRAIN_MARGIN_WIDTH
+                  };
+                  return (0, _terrain["default"])(MAX_TERRAIN_EXTREMA, NUM_TERRAIN_POINTS, terrainOptions);
                 };
-                terrainHeights = (0, _terrain["default"])(MAX_TERRAIN_EXTREMA, NUM_TERRAIN_POINTS, terrainOptions);
+
+                terrainHeights = game.map ? game.map : newTerrainHeights();
                 terrainPoints = terrainHeights.map(function (h, i) {
                   return [draw.width() * (i / (terrainHeights.length - 1)), TERRAIN_HEIGHT_SCALE * h];
                 }).concat([[2 * draw.width(), 0], [2 * draw.width(), draw.height()], [-draw.width(), draw.height()], [-draw.width(), 0]]);
                 this.terrainHeights = terrainHeights;
                 this.treasureLocation = this.locateTreasure();
+                console.log("Map:", terrainHeights);
                 console.log("Treasure location:", this.treasureLocation);
                 behindGroundGroup = this.groundGroup.group();
                 treasure = behindGroundGroup.group().addClass('treasure').transform({
@@ -921,7 +927,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 this.groundGroup.back();
                 this.tangents = modeGroup.group().translate(0, TERRAIN_DISTANCE);
 
-              case 33:
+              case 34:
               case "end":
                 return _context3.stop();
             }
@@ -1855,6 +1861,7 @@ var GradientDescentGame = /*#__PURE__*/function () {
     this.controls = {};
     this.debugControlsPane = null;
     this.numPlayers = this.config.maxPlayers;
+    this.map = null;
   }
   /**
    * Initializes the app and downloads any external assets
@@ -2258,6 +2265,21 @@ var GradientDescentGame = /*#__PURE__*/function () {
           callback();
         }
       });
+    }
+    /**
+     * Set a custom sea floor map that will be used the next time the play mode is entered.
+     *
+     * @param map {number[]|null} An array containing distance values between 0 and 1. 0 is closest
+     *  to the water surface, 1 is farthest away from the water surface. The map will only be used if
+     *  it contains at least distance values (distances at the left and right edge). If {null} is
+     *  provided, no custom map will be used and a new map will be generated each time the game
+     *  restarts.
+     */
+
+  }, {
+    key: "setMap",
+    value: function setMap(map) {
+      this.map = !Array.isArray(map) || map.length < 2 ? null : map;
     }
   }]);
 
