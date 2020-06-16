@@ -784,6 +784,11 @@
   resolved "https://registry.yarnpkg.com/@types/pug/-/pug-2.0.4.tgz#8772fcd0418e3cd2cc171555d73007415051f4b2"
   integrity sha1-h3L80EGOPNLMFxVV1zAHQVBR9LI=
 
+"@wessberg/pointer-events@^1.0.9":
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/@wessberg/pointer-events/-/pointer-events-1.0.9.tgz#9591f2326e3592cdfa52d630217b97ecf7c5d817"
+  integrity sha512-fTOBNzakyi3wBXMmQ1mpAibU3lCbXVWSwgM9nsjtlfbJ5MH1yvteCZgZF+TDQWNtTPg8JWuQUjBF7+8cKoj92A==
+
 JSONStream@^1.0.3:
   version "1.3.5"
   resolved "https://registry.yarnpkg.com/JSONStream/-/JSONStream-1.3.5.tgz#3208c1f08d3a4d99261ab64f92302bc15e111ca0"

@@ -1,0 +1,22 @@
+.fullscreen-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 1ex 1ex 1ex 1ex;
+  padding: 0ex 0ex 2ex 2ex;
+  color: $color-yellow;
+  opacity: 0.6;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &:active {
+    opacity: 1.0;
+  }
+
+  & * {
+    margin-top: -0.1ex;
+    font-size: 188%;
+  }
+}

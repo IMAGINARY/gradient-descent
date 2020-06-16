@@ -284,4 +284,20 @@ body {
   .overlay .game-stats * .counter {
     margin-left: 1ex; }
 
+.fullscreen-button {
+  position: absolute;
+  top: 0;
+  right: 0;
+  margin: 1ex 1ex 1ex 1ex;
+  padding: 0ex 0ex 2ex 2ex;
+  color: #ffec02;
+  opacity: 0.6; }
+  .fullscreen-button:hover {
+    opacity: 0.8; }
+  .fullscreen-button:active {
+    opacity: 1.0; }
+  .fullscreen-button * {
+    margin-top: -0.1ex;
+    font-size: 188%; }
+
 /*# sourceMappingURL=default.css.map */

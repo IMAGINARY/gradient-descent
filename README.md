@@ -18,6 +18,7 @@ The `config.json` file is loaded when opening the application. It supports the f
 - **maxProbes** (integer or string "Infinity", default: "Infinity"): Maximum number of probes until the game is over.
 - **showSeaFloor** (boolean, default: false): Make the sea floor visible from the very beginning.
 - **continuousGame** (boolean, default: false): Skip the title screen and time limit, auto-restart.
+- **fullScreenButton** (boolean, default: true): Show a button to toggle full-screen mode.
 - **debugControls** (boolean, default: false): Shows debugging data for controls.
 
 ## Remote controlling the game

@@ -1,10 +1,13 @@
 /* globals SVG */
+import "@wessberg/pointer-events";
+
 import PlayMode from './game-mode-play';
 import TitleMode from './game-mode-title';
 import PlayerNumberMode from './game-mode-numplayers';
 import GamepadControls from "./controls/gamepad";
 import ScreenControls from './controls/screen';
 import KeyboardControls from "./controls/keyboard";
+import FullScreenToggle from './full-screen-toggle';
 
 /**
  * The main application
@@ -67,10 +70,15 @@ export default class GradientDescentGame {
       this.controls.screen = new ScreenControls(this.config.maxPlayers);
       minAspectRatioContainer.appendChild(this.controls.screen.element);
     }
-
     if (this.config.useGamepads) {
       this.controls.gamepad = new GamepadControls(this.config.maxPlayers);
     }
+    
+    if (this.config.fullScreenButton) {
+      this.fullScreenToggle = new FullScreenToggle();
+      minAspectRatioContainer.appendChild(this.fullScreenToggle.element);
+    }
+
     if (this.config.useKeyboardControls) {
       this.controls.keyboard = new KeyboardControls(this.config.maxPlayers);
     }
