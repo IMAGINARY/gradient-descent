@@ -17,12 +17,12 @@ body {
 
 @media (min-aspect-ratio: #{$width} / #{$height}), (aspect-ratio: #{$width} / #{$height}) {
   body {
-    font-size: 3vh;
+    font-size: 4vh;
   }
 }
 
 @media (max-aspect-ratio: #{$width} / #{$height}) {
   body {
-    font-size: #{3 * $aspect-ratio-hw}vw;
+    font-size: #{4 * $aspect-ratio-hw}vw;
   }
 }

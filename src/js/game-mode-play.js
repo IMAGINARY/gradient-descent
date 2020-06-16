@@ -63,13 +63,13 @@ export default class PlayMode extends GameMode {
     this.$overlay = $('<div class="play" />').appendTo(this.game.overlay);
     const $gameStats = $('<div class="game-stats"/>').appendTo(this.$overlay);
 
-    const $remainingTimeContainer = $('<div />')
+    const $remainingTimeContainer = $('<div class="remaining-time"/>')
       .text(IMAGINARY.i18n.t('remaining-time'))
       .appendTo($gameStats);
     if (config.maxTime === Number.POSITIVE_INFINITY)
       $remainingTimeContainer.hide()
 
-    const $remainingProbesContainer = $('<div />')
+    const $remainingProbesContainer = $('<div class="remaining-probes"/>')
       .text(IMAGINARY.i18n.t('remaining-probes'))
       .appendTo($gameStats);
     this.$remainingTime = $('<span class="counter"/>')

@@ -789,9 +789,9 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 this.remainingTime = config.maxTime * 1000;
                 this.$overlay = $('<div class="play" />').appendTo(this.game.overlay);
                 $gameStats = $('<div class="game-stats"/>').appendTo(this.$overlay);
-                $remainingTimeContainer = $('<div />').text(IMAGINARY.i18n.t('remaining-time')).appendTo($gameStats);
+                $remainingTimeContainer = $('<div class="remaining-time"/>').text(IMAGINARY.i18n.t('remaining-time')).appendTo($gameStats);
                 if (config.maxTime === Number.POSITIVE_INFINITY) $remainingTimeContainer.hide();
-                $remainingProbesContainer = $('<div />').text(IMAGINARY.i18n.t('remaining-probes')).appendTo($gameStats);
+                $remainingProbesContainer = $('<div class="remaining-probes"/>').text(IMAGINARY.i18n.t('remaining-probes')).appendTo($gameStats);
                 this.$remainingTime = $('<span class="counter"/>').appendTo($remainingTimeContainer);
                 this.$remainingProbes = $('<span />').appendTo($remainingProbesContainer);
                 if (config.maxProbes === Number.POSITIVE_INFINITY) $remainingProbesContainer.hide();

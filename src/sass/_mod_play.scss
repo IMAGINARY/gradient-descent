@@ -51,7 +51,7 @@ $player-colors: $color-player-0, $color-player-1, $color-player-2, $color-player
   .ending-sequences-text {
     text-align: center;
     text-transform: uppercase;
-    padding-bottom: 1ex;
+    padding-bottom: 0.25ex;
   }
 
   .ending-sequences-text-anchor {
@@ -59,10 +59,21 @@ $player-colors: $color-player-0, $color-player-1, $color-player-2, $color-player
   }
 
   .game-stats {
+    position: relative;
     text-align: right;
-    margin: 1ex;
+    margin: 1ex 8ex 1ex 8ex;
 
-    .counter {
+    .remaining-time {
+      position: absolute;
+      right: 0;
+    }
+
+    .remaining-probes {
+      position: absolute;
+      left: 0;
+    }
+
+    * .counter {
       margin-left: 1ex;
     }
   }

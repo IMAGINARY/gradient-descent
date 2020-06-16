@@ -34,11 +34,11 @@ body {
 
 @media (min-aspect-ratio: 1920 / 1080), (aspect-ratio: 1920 / 1080) {
   body {
-    font-size: 3vh; } }
+    font-size: 4vh; } }
 
 @media (max-aspect-ratio: 1920 / 1080) {
   body {
-    font-size: 1.6875vw; } }
+    font-size: 2.25vw; } }
 
 .screen-controls {
   width: 100%;
@@ -266,15 +266,22 @@ body {
 .overlay .ending-sequences-text {
   text-align: center;
   text-transform: uppercase;
-  padding-bottom: 1ex; }
+  padding-bottom: 0.25ex; }
 
 .overlay .ending-sequences-text-anchor {
   position: absolute; }
 
 .overlay .game-stats {
+  position: relative;
   text-align: right;
-  margin: 1ex; }
-  .overlay .game-stats .counter {
+  margin: 1ex 8ex 1ex 8ex; }
+  .overlay .game-stats .remaining-time {
+    position: absolute;
+    right: 0; }
+  .overlay .game-stats .remaining-probes {
+    position: absolute;
+    left: 0; }
+  .overlay .game-stats * .counter {
     margin-left: 1ex; }
 
 /*# sourceMappingURL=default.css.map */
