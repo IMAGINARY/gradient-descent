@@ -2,3 +2,6 @@ node_modules/
 yarn-debug.log*
 yarn-error.log*
 work
+
+# Useful during development to avoid modifying the default config file
+config.local.json

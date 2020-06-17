@@ -2487,7 +2487,13 @@ function loadConfig(_x) {
   return _loadConfig.apply(this, arguments);
 }
 /**
- * Load config files and start the program
+ * Return the URL of the user-supplied config file or {null} if it is not present.
+ *
+ * A custom config file URL can be provided via the 'config' query string variable. It must not
+ * contain references to parent directories ('..').
+ *
+ * @returns {URL|null} User-supplied config or {null} if not supplied.
+ * @throws {Error} If the user-supplied config contains a reference to parent directories.
  */
 
 
@@ -2545,53 +2551,76 @@ function _loadConfig() {
   return _loadConfig.apply(this, arguments);
 }
 
+function getCustomConfigUrl() {
+  var urlSearchParams = new URLSearchParams(window.location.search);
+
+  if (!urlSearchParams.has('config')) {
+    return null;
+  } else {
+    var customConfigName = urlSearchParams.get('config');
+
+    if (/\.\./.test(customConfigName)) {
+      throw new Error("Custom config path ".concat(customConfigName, " must not contain references to parent directories and will be ignored."));
+    } else {
+      return new URL(customConfigName, window.location.href);
+    }
+  }
+}
+/**
+ * Load config files and start the program
+ */
+
+
 (function () {
   var _main = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
-    var config, game;
+    var defaultConfigUrl, costumConfigUrl, configUrl, config, game;
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
             _context.prev = 0;
+            defaultConfigUrl = new URL('./config.json', window.location.href);
+            costumConfigUrl = getCustomConfigUrl();
+            configUrl = costumConfigUrl ? costumConfigUrl : defaultConfigUrl;
             _context.t0 = Object;
             _context.t1 = {};
             _context.t2 = defaultConfig;
-            _context.next = 6;
-            return loadConfig('./config.json');
+            _context.next = 9;
+            return loadConfig(configUrl.href);
 
-          case 6:
+          case 9:
             _context.t3 = _context.sent;
             config = _context.t0.assign.call(_context.t0, _context.t1, _context.t2, _context.t3);
-            _context.next = 10;
+            _context.next = 13;
             return IMAGINARY.i18n.init({
               queryStringVariable: 'lang',
               translationsDirectory: 'tr',
               defaultLanguage: config.defaultLanguage || 'en'
             });
 
-          case 10:
+          case 13:
             // eslint-disable-next-line no-unused-vars
             game = new _game["default"](document.querySelector('.main'), config);
             window.game = game;
-            _context.next = 14;
+            _context.next = 17;
             return game.init();
 
-          case 14:
-            _context.next = 19;
+          case 17:
+            _context.next = 22;
             break;
 
-          case 16:
-            _context.prev = 16;
+          case 19:
+            _context.prev = 19;
             _context.t4 = _context["catch"](0);
             // eslint-disable-next-line no-console
             console.error(_context.t4);
 
-          case 19:
+          case 22:
           case "end":
             return _context.stop();
         }
       }
-    }, _callee, null, [[0, 16]]);
+    }, _callee, null, [[0, 19]]);
   }));
 
   function main() {

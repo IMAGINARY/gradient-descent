@@ -41,11 +41,38 @@ async function loadConfig(uri) {
 }
 
 /**
+ * Return the URL of the user-supplied config file or {null} if it is not present.
+ *
+ * A custom config file URL can be provided via the 'config' query string variable. It must not
+ * contain references to parent directories ('..').
+ *
+ * @returns {URL|null} User-supplied config or {null} if not supplied.
+ * @throws {Error} If the user-supplied config contains a reference to parent directories.
+ */
+function getCustomConfigUrl() {
+  const urlSearchParams = new URLSearchParams(window.location.search);
+  if (!urlSearchParams.has('config')) {
+    return null;
+  } else {
+    const customConfigName = urlSearchParams.get('config');
+    if (/\.\./.test(customConfigName)) {
+      throw new Error(`Custom config path ${customConfigName} must not contain references to parent directories and will be ignored.`);
+    } else {
+      return new URL(customConfigName, window.location.href);
+    }
+  }
+}
+
+/**
  * Load config files and start the program
  */
 (async function main() {
   try {
-    const config = Object.assign({}, defaultConfig, await loadConfig('./config.json'));
+    const defaultConfigUrl = new URL('./config.json', window.location.href);
+    const costumConfigUrl = getCustomConfigUrl();
+    const configUrl = costumConfigUrl ? costumConfigUrl : defaultConfigUrl;
+    const config = Object.assign({}, defaultConfig, await loadConfig(configUrl.href));
+
     await IMAGINARY.i18n.init({
       queryStringVariable: 'lang',
       translationsDirectory: 'tr',

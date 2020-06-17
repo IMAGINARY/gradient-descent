@@ -6,7 +6,7 @@ Original concept by Aaron Montag.
 
 ## Configuration
 
-The `config.json` file is loaded when opening the application. It supports the following keys:
+A config file is loaded when opening the application. It supports the following keys:
 
 - **defaultLanguage** (string, default: en): Default language to use. Can be overriden by the 
   `lang` query string.
@@ -20,6 +20,9 @@ The `config.json` file is loaded when opening the application. It supports the f
 - **continuousGame** (boolean, default: false): Skip the title screen and time limit, auto-restart.
 - **fullScreenButton** (boolean, default: true): Show a button to toggle full-screen mode.
 - **debugControls** (boolean, default: false): Shows debugging data for controls.
+
+By default, the config file `config.json` is used. However, this file name can be overwritten by
+setting the `config` query string variable, e.g. `index.html?config=config.local.json`.
 
 ## Remote controlling the game
 
