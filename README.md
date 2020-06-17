@@ -17,6 +17,7 @@ A config file is loaded when opening the application. It supports the following 
 - **maxTime** (integer or string "Infinity", default: "Infinity"): Maximum number seconds until the game is over.
 - **maxProbes** (integer or string "Infinity", default: "Infinity"): Maximum number of probes until the game is over.
 - **showSeaFloor** (boolean, default: false): Make the sea floor visible from the very beginning.
+- **map** (array or null, default: null): If null, auto-generate a map. Otherwise, use the supplied map. See [below](#setting-a-sea-floor-map) for details.
 - **continuousGame** (boolean, default: false): Skip the title screen and time limit, auto-restart.
 - **fullScreenButton** (boolean, default: true): Show a button to toggle full-screen mode.
 - **debugControls** (boolean, default: false): Shows debugging data for controls.

@@ -36,7 +36,7 @@ export default class GradientDescentGame {
 
     this.numPlayers = this.config.maxPlayers;
 
-    this.map = null;
+    this.map = config.map;
   }
 
   /**

@@ -1973,7 +1973,7 @@ var GradientDescentGame = /*#__PURE__*/function () {
     this.controls = {};
     this.debugControlsPane = null;
     this.numPlayers = this.config.maxPlayers;
-    this.map = null;
+    this.map = config.map;
   }
   /**
    * Initializes the app and downloads any external assets
@@ -2474,7 +2474,8 @@ var defaultConfig = {
   continuousGame: false,
   showSeaFloor: false,
   fullScreenButton: true,
-  debugControls: false
+  debugControls: false,
+  map: null
 };
 /**
  * Loads the config file from an external JSON file

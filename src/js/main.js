@@ -13,6 +13,7 @@ const defaultConfig = {
   showSeaFloor: false,
   fullScreenButton: true,
   debugControls: false,
+  map: null,
 };
 
 /**
