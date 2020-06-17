@@ -768,6 +768,9 @@ var PROBE_DISTANCE_AT_REST = 0.3;
 var PROBE_MIN_DURATION = 500;
 var PROBE_DELAY = 500;
 var TANGENT_LENGTH = 0.02;
+var TANGENT_MIN_OPACITY = 0.25;
+var TANGENT_OPACITY_FADEOUT_FACTOR = 0.9;
+var TANGENT_OPACITY_FADEOUT_DURATION = 500;
 var TREASURE_SIZE = 0.03;
 var UNCOVER_DURATION = 2000;
 var ENDING_SEQUENCE_FST_DELAY = 0;
@@ -1000,7 +1003,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 this.groundCoverRight = groundCover.rect(draw.width(), draw.height()).addClass('ground-cover').move(draw.width() * this.treasureLocation.x, -TERRAIN_HEIGHT_SCALE / 2);
                 if (config.showSeaFloor) groundCover.hide();
                 this.groundGroup.back();
-                this.tangents = modeGroup.group().translate(0, TERRAIN_DISTANCE);
+                this.tangentGroup = modeGroup.group().translate(0, TERRAIN_DISTANCE);
 
               case 35:
               case "end":
@@ -1246,6 +1249,16 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
   }, {
     key: "addTangent",
     value: function addTangent(player) {
+      // Reduce the opacity of previously added tangents of this player
+      var offsetMult = function offsetMult(v, factor, offset) {
+        return offset + (v - offset) * factor;
+      };
+
+      this.tangentGroup.find(".player-".concat(player.id)).each(function () {
+        var o = offsetMult(this.opacity(), TANGENT_OPACITY_FADEOUT_FACTOR, TANGENT_MIN_OPACITY);
+        this.animate(TANGENT_OPACITY_FADEOUT_DURATION).opacity(o);
+      }); // Add the new tangent
+
       var draw = this.game.draw;
       var width = draw.width();
 
@@ -1254,7 +1267,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
           slope = _this$terrainHeightEx.slope;
 
       var angle = 180 * Math.atan2(slope * TERRAIN_HEIGHT_SCALE, width) / Math.PI;
-      this.tangents.line(-width * TANGENT_LENGTH / 2, 0, width * TANGENT_LENGTH / 2, 0).addClass("player-".concat(player.id)).transform({
+      this.tangentGroup.line(-width * TANGENT_LENGTH / 2, 0, width * TANGENT_LENGTH / 2, 0).addClass("player-".concat(player.id)).transform({
         translateX: width * player.x,
         translateY: TERRAIN_HEIGHT_SCALE * value,
         rotate: angle

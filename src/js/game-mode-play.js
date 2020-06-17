@@ -27,6 +27,9 @@ const PROBE_MIN_DURATION = 500;
 const PROBE_DELAY = 500;
 
 const TANGENT_LENGTH = 0.02;
+const TANGENT_MIN_OPACITY = 0.25;
+const TANGENT_OPACITY_FADEOUT_FACTOR = 0.9;
+const TANGENT_OPACITY_FADEOUT_DURATION = 500;
 
 const TREASURE_SIZE = 0.03;
 
@@ -216,7 +219,7 @@ export default class PlayMode extends GameMode {
 
     this.groundGroup.back();
 
-    this.tangents = modeGroup.group()
+    this.tangentGroup = modeGroup.group()
       .translate(0, TERRAIN_DISTANCE);
   }
 
@@ -350,11 +353,20 @@ export default class PlayMode extends GameMode {
   }
 
   addTangent(player) {
+    // Reduce the opacity of previously added tangents of this player
+    const offsetMult = (v, factor, offset) => offset + (v - offset) * factor;
+    this.tangentGroup.find(`.player-${player.id}`)
+      .each(function () {
+        const o = offsetMult(this.opacity(), TANGENT_OPACITY_FADEOUT_FACTOR, TANGENT_MIN_OPACITY);
+        this.animate(TANGENT_OPACITY_FADEOUT_DURATION).opacity(o);
+      });
+
+    // Add the new tangent
     const { draw } = this.game;
     const width = draw.width();
     const { value, slope } = this.terrainHeightExt(player.x);
     const angle = 180 * Math.atan2(slope * TERRAIN_HEIGHT_SCALE, width) / Math.PI;
-    this.tangents.line(-width * TANGENT_LENGTH / 2, 0, width * TANGENT_LENGTH / 2, 0,)
+    this.tangentGroup.line(-width * TANGENT_LENGTH / 2, 0, width * TANGENT_LENGTH / 2, 0,)
       .addClass(`player-${player.id}`)
       .transform({
         translateX: width * player.x,
