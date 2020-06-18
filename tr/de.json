@@ -2,6 +2,10 @@
   "press-to-start": "Start mit Knopfdruck",
   "press-to-restart": "Neustart mit Knopfdruck",
   "choose-num-players": "Wähle die Anzahl der Spieler*innen",
+  "choose-bot-type": "Wähle die Art des Bots",
+  "bot-types": {
+    "none": "Ohne"
+  },
   "remaining-time": "Zeit:",
   "remaining-probes": "Sonden:",
   "win-announcement-begin": "Spieler*in ",

@@ -6,6 +6,7 @@ const defaultConfig = {
   useGamepads: true,
   useScreenControls: true,
   useKeyboardControls: true,
+  botType: null,
   maxPlayers: 2,
   maxTime: Number.POSITIVE_INFINITY,
   maxProbes: Number.POSITIVE_INFINITY,

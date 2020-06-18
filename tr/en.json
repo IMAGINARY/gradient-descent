@@ -2,6 +2,10 @@
   "press-to-start": "Press a button to start",
   "press-to-restart": "Press a button to restart",
   "choose-num-players": "Choose number of players",
+  "choose-bot-type": "Choose the bot type",
+  "bot-types": {
+    "none": "None"
+  },
   "remaining-time": "Time:",
   "remaining-probes": "Probes:",
   "win-announcement-begin": "Player ",

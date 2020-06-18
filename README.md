@@ -8,19 +8,20 @@ Original concept by Aaron Montag.
 
 A config file is loaded when opening the application. It supports the following keys:
 
-- **defaultLanguage** (string, default: en): Default language to use. Can be overriden by the 
+- **defaultLanguage** (string, default: `"en"`): Default language to use. Can be overriden by the 
   `lang` query string.
-- **useGamepads** (boolean, default: true): Enables gamepad use.
-- **useScreenControls** (boolean, default: true): Shows on-screen controllers.
-- **useKeyboardControls** (boolean, default: true): Control the game via keyboard (player 1: <kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd> resp. <kbd>←</kbd><kbd>Space</kbd><kbd>→</kbd>, player 2: <kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>).
+- **useGamepads** (boolean, default: `true`): Enables gamepad use.
+- **useScreenControls** (boolean, default: `true`): Shows on-screen controllers.
+- **useKeyboardControls** (boolean, default: `true`): Control the game via keyboard (player 1: <kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd> resp. <kbd>←</kbd><kbd>Space</kbd><kbd>→</kbd>, player 2: <kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>).
+- **botType** (`"none"` or `null`, default: `null`): Set the type of bot player to use. Let the user choose if `null`.
 - **maxPlayers** (integer, default: 2): Maximum number of players (between 1 and 4).
-- **maxTime** (integer or string "Infinity", default: "Infinity"): Maximum number seconds until the game is over.
-- **maxProbes** (integer or string "Infinity", default: "Infinity"): Maximum number of probes until the game is over.
-- **showSeaFloor** (boolean, default: false): Make the sea floor visible from the very beginning.
-- **map** (array or null, default: null): If null, auto-generate a map. Otherwise, use the supplied map. See [below](#setting-a-sea-floor-map) for details.
-- **continuousGame** (boolean, default: false): Skip the title screen and time limit, auto-restart.
-- **fullScreenButton** (boolean, default: true): Show a button to toggle full-screen mode.
-- **debugControls** (boolean, default: false): Shows debugging data for controls.
+- **maxTime** (integer or string `"Infinity"`, default: `"Infinity"`): Maximum number seconds until the game is over.
+- **maxProbes** (integer or string `"Infinity"`, default: `"Infinity"`): Maximum number of probes until the game is over.
+- **showSeaFloor** (boolean, default: `false`): Make the sea floor visible from the very beginning.
+- **map** (array or `null`, default: `null`): If `null`, auto-generate a map. Otherwise, use the supplied map. See [below](#setting-a-sea-floor-map) for details.
+- **continuousGame** (boolean, default: `false`): Skip the title screen and time limit, auto-restart.
+- **fullScreenButton** (boolean, default: `true`): Show a button to toggle full-screen mode.
+- **debugControls** (boolean, default: `false`): Shows debugging data for controls.
 
 By default, the config file `config.json` is used. However, this file name can be overwritten by
 setting the `config` query string variable, e.g. `index.html?config=config.local.json`.

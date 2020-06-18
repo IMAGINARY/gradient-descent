@@ -541,6 +541,84 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
+var _gameModeMenu = _interopRequireDefault(require("./game-mode-menu"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+var BOT_TYPE_ORDER = ["none"];
+
+var BotTypeMode = /*#__PURE__*/function (_MenuMode) {
+  _inherits(BotTypeMode, _MenuMode);
+
+  var _super = _createSuper(BotTypeMode);
+
+  function BotTypeMode() {
+    _classCallCheck(this, BotTypeMode);
+
+    return _super.apply(this, arguments);
+  }
+
+  _createClass(BotTypeMode, [{
+    key: "getMenuTitle",
+    value: function getMenuTitle() {
+      return IMAGINARY.i18n.t('choose-bot-type');
+    }
+  }, {
+    key: "getMenuItems",
+    value: function getMenuItems() {
+      var botTypeStrings = IMAGINARY.i18n.t('bot-types');
+      return BOT_TYPE_ORDER.map(function (key) {
+        return botTypeStrings[key];
+      });
+    }
+  }, {
+    key: "processSelection",
+    value: function processSelection(selectedIndex) {
+      _get(_getPrototypeOf(BotTypeMode.prototype), "processSelection", this).call(this, selectedIndex);
+
+      this.game.botType = BOT_TYPE_ORDER[selectedIndex];
+    }
+  }]);
+
+  return BotTypeMode;
+}(_gameModeMenu["default"]);
+
+exports["default"] = BotTypeMode;
+
+},{"./game-mode-menu":7}],7:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
 var _gameMode = _interopRequireDefault(require("./game-mode"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
@@ -703,7 +781,7 @@ var MenuMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = MenuMode;
 
-},{"./game-mode":10}],7:[function(require,module,exports){
+},{"./game-mode":11}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -784,7 +862,7 @@ var PlayerNumberMode = /*#__PURE__*/function (_MenuMode) {
 
 exports["default"] = PlayerNumberMode;
 
-},{"./game-mode-menu":6}],8:[function(require,module,exports){
+},{"./game-mode-menu":7}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1639,7 +1717,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = PlayMode;
 
-},{"./game-mode":10,"./terrain":13,"./waves":14,"@popperjs/core":16,"events":18}],9:[function(require,module,exports){
+},{"./game-mode":11,"./terrain":14,"./waves":15,"@popperjs/core":17,"events":19}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1816,7 +1894,7 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = TitleMode;
 
-},{"./game-mode":10,"./wavy-animation":15}],10:[function(require,module,exports){
+},{"./game-mode":11,"./wavy-animation":16}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1996,7 +2074,7 @@ var GameMode = /*#__PURE__*/function () {
 
 exports["default"] = GameMode;
 
-},{"events":18}],11:[function(require,module,exports){
+},{"events":19}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2019,6 +2097,8 @@ var _screen = _interopRequireDefault(require("./controls/screen"));
 var _keyboard = _interopRequireDefault(require("./controls/keyboard"));
 
 var _fullScreenToggle = _interopRequireDefault(require("./full-screen-toggle"));
+
+var _gameModeBottype = _interopRequireDefault(require("./game-mode-bottype"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -2055,6 +2135,7 @@ var GradientDescentGame = /*#__PURE__*/function () {
     this.currentMode = null;
     this.controls = {};
     this.debugControlsPane = null;
+    this.botType = this.config.botType;
     this.numPlayers = this.config.maxPlayers;
     this.map = config.map;
   }
@@ -2069,7 +2150,7 @@ var GradientDescentGame = /*#__PURE__*/function () {
     key: "init",
     value: function () {
       var _init = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
-        var width, height, minAspectRatioContainer, viewContainer;
+        var width, height, minAspectRatioContainer, viewContainer, showBotType, showNumPlayers, afterBotType, afterTitle;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -2118,34 +2199,43 @@ var GradientDescentGame = /*#__PURE__*/function () {
 
               case 20:
                 _context.next = 22;
-                return this.registerMode('numplayers', new _gameModeNumplayers["default"](this));
+                return this.registerMode('bottype', new _gameModeBottype["default"](this));
 
               case 22:
                 _context.next = 24;
-                return this.registerMode('play', new _gameModePlay["default"](this));
+                return this.registerMode('numplayers', new _gameModeNumplayers["default"](this));
 
               case 24:
+                _context.next = 26;
+                return this.registerMode('play', new _gameModePlay["default"](this));
+
+              case 26:
                 if (!this.config.continuousGame) {
-                  _context.next = 30;
+                  _context.next = 32;
                   break;
                 }
 
                 this.transition('play', 'done', 'play');
-                _context.next = 28;
+                _context.next = 30;
                 return this.setMode('play');
 
-              case 28:
-                _context.next = 35;
+              case 30:
+                _context.next = 42;
                 break;
 
-              case 30:
-                this.transition('title', 'done', this.config.maxPlayers > 1 ? 'numplayers' : 'play');
+              case 32:
+                showBotType = this.config.botType === null;
+                showNumPlayers = this.config.maxPlayers > 1;
+                afterBotType = showNumPlayers ? 'numplayers' : 'play';
+                afterTitle = showBotType ? 'bottype' : afterBotType;
+                this.transition('title', 'done', afterTitle);
+                this.transition('bottype', 'done', afterBotType);
                 this.transition('numplayers', 'done', 'play');
                 this.transition('play', 'done', 'title');
-                _context.next = 35;
+                _context.next = 42;
                 return this.setMode('title');
 
-              case 35:
+              case 42:
               case "end":
                 return _context.stop();
             }
@@ -2535,7 +2625,7 @@ var GradientDescentGame = /*#__PURE__*/function () {
 
 exports["default"] = GradientDescentGame;
 
-},{"./controls/gamepad":2,"./controls/keyboard":3,"./controls/screen":4,"./full-screen-toggle":5,"./game-mode-numplayers":7,"./game-mode-play":8,"./game-mode-title":9,"@wessberg/pointer-events":17}],12:[function(require,module,exports){
+},{"./controls/gamepad":2,"./controls/keyboard":3,"./controls/screen":4,"./full-screen-toggle":5,"./game-mode-bottype":6,"./game-mode-numplayers":8,"./game-mode-play":9,"./game-mode-title":10,"@wessberg/pointer-events":18}],13:[function(require,module,exports){
 "use strict";
 
 var _game = _interopRequireDefault(require("./game"));
@@ -2551,6 +2641,7 @@ var defaultConfig = {
   useGamepads: true,
   useScreenControls: true,
   useKeyboardControls: true,
+  botType: null,
   maxPlayers: 2,
   maxTime: Number.POSITIVE_INFINITY,
   maxProbes: Number.POSITIVE_INFINITY,
@@ -2714,7 +2805,7 @@ function getCustomConfigUrl() {
   return main;
 })()();
 
-},{"./game":11}],13:[function(require,module,exports){
+},{"./game":12}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2852,7 +2943,7 @@ function terrain(numSamples, length) {
   });
 }
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2925,7 +3016,7 @@ function animatedSVG(svgContainer, numPoints, numSteps, xScale, yScale, duration
   return waves;
 }
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3014,7 +3105,7 @@ function WavyAnimation(shape) {
   };
 }
 
-},{}],16:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 (function (process){
 /**
  * @popperjs/core v2.4.0 - MIT License
@@ -4815,7 +4906,7 @@ exports.popperGenerator = popperGenerator;
 
 }).call(this,require('_process'))
 
-},{"_process":19}],17:[function(require,module,exports){
+},{"_process":20}],18:[function(require,module,exports){
 (function () {
 	'use strict';
 
@@ -6672,7 +6763,7 @@ exports.popperGenerator = popperGenerator;
 }());
 
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -7197,7 +7288,7 @@ function functionBindPolyfill(context) {
   };
 }
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -7383,5 +7474,5 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[12])
+},{}]},{},[13])
 

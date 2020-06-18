@@ -8,6 +8,7 @@ import GamepadControls from "./controls/gamepad";
 import ScreenControls from './controls/screen';
 import KeyboardControls from "./controls/keyboard";
 import FullScreenToggle from './full-screen-toggle';
+import BotTypeMode from './game-mode-bottype';
 
 /**
  * The main application
@@ -34,6 +35,7 @@ export default class GradientDescentGame {
     this.controls = {};
     this.debugControlsPane = null;
 
+    this.botType = this.config.botType;
     this.numPlayers = this.config.maxPlayers;
 
     this.map = config.map;
@@ -73,7 +75,7 @@ export default class GradientDescentGame {
     if (this.config.useGamepads) {
       this.controls.gamepad = new GamepadControls(this.config.maxPlayers);
     }
-    
+
     if (this.config.fullScreenButton) {
       this.fullScreenToggle = new FullScreenToggle();
       minAspectRatioContainer.appendChild(this.fullScreenToggle.element);
@@ -91,6 +93,7 @@ export default class GradientDescentGame {
     }
 
     await this.registerMode('title', new TitleMode(this));
+    await this.registerMode('bottype', new BotTypeMode(this));
     await this.registerMode('numplayers', new PlayerNumberMode(this));
     await this.registerMode('play', new PlayMode(this));
 
@@ -98,8 +101,14 @@ export default class GradientDescentGame {
       this.transition('play', 'done', 'play');
       await this.setMode('play');
     } else {
-      this.transition('title', 'done',
-        this.config.maxPlayers > 1 ? 'numplayers' : 'play');
+      const showBotType = this.config.botType === null;
+      const showNumPlayers = this.config.maxPlayers > 1;
+
+      const afterBotType = showNumPlayers ? 'numplayers' : 'play';
+      const afterTitle = showBotType ? 'bottype' : afterBotType;
+
+      this.transition('title', 'done', afterTitle);
+      this.transition('bottype', 'done', afterBotType);
       this.transition('numplayers', 'done', 'play');
       this.transition('play', 'done', 'title');
       await this.setMode('title');
