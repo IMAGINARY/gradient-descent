@@ -50,11 +50,11 @@
   top: 80%;
 }
 
-.numPlayers-title {
+.menu-title {
   margin-top: 15%;
 }
 
-.numPlayers-selector {
+.menu-selector {
   text-align: center;
   margin-top: 10%;
 
@@ -62,15 +62,13 @@
     position: relative;
     display: inline-block;
     margin: 0 5%;
+    padding-top: 0.16ex;
+    box-sizing: content-box;
 
     &.selected {
-      &:after {
-        position: absolute;
-        display: block;
-        content: "^";
-        top: 1em;
-        left: 0;
-      }
+      border-color: $color-yellow;
+      border-bottom: 0.09ex solid;
+      border-top: 0.09ex solid;
     }
   }
 }

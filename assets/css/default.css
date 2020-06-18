@@ -194,22 +194,22 @@ body {
   position: absolute;
   top: 80%; }
 
-.numPlayers-title {
+.menu-title {
   margin-top: 15%; }
 
-.numPlayers-selector {
+.menu-selector {
   text-align: center;
   margin-top: 10%; }
-  .numPlayers-selector .item {
+  .menu-selector .item {
     position: relative;
     display: inline-block;
-    margin: 0 5%; }
-    .numPlayers-selector .item.selected:after {
-      position: absolute;
-      display: block;
-      content: "^";
-      top: 1em;
-      left: 0; }
+    margin: 0 5%;
+    padding-top: 0.16ex;
+    box-sizing: content-box; }
+    .menu-selector .item.selected {
+      border-color: #ffec02;
+      border-bottom: 0.09ex solid;
+      border-top: 0.09ex solid; }
 
 .play {
   color: lightgray;

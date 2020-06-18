@@ -571,64 +571,44 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
-var PlayerNumberMode = /*#__PURE__*/function (_GameMode) {
-  _inherits(PlayerNumberMode, _GameMode);
+var MenuMode = /*#__PURE__*/function (_GameMode) {
+  _inherits(MenuMode, _GameMode);
 
-  var _super = _createSuper(PlayerNumberMode);
+  var _super = _createSuper(MenuMode);
 
-  function PlayerNumberMode() {
-    _classCallCheck(this, PlayerNumberMode);
+  function MenuMode(game) {
+    _classCallCheck(this, MenuMode);
 
-    return _super.apply(this, arguments);
+    return _super.call(this, game);
   }
 
-  _createClass(PlayerNumberMode, [{
-    key: "preLoadAssets",
+  _createClass(MenuMode, [{
+    key: "handleEnterMode",
     value: function () {
-      var _preLoadAssets = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+      var _handleEnterMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+        var $overlay, menuItems, $selector, i;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
+                $overlay = $(this.game.overlay);
+                menuItems = this.getMenuItems();
+                this.selectedIndex = 0;
+                $('<div class="text text-center menu-title" />').text(this.getMenuTitle()).appendTo($overlay);
+                $selector = $('<div class="menu-selector" />').addClass("menu-selector-with-".concat(menuItems.length)).appendTo($overlay);
+
+                for (i = 0; i < menuItems.length; ++i) {
+                  $('<div class="item" />').addClass("item-".concat(i)).toggleClass('selected', this.selectedIndex === i).text(menuItems[i]).appendTo($selector);
+                }
+
+                this.$selectorItems = $selector.children();
+
+              case 7:
               case "end":
                 return _context.stop();
             }
           }
-        }, _callee);
-      }));
-
-      function preLoadAssets() {
-        return _preLoadAssets.apply(this, arguments);
-      }
-
-      return preLoadAssets;
-    }()
-  }, {
-    key: "handleEnterMode",
-    value: function () {
-      var _handleEnterMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
-        var $overlay, maxPlayers, $selector, i;
-        return regeneratorRuntime.wrap(function _callee2$(_context2) {
-          while (1) {
-            switch (_context2.prev = _context2.next) {
-              case 0:
-                $overlay = $(this.game.overlay);
-                maxPlayers = this.game.config.maxPlayers;
-                this.selectedNumber = 1;
-                this.selectorItems = {};
-                $('<div class="text text-center numPlayers-title" />').text(IMAGINARY.i18n.t('choose-num-players')).appendTo($overlay);
-                $selector = $('<div class="numPlayers-selector" />').addClass("numPlayers-selector-with-".concat(maxPlayers)).appendTo($overlay);
-
-                for (i = 1; i <= maxPlayers; i += 1) {
-                  this.selectorItems[i] = $('<div class="item" />').addClass("item-".concat(i)).toggleClass('selected', this.selectedNumber === i).text(i).appendTo($selector);
-                }
-
-              case 7:
-              case "end":
-                return _context2.stop();
-            }
-          }
-        }, _callee2, this);
+        }, _callee, this);
       }));
 
       function handleEnterMode() {
@@ -640,16 +620,16 @@ var PlayerNumberMode = /*#__PURE__*/function (_GameMode) {
   }, {
     key: "handleExitMode",
     value: function () {
-      var _handleExitMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
-        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+      var _handleExitMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2() {
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
           while (1) {
-            switch (_context3.prev = _context3.next) {
+            switch (_context2.prev = _context2.next) {
               case 0:
               case "end":
-                return _context3.stop();
+                return _context2.stop();
             }
           }
-        }, _callee3);
+        }, _callee2);
       }));
 
       function handleExitMode() {
@@ -661,47 +641,150 @@ var PlayerNumberMode = /*#__PURE__*/function (_GameMode) {
   }, {
     key: "handleInputs",
     value: function handleInputs(inputs, lastInputs, delta, ts) {
-      var maxPlayers = this.game.config.maxPlayers;
-      var newSelection = null;
+      var _this = this;
 
-      if (inputs.find(function (ctrl, i) {
-        return ctrl.direction === -1 && lastInputs[i].direction !== -1;
-      })) {
-        newSelection = Math.max(1, this.selectedNumber - 1);
-      } else if (inputs.find(function (ctrl, i) {
-        return ctrl.direction === 1 && lastInputs[i].direction !== 1;
-      })) {
-        newSelection = Math.min(maxPlayers, this.selectedNumber + 1);
-      }
+      var clampIndex = function clampIndex(i) {
+        return Math.max(0, Math.min(i, _this.$selectorItems.length - 1));
+      };
 
-      if (newSelection && newSelection !== this.selectedNumber) {
-        this.selectorItems[this.selectedNumber].removeClass('selected');
-        this.selectorItems[newSelection].addClass('selected');
-        this.selectedNumber = newSelection;
-      } // If any button was pressed
+      for (var i = 0; i < inputs.length; ++i) {
+        var _ref = [inputs[i], lastInputs[i]],
+            input = _ref[0],
+            lastInput = _ref[1];
 
+        if (input.direction !== 0 && input.direction * lastInput.direction <= 0) {
+          this.$selectorItems.eq(this.selectedIndex).removeClass('selected');
+          this.selectedIndex = clampIndex(this.selectedIndex + input.direction);
+          this.$selectorItems.eq(this.selectedIndex).addClass('selected');
+        }
 
-      if (inputs.find(function (ctrl, i) {
-        return ctrl.action && !lastInputs[i].action;
-      })) {
-        this.game.numPlayers = this.selectedNumber;
-        this.triggerEvent('done');
+        if (input.action && !lastInput.action) {
+          this.processSelection(this.selectedIndex);
+          this.triggerEvent('done');
+          break;
+        }
       }
     }
+    /**
+     * Get the menu title.
+     *
+     * Overwrite this method in a subclass to provide the menu title.
+     * I will be called whenever this game mode is entered to also reflect possible language changes.
+     *
+     * @returns {string}
+     */
+
   }, {
-    key: "draw",
-    value: function draw(delta, ts) {// Move boats
-      // Draw bottom
-      // etc...
+    key: "getMenuTitle",
+    value: function getMenuTitle() {
+      return "Menu";
+    }
+    /**
+     * Get the menu items.
+     *
+     * Overwrite this method in a subclass to provide the list of menu items.
+     * I will be called whenever this game mode is entered to also reflect possible language changes.
+     *
+     *  @returns {string[]}
+     */
+
+  }, {
+    key: "getMenuItems",
+    value: function getMenuItems() {
+      return ['One', 'Two'];
+    }
+  }, {
+    key: "processSelection",
+    value: function processSelection(itemIndex) {}
+  }]);
+
+  return MenuMode;
+}(_gameMode["default"]);
+
+exports["default"] = MenuMode;
+
+},{"./game-mode":10}],7:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _gameModeMenu = _interopRequireDefault(require("./game-mode-menu"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+var PlayerNumberMode = /*#__PURE__*/function (_MenuMode) {
+  _inherits(PlayerNumberMode, _MenuMode);
+
+  var _super = _createSuper(PlayerNumberMode);
+
+  function PlayerNumberMode(game) {
+    var _this;
+
+    _classCallCheck(this, PlayerNumberMode);
+
+    _this = _super.call(this, game);
+    _this._menuItems = Array.from({
+      length: _this.game.config.maxPlayers
+    }, function (_, id) {
+      return String(id + 1);
+    });
+    return _this;
+  }
+
+  _createClass(PlayerNumberMode, [{
+    key: "getMenuTitle",
+    value: function getMenuTitle() {
+      return IMAGINARY.i18n.t('choose-num-players');
+    }
+  }, {
+    key: "getMenuItems",
+    value: function getMenuItems() {
+      return this._menuItems;
+    }
+  }, {
+    key: "processSelection",
+    value: function processSelection(selectedIndex) {
+      _get(_getPrototypeOf(PlayerNumberMode.prototype), "processSelection", this).call(this, selectedIndex);
+
+      this.game.numPlayers = selectedIndex + 1;
     }
   }]);
 
   return PlayerNumberMode;
-}(_gameMode["default"]);
+}(_gameModeMenu["default"]);
 
 exports["default"] = PlayerNumberMode;
 
-},{"./game-mode":9}],7:[function(require,module,exports){
+},{"./game-mode-menu":6}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1556,7 +1639,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = PlayMode;
 
-},{"./game-mode":9,"./terrain":12,"./waves":13,"@popperjs/core":15,"events":17}],8:[function(require,module,exports){
+},{"./game-mode":10,"./terrain":13,"./waves":14,"@popperjs/core":16,"events":18}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1733,7 +1816,7 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = TitleMode;
 
-},{"./game-mode":9,"./wavy-animation":14}],9:[function(require,module,exports){
+},{"./game-mode":10,"./wavy-animation":15}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1913,7 +1996,7 @@ var GameMode = /*#__PURE__*/function () {
 
 exports["default"] = GameMode;
 
-},{"events":17}],10:[function(require,module,exports){
+},{"events":18}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2452,7 +2535,7 @@ var GradientDescentGame = /*#__PURE__*/function () {
 
 exports["default"] = GradientDescentGame;
 
-},{"./controls/gamepad":2,"./controls/keyboard":3,"./controls/screen":4,"./full-screen-toggle":5,"./game-mode-numplayers":6,"./game-mode-play":7,"./game-mode-title":8,"@wessberg/pointer-events":16}],11:[function(require,module,exports){
+},{"./controls/gamepad":2,"./controls/keyboard":3,"./controls/screen":4,"./full-screen-toggle":5,"./game-mode-numplayers":7,"./game-mode-play":8,"./game-mode-title":9,"@wessberg/pointer-events":17}],12:[function(require,module,exports){
 "use strict";
 
 var _game = _interopRequireDefault(require("./game"));
@@ -2631,7 +2714,7 @@ function getCustomConfigUrl() {
   return main;
 })()();
 
-},{"./game":10}],12:[function(require,module,exports){
+},{"./game":11}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2769,7 +2852,7 @@ function terrain(numSamples, length) {
   });
 }
 
-},{}],13:[function(require,module,exports){
+},{}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2842,7 +2925,7 @@ function animatedSVG(svgContainer, numPoints, numSteps, xScale, yScale, duration
   return waves;
 }
 
-},{}],14:[function(require,module,exports){
+},{}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2931,7 +3014,7 @@ function WavyAnimation(shape) {
   };
 }
 
-},{}],15:[function(require,module,exports){
+},{}],16:[function(require,module,exports){
 (function (process){
 /**
  * @popperjs/core v2.4.0 - MIT License
@@ -4732,7 +4815,7 @@ exports.popperGenerator = popperGenerator;
 
 }).call(this,require('_process'))
 
-},{"_process":18}],16:[function(require,module,exports){
+},{"_process":19}],17:[function(require,module,exports){
 (function () {
 	'use strict';
 
@@ -6589,7 +6672,7 @@ exports.popperGenerator = popperGenerator;
 }());
 
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -7114,7 +7197,7 @@ function functionBindPolyfill(context) {
   };
 }
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -7300,5 +7383,5 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[11])
+},{}]},{},[12])
 
