@@ -2390,7 +2390,7 @@ var GradientDescentGame = /*#__PURE__*/function () {
     key: "init",
     value: function () {
       var _init = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
-        var width, height, minAspectRatioContainer, viewContainer, showBotType, showNumPlayers, afterBotType, afterTitle;
+        var width, height, minAspectRatioContainer, viewContainer, showBotType, showNumPlayers, afterNumPlayers, afterTitle;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
@@ -2466,11 +2466,11 @@ var GradientDescentGame = /*#__PURE__*/function () {
               case 32:
                 showBotType = this.config.botType === null;
                 showNumPlayers = this.config.maxPlayers > 1;
-                afterBotType = showNumPlayers ? 'numplayers' : 'play';
-                afterTitle = showBotType ? 'bottype' : afterBotType;
+                afterNumPlayers = showBotType ? 'bottype' : 'play';
+                afterTitle = showNumPlayers ? 'numplayers' : afterNumPlayers;
                 this.transition('title', 'done', afterTitle);
-                this.transition('bottype', 'done', afterBotType);
-                this.transition('numplayers', 'done', 'play');
+                this.transition('numplayers', 'done', afterNumPlayers);
+                this.transition('bottype', 'done', 'play');
                 this.transition('play', 'done', 'title');
                 _context.next = 42;
                 return this.setMode('title');

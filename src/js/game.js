@@ -104,12 +104,12 @@ export default class GradientDescentGame {
       const showBotType = this.config.botType === null;
       const showNumPlayers = this.config.maxPlayers > 1;
 
-      const afterBotType = showNumPlayers ? 'numplayers' : 'play';
-      const afterTitle = showBotType ? 'bottype' : afterBotType;
+      const afterNumPlayers = showBotType ? 'bottype' : 'play';
+      const afterTitle = showNumPlayers ? 'numplayers' : afterNumPlayers;
 
       this.transition('title', 'done', afterTitle);
-      this.transition('bottype', 'done', afterBotType);
-      this.transition('numplayers', 'done', 'play');
+      this.transition('numplayers', 'done', afterNumPlayers);
+      this.transition('bottype', 'done', 'play');
       this.transition('play', 'done', 'title');
       await this.setMode('title');
     }
