@@ -4,7 +4,8 @@
   "choose-num-players": "Wähle die Anzahl der Spieler*innen",
   "choose-bot-type": "Wähle die Art des Bots",
   "bot-types": {
-    "none": "Ohne"
+    "none": "Ohne",
+    "random": "Zufall"
   },
   "remaining-time": "Zeit:",
   "remaining-probes": "Sonden:",

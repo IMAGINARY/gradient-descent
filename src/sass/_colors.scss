@@ -8,11 +8,13 @@ $color-yellow: #ffec02;
 $color-blue: #2197ff;
 $color-red: #ff2d2d;
 $color-green: #29da29;
+$color-orange: #FF8D18;
 
 $color-yellow-lit: #fffbcd;
 $color-blue-lit: #c2e2ff;
 $color-red-lit: #ffcaca;
 $color-green-lit: #b4ffb4;
+$color-orange-lit: #fad0a5;
 
 $color-bg: $color-black;
 
@@ -23,7 +25,8 @@ $color-treasure: #F99C2D;
 $color-player-0: $color-blue;
 $color-player-1: $color-red;
 $color-player-2: $color-green;
-$color-player-3: $color-yellow;
+$color-player-3: $color-orange;
+$color-player-bot: $color-yellow;
 
 @mixin neg {
   -webkit-font-smoothing: antialiased;

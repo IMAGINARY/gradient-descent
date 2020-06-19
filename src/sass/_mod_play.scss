@@ -7,20 +7,28 @@
 
 $player-colors: $color-player-0, $color-player-1, $color-player-2, $color-player-3;
 
+@mixin player($color) {
+  $player-color: $color;
+
+  color: $player-color;
+
+  .draw &, &.draw {
+    stroke: $player-color;
+  }
+
+  .fill &, &.fill {
+    fill: $player-color;
+  }
+}
+
 @for $i from 0 through 3 {
   .player-#{$i} {
-    $player-color: nth($player-colors, 1 + $i);
-
-    color: $player-color;
-
-    .draw &, &.draw {
-      stroke: $player-color;
-    }
-
-    .fill &, &.fill {
-      fill: $player-color;
-    }
+    @include player(nth($player-colors, 1 + $i));
   }
+}
+
+.player-bot {
+  @include player($color-player-bot);
 }
 
 .cover {

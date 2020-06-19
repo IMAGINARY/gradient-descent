@@ -102,15 +102,10 @@ body {
       color: #b4ffb4;
       text-shadow: 0 0 1ex #29da29; }
   .screen-controls .screen-control-3 {
-    color: #ffec02; }
+    color: #FF8D18; }
     .screen-controls .screen-control-3 button.active {
-      color: #fffbcd;
-      text-shadow: 0 0 1ex #ffec02; }
-  .screen-controls.with-1-controls .screen-control-0 {
-    color: #ffec02; }
-    .screen-controls.with-1-controls .screen-control-0 button.active {
-      color: #fffbcd;
-      text-shadow: 0 0 1ex #ffec02; }
+      color: #fad0a5;
+      text-shadow: 0 0 1ex #FF8D18; }
 
 .debug-pane {
   font-family: Helvetica Neue, Helvetica, Arial, sans-serif;
@@ -239,10 +234,17 @@ body {
     fill: #29da29; }
 
 .player-3 {
-  color: #ffec02; }
+  color: #FF8D18; }
   .draw .player-3, .player-3.draw {
-    stroke: #ffec02; }
+    stroke: #FF8D18; }
   .fill .player-3, .player-3.fill {
+    fill: #FF8D18; }
+
+.player-bot {
+  color: #ffec02; }
+  .draw .player-bot, .player-bot.draw {
+    stroke: #ffec02; }
+  .fill .player-bot, .player-bot.fill {
     fill: #ffec02; }
 
 .cover, .ground-cover {

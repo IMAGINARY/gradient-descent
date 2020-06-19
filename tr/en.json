@@ -4,7 +4,8 @@
   "choose-num-players": "Choose number of players",
   "choose-bot-type": "Choose the bot type",
   "bot-types": {
-    "none": "None"
+    "none": "None",
+    "random": "Random"
   },
   "remaining-time": "Time:",
   "remaining-probes": "Probes:",

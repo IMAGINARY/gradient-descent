@@ -102,13 +102,7 @@
   }
 
   .screen-control-3 {
-    @include control-color($color-yellow, $color-yellow-lit);
-  }
-
-  &.with-1-controls {
-    .screen-control-0 {
-      @include control-color($color-yellow, $color-yellow-lit);
-    }
+    @include control-color($color-orange, $color-orange-lit);
   }
 }
 

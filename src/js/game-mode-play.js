@@ -4,6 +4,8 @@ import { createPopper } from '@popperjs/core';
 import GameMode from './game-mode';
 import terrain from './terrain';
 import * as waves from './waves';
+import BotStrategyBase from './bot-strategies/base';
+import RandomBotStrategy from './bot-strategies/random';
 
 const WATER_HEIGHT_SCALE = 10;
 const NUM_WATER_POINTS = 300;
@@ -44,6 +46,7 @@ export default class PlayMode extends GameMode {
     super(game);
     const wavesPoints = Array(NUM_WATER_POINTS).fill(null);
     this.wavesPoints = t => waves.points(wavesPoints, t, game.draw.width(), WATER_HEIGHT_SCALE);
+    this.bot = null;
   }
 
   async preLoadAssets() {
@@ -56,7 +59,7 @@ export default class PlayMode extends GameMode {
   }
 
   async handleEnterMode() {
-    const { draw, config, numPlayers } = this.game;
+    const { draw, config, numPlayers, botType } = this.game;
 
     this.isGameOver = false;
     this.discardInputs = false;
@@ -88,85 +91,114 @@ export default class PlayMode extends GameMode {
       .addClass('draw')
       .translate(0, WATER_DISTANCE);
 
-    // Create a boat for each player
-    this.players = Array(numPlayers)
-      .fill(null)
-      .map((_, playerIndex) => {
-        const x = (playerIndex + 1) / (numPlayers + 1);
-        const group = modeGroup.group();
-        group
-          .addClass(`player-${playerIndex}`)
-          .transform({ translateX: x * draw.width() });
+    const createPlayer = (playerIndex, numPlayers, cssClass) => {
+      const x = (playerIndex + 1) / (numPlayers + 1);
+      const group = modeGroup.group();
+      group
+        .addClass(cssClass)
+        .transform({ translateX: x * draw.width() });
 
-        const boat = group.use(this.shipSymbol)
-          .center(0, BOAT_DRAFT);
+      const boat = group.use(this.shipSymbol)
+        .center(0, BOAT_DRAFT);
 
-        const probeParent = group.group();
-        const probe = probeParent.group();
-        const probeY = TERRAIN_DISTANCE * PROBE_DISTANCE_AT_REST;
-        const probeRope = probe.line(0, BOAT_DRAFT, 0, probeY - PROBE_SIZE / 2);
-        const probeCircle = probe.circle(PROBE_SIZE).center(0, probeY);
+      const probeParent = group.group();
+      const probe = probeParent.group();
+      const probeY = TERRAIN_DISTANCE * PROBE_DISTANCE_AT_REST;
+      const probeRope = probe.line(0, BOAT_DRAFT, 0, probeY - PROBE_SIZE / 2);
+      const probeCircle = probe.circle(PROBE_SIZE).center(0, probeY);
 
-        const doProbe = function (terrainHeight) {
-          this.probing = true;
-          this.remainingProbes = Math.max(0, this.remainingProbes - 1);
-          const probeHeight = TERRAIN_DISTANCE + TERRAIN_HEIGHT_SCALE * terrainHeight;
-          const probeDuration = probeHeight * (PROBE_MIN_DURATION / TERRAIN_DISTANCE);
+      const doProbe = function (terrainHeight) {
+        this.probing = true;
+        this.remainingProbes = Math.max(0, this.remainingProbes - 1);
+        const probeHeight = TERRAIN_DISTANCE + TERRAIN_HEIGHT_SCALE * terrainHeight;
+        const probeDuration = probeHeight * (PROBE_MIN_DURATION / TERRAIN_DISTANCE);
 
-          const probeDown = probeCircle.animate(probeDuration, 0, 'now')
-            .cy(probeHeight);
-          const probeRopeDown = probeRope.animate(probeDuration, 0, 'now')
-            .plot(0, BOAT_DRAFT, 0, probeHeight - PROBE_SIZE / 2);
+        const probeDown = probeCircle.animate(probeDuration, 0, 'now')
+          .cy(probeHeight);
+        const probeRopeDown = probeRope.animate(probeDuration, 0, 'now')
+          .plot(0, BOAT_DRAFT, 0, probeHeight - PROBE_SIZE / 2);
 
-          const yUp = this.remainingProbes > 0 ? TERRAIN_DISTANCE
-            * PROBE_DISTANCE_AT_REST : BOAT_DRAFT + PROBE_SIZE;
-          const probeUp = probeDown.animate(probeDuration, PROBE_DELAY)
-            .cy(yUp)
-            .after(() => this.probing = false);
-          const probeRopeUp = probeRopeDown.animate(probeDuration, PROBE_DELAY)
-            .plot(0, BOAT_DRAFT, 0, yUp - PROBE_SIZE / 2);
-
-          return {
-            down: new Promise(resolve => probeDown.after(resolve)),
-            up: new Promise(resolve => probeUp.after(resolve)),
-          }
-        }
-
-        // Add an element for displaying the number of remaining probes
-        const $remainingProbes = $(`<span class="counter player-${playerIndex}"/>`)
-          .appendTo(this.$remainingProbes);
-
-        // Move boat in front of the probe
-        boat.front();
+        const yUp = this.remainingProbes > 0 ? TERRAIN_DISTANCE
+          * PROBE_DISTANCE_AT_REST : BOAT_DRAFT + PROBE_SIZE;
+        const probeUp = probeDown.animate(probeDuration, PROBE_DELAY)
+          .cy(yUp)
+          .after(() => this.probing = false);
+        const probeRopeUp = probeRopeDown.animate(probeDuration, PROBE_DELAY)
+          .plot(0, BOAT_DRAFT, 0, yUp - PROBE_SIZE / 2);
 
         return {
-          id: playerIndex,
-          group: group,
-          boat: boat,
-          probe: probe,
-          doProbe: doProbe,
-          x: x,
-          flipX: false,
-          _probing: false,
-          _probeEventEmitter: new EventEmitter(),
-          set probing(p) {
-            const probeTurnedOff = this._probing && !p;
-            this._probing = p;
-            if (probeTurnedOff)
-              this._probeEventEmitter.emit("probe-off");
-          },
-          get probing() {
-            return this._probing;
-          },
-          probingDone: async function () {
-            if (!this.probing)
-              return;
-            await new Promise(resolve => this._probeEventEmitter.addListener("probe-off", resolve));
-          },
-          remainingProbes: config.maxProbes,
-          $remainingProbes: $remainingProbes,
-        };
-      });
+          down: new Promise(resolve => probeDown.after(resolve)),
+          up: new Promise(resolve => probeUp.after(resolve)),
+        }
+      }
+
+      // Add an element for displaying the number of remaining probes
+      const $remainingProbes = $(`<span class="counter ${cssClass}"/>`)
+        .appendTo(this.$remainingProbes);
+
+      // Move boat in front of the probe
+      boat.front();
+
+      return {
+        id: playerIndex,
+        cssClass: cssClass,
+        group: group,
+        boat: boat,
+        probe: probe,
+        doProbe: doProbe,
+        x: x,
+        lastX: x,
+        flipX: false,
+        _probing: false,
+        _probeEventEmitter: new EventEmitter(),
+        set probing(p) {
+          const probeTurnedOff = this._probing && !p;
+          this._probing = p;
+          if (probeTurnedOff)
+            this._probeEventEmitter.emit("probe-off");
+        },
+        get probing() {
+          return this._probing;
+        },
+        probingDone: async function () {
+          if (!this.probing)
+            return;
+          await new Promise(resolve => this._probeEventEmitter.addListener("probe-off", resolve));
+        },
+        remainingProbes: config.maxProbes,
+        $remainingProbes: $remainingProbes,
+      };
+    };
+
+    // Create a boat for each player
+    const addBot = botType && botType !== 'none';
+    this.players = Array(numPlayers)
+      .fill(null)
+      .map((_, playerIndex) => createPlayer(
+        playerIndex,
+        numPlayers + (addBot ? 1 : 0),
+        `player-${playerIndex}`)
+      );
+    if (addBot) {
+      const botStrategyClass = botType === 'random' ? RandomBotStrategy : BotStrategyBase;
+      console.log(botStrategyClass);
+      const botStrategy = new botStrategyClass(TERRAIN_MARGIN_WIDTH, 1 - TERRAIN_MARGIN_WIDTH);
+      const bot = {};
+      bot.type = botType;
+      bot.player = createPlayer(numPlayers, numPlayers + 1, 'player-bot');
+      bot.targetX = bot.player.x;
+      bot.tangentListener = () => bot.targetX = botStrategy.getNextProbeLocation(
+        this.tangents,
+        bot.player,
+        bot.player.id,
+        this.players,
+      );
+      this.players.push(bot.player);
+      this.events.addListener('new-tangent', bot.tangentListener);
+      this.bot = bot;
+    } else {
+      this.bot = null;
+    }
 
     this.water = modeGroup.group()
       .polyline(this.wavesPoints(0))
@@ -221,51 +253,102 @@ export default class PlayMode extends GameMode {
 
     this.tangentGroup = modeGroup.group()
       .translate(0, TERRAIN_DISTANCE);
+
+    // Sentinel values to avoid having to deal boundary cases.
+    this.tangents = [
+      this.terrainHeightExt(TERRAIN_MARGIN_WIDTH),
+      this.terrainHeightExt(1.0 - TERRAIN_MARGIN_WIDTH),
+    ];
   }
 
   async handleExitMode() {
     // Cleanup timers, etc. created on handleEnterMode
+    if (this.bot !== null)
+      this.events.removeListener('new-tangent', this.bot.tangentListener);
+  }
+
+  static buildBotInput(bot) {
+    const botInput = { direction: 0, action: false };
+    const botLastInput = { direction: 0, action: false };
+
+    const { player, targetX } = bot;
+    const { x, lastX } = player;
+    const [lower, upper] = x < lastX ? [x, lastX] : [lastX, x];
+
+    if (lower <= targetX && targetX <= upper) {
+      // It's time to probe!
+      player.lastX = x;
+      player.x = targetX;
+      botInput.action = true;
+    } else {
+      // Navigate towards targetX
+      botInput.direction = Math.sign(targetX - player.x);
+    }
+
+    return {
+      input: botInput,
+      lastInput: botLastInput,
+    }
   }
 
   handleInputs(inputs, lastInputs, delta, ts) {
     // Move the boats or check if they're lowering the probe
     const { draw, config, numPlayers } = this.game;
 
+    // Some game states do not allow user input
     if (this.discardInputs)
       return;
 
-    if (!this.isGameOver) {
-      this.remainingTime = Math.max(0, this.remainingTime - delta);
-      if (this.remainingTime === 0) {
-        console.log("Time is up - GAME OVER!");
-        this.gameOver(async () => this.showLoseSequenceTimeIsUp());
-      } else if (this.players.reduce((a, c) => a + c.remainingProbes, 0) === 0) {
-        const anyoneProbing = this.players.reduce((a, c) => a || c.probing, false);
-        if (!anyoneProbing) {
-          console.log("No probes left - GAME OVER!");
-          this.gameOver(async () => this.showLoseSequenceNoProbesLeft());
-        }
+    // Leave game mode when the game is over and a player pressed the action button
+    if (this.isGameOver) {
+      const action = inputs.findIndex((input, i) => actionPressed(input, lastInputs[i])) !== -1;
+      if (this.isGameOver && action) {
+        this.discardInputs = true;
+        this.triggerEvent('done');
+      }
+      return;
+    }
+
+    // Check whether the game is lost
+    this.remainingTime = Math.max(0, this.remainingTime - delta);
+    if (this.remainingTime === 0) {
+      console.log("Time is up - GAME OVER!");
+      this.gameOver(async () => this.showLoseSequenceTimeIsUp());
+      return;
+    } else if (this.players.reduce((a, c) => a + c.remainingProbes, 0) === 0) {
+      const anyoneProbing = this.players.reduce((a, c) => a || c.probing, false);
+      if (!anyoneProbing) {
+        console.log("No probes left - GAME OVER!");
+        this.gameOver(async () => this.showLoseSequenceNoProbesLeft());
+        return;
       }
     }
 
+    // Discard inputs that don't belong to an active player
+    inputs = inputs.slice(0, numPlayers);
+    lastInputs = lastInputs.slice(0, numPlayers);
+
+    // If there is a bot, create fake inputs for it
+    if (this.bot !== null) {
+      const { input, lastInput } = PlayMode.buildBotInput(this.bot);
+      inputs.push(input);
+      lastInputs.push(lastInput);
+    }
+
+    // Regular move & probe logic
     inputs
       .forEach((input, playerIndex) => {
         const lastInput = lastInputs[playerIndex];
-        const actionDown = input.action && !lastInput.action;
-        if (this.isGameOver && actionDown)
-          this.triggerEvent('done');
-
-        // discard inputs that don't belong to an active player
-        if (playerIndex >= numPlayers)
-          return;
+        const action = actionPressed(input, lastInput);
 
         const player = this.players[playerIndex];
         if (!player.probing && !this.isGameOver) {
+          player.lastX = player.x;
           player.x += SPEED_FACTOR * (delta * input.direction);
           player.x = Math.min(Math.max(TERRAIN_MARGIN_WIDTH, player.x),
             1.0 - TERRAIN_MARGIN_WIDTH);
           player.flipX = input.direction === 0 ? player.flipX : input.direction === -1;
-          if (actionDown && player.remainingProbes > 0) {
+          if (action && player.remainingProbes > 0) {
             // Switch to probe mode
             // Lower the probe, wait and raise it again
             const terrainHeight = this.terrainHeight(player.x);
@@ -338,6 +421,7 @@ export default class PlayMode extends GameMode {
     const h1 = this.terrainHeights[i1];
     const t = xInArray - i0;
     return {
+      x: x,
       value: h0 + t * (h1 - h0),
       slope: (h1 - h0) * (this.terrainHeights.length - 1),
     };
@@ -355,7 +439,7 @@ export default class PlayMode extends GameMode {
   addTangent(player) {
     // Reduce the opacity of previously added tangents of this player
     const offsetMult = (v, factor, offset) => offset + (v - offset) * factor;
-    this.tangentGroup.find(`.player-${player.id}`)
+    this.tangentGroup.find(player.cssClass)
       .each(function () {
         const o = offsetMult(this.opacity(), TANGENT_OPACITY_FADEOUT_FACTOR, TANGENT_MIN_OPACITY);
         this.animate(TANGENT_OPACITY_FADEOUT_DURATION).opacity(o);
@@ -364,15 +448,20 @@ export default class PlayMode extends GameMode {
     // Add the new tangent
     const { draw } = this.game;
     const width = draw.width();
-    const { value, slope } = this.terrainHeightExt(player.x);
+    const tangent = this.terrainHeightExt(player.x);
+    const { x, value, slope } = tangent;
     const angle = 180 * Math.atan2(slope * TERRAIN_HEIGHT_SCALE, width) / Math.PI;
     this.tangentGroup.line(-width * TANGENT_LENGTH / 2, 0, width * TANGENT_LENGTH / 2, 0,)
-      .addClass(`player-${player.id}`)
+      .addClass(player.cssClass)
       .transform({
-        translateX: width * player.x,
+        translateX: width * x,
         translateY: TERRAIN_HEIGHT_SCALE * value,
         rotate: angle,
       });
+
+    this.tangents.push(tangent);
+    this.tangents.sort((a, b) => a.x - b.x);
+    this.events.emit('new-tangent', tangent, this.tangents.indexOf(tangent), this.tangents);
   }
 
   async gameOver(endingSequenceCallback) {
@@ -423,7 +512,7 @@ export default class PlayMode extends GameMode {
       winAnnouncement,
       treasure,
       openTreaureChest,
-      [`player-${winner.id}`]
+      [winner.cssClass]
     );
   }
 
@@ -491,4 +580,8 @@ export default class PlayMode extends GameMode {
     await delay(ENDING_SEQUENCE_RESTART_DELAY);
     $restartDiv.css("visibility", "visible");
   }
+}
+
+function actionPressed(input, lastInput) {
+  return input.action && !lastInput.action;
 }

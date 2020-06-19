@@ -12,6 +12,122 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+var BotStrategyBase = /*#__PURE__*/function () {
+  /**
+   * Construct a new bot strategy.
+   * @param lower {number} Lower bound for probe location.
+   * @param upper {number} Upper bound for probe location.
+   */
+  function BotStrategyBase(lower, upper) {
+    _classCallCheck(this, BotStrategyBase);
+
+    this.lower = lower;
+    this.upper = upper;
+  }
+  /**
+   * Compute the location in [this.lower,this.upper] to probe next. Overwrite in subclasses.
+   *
+   * @param tangents {[{x:number,value:number,slope:number}]}
+   * @param player
+   * @param playerIndex {number}
+   * @param players {[]}
+   * @returns {number}
+   */
+
+
+  _createClass(BotStrategyBase, [{
+    key: "getNextProbeLocation",
+    value: function getNextProbeLocation(tangents, player, playerIndex, players) {
+      return Math.max(this.lower, Math.min(player.x, this.upper));
+    }
+  }]);
+
+  return BotStrategyBase;
+}();
+
+exports["default"] = BotStrategyBase;
+
+},{}],2:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _base = _interopRequireDefault(require("./base"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+var BotStrategyRandom = /*#__PURE__*/function (_BotStrategyBase) {
+  _inherits(BotStrategyRandom, _BotStrategyBase);
+
+  var _super = _createSuper(BotStrategyRandom);
+
+  function BotStrategyRandom() {
+    _classCallCheck(this, BotStrategyRandom);
+
+    return _super.apply(this, arguments);
+  }
+
+  _createClass(BotStrategyRandom, [{
+    key: "getNextProbeLocation",
+
+    /**
+     * Return a random next probe location.
+     *
+     * @param tangents {[{x:number,value:number,slope:number}]}
+     * @param player
+     * @param playerIndex {number}
+     * @param players {[]}
+     * @returns {number}
+     */
+    value: function getNextProbeLocation(tangents, player, playerIndex, players) {
+      return this.lower + (this.upper - this.lower) * Math.random();
+    }
+  }]);
+
+  return BotStrategyRandom;
+}(_base["default"]);
+
+exports["default"] = BotStrategyRandom;
+
+},{"./base":1}],3:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 /**
  * Component that handles gamepad controls
  *
@@ -85,7 +201,7 @@ var Controls = /*#__PURE__*/function () {
 
 exports["default"] = Controls;
 
-},{}],2:[function(require,module,exports){
+},{}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -199,7 +315,7 @@ var GamepadControls = /*#__PURE__*/function (_Controls) {
 
 exports["default"] = GamepadControls;
 
-},{"./controls":1}],3:[function(require,module,exports){
+},{"./controls":3}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -309,7 +425,7 @@ var KeyboardControls = /*#__PURE__*/function (_Controls) {
 
 exports["default"] = KeyboardControls;
 
-},{"./controls":1}],4:[function(require,module,exports){
+},{"./controls":3}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -463,7 +579,7 @@ var ScreenControls = /*#__PURE__*/function (_Controls) {
 
 exports["default"] = ScreenControls;
 
-},{"./controls":1}],5:[function(require,module,exports){
+},{"./controls":3}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -533,7 +649,7 @@ var FullScreenToggle = /*#__PURE__*/function () {
 
 exports["default"] = FullScreenToggle;
 
-},{}],6:[function(require,module,exports){
+},{}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -571,7 +687,7 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
-var BOT_TYPE_ORDER = ["none"];
+var BOT_TYPE_ORDER = ["none", "random"];
 
 var BotTypeMode = /*#__PURE__*/function (_MenuMode) {
   _inherits(BotTypeMode, _MenuMode);
@@ -611,7 +727,7 @@ var BotTypeMode = /*#__PURE__*/function (_MenuMode) {
 
 exports["default"] = BotTypeMode;
 
-},{"./game-mode-menu":7}],7:[function(require,module,exports){
+},{"./game-mode-menu":9}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -781,7 +897,7 @@ var MenuMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = MenuMode;
 
-},{"./game-mode":11}],8:[function(require,module,exports){
+},{"./game-mode":13}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -862,7 +978,7 @@ var PlayerNumberMode = /*#__PURE__*/function (_MenuMode) {
 
 exports["default"] = PlayerNumberMode;
 
-},{"./game-mode-menu":7}],9:[function(require,module,exports){
+},{"./game-mode-menu":9}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -880,6 +996,10 @@ var _terrain = _interopRequireDefault(require("./terrain"));
 
 var waves = _interopRequireWildcard(require("./waves"));
 
+var _base = _interopRequireDefault(require("./bot-strategies/base"));
+
+var _random = _interopRequireDefault(require("./bot-strategies/random"));
+
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
@@ -887,6 +1007,18 @@ function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj;
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(n); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
@@ -955,6 +1087,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       return waves.points(wavesPoints, t, game.draw.width(), WATER_HEIGHT_SCALE);
     };
 
+    _this.bot = null;
     return _this;
   }
 
@@ -1011,13 +1144,13 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       var _handleEnterMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
         var _this2 = this;
 
-        var _this$game, draw, config, numPlayers, $gameStats, $remainingTimeContainer, $remainingProbesContainer, modeGroup, newTerrainHeights, terrainHeights, terrainPoints, behindGroundGroup, treasure, groundCover;
+        var _this$game, draw, config, numPlayers, botType, $gameStats, $remainingTimeContainer, $remainingProbesContainer, modeGroup, createPlayer, addBot, botStrategyClass, botStrategy, bot, newTerrainHeights, terrainHeights, terrainPoints, behindGroundGroup, treasure, groundCover;
 
         return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
-                _this$game = this.game, draw = _this$game.draw, config = _this$game.config, numPlayers = _this$game.numPlayers;
+                _this$game = this.game, draw = _this$game.draw, config = _this$game.config, numPlayers = _this$game.numPlayers, botType = _this$game.botType;
                 this.isGameOver = false;
                 this.discardInputs = false;
                 this.remainingTime = config.maxTime * 1000;
@@ -1030,12 +1163,12 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 this.$remainingProbes = $('<span />').appendTo($remainingProbesContainer);
                 if (config.maxProbes === Number.POSITIVE_INFINITY) $remainingProbesContainer.hide();
                 this.$endingSequenceContainer = $('<div />').appendTo(this.$overlay);
-                modeGroup = draw.group().addClass('play').addClass('draw').translate(0, WATER_DISTANCE); // Create a boat for each player
+                modeGroup = draw.group().addClass('play').addClass('draw').translate(0, WATER_DISTANCE);
 
-                this.players = Array(numPlayers).fill(null).map(function (_, playerIndex) {
+                createPlayer = function createPlayer(playerIndex, numPlayers, cssClass) {
                   var x = (playerIndex + 1) / (numPlayers + 1);
                   var group = modeGroup.group();
-                  group.addClass("player-".concat(playerIndex)).transform({
+                  group.addClass(cssClass).transform({
                     translateX: x * draw.width()
                   });
                   var boat = group.use(_this2.shipSymbol).center(0, BOAT_DRAFT);
@@ -1070,16 +1203,18 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                   }; // Add an element for displaying the number of remaining probes
 
 
-                  var $remainingProbes = $("<span class=\"counter player-".concat(playerIndex, "\"/>")).appendTo(_this2.$remainingProbes); // Move boat in front of the probe
+                  var $remainingProbes = $("<span class=\"counter ".concat(cssClass, "\"/>")).appendTo(_this2.$remainingProbes); // Move boat in front of the probe
 
                   boat.front();
                   return {
                     id: playerIndex,
+                    cssClass: cssClass,
                     group: group,
                     boat: boat,
                     probe: probe,
                     doProbe: doProbe,
                     x: x,
+                    lastX: x,
                     flipX: false,
                     _probing: false,
                     _probeEventEmitter: new _events["default"](),
@@ -1132,7 +1267,34 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                     remainingProbes: config.maxProbes,
                     $remainingProbes: $remainingProbes
                   };
+                }; // Create a boat for each player
+
+
+                addBot = botType && botType !== 'none';
+                this.players = Array(numPlayers).fill(null).map(function (_, playerIndex) {
+                  return createPlayer(playerIndex, numPlayers + (addBot ? 1 : 0), "player-".concat(playerIndex));
                 });
+
+                if (addBot) {
+                  botStrategyClass = botType === 'random' ? _random["default"] : _base["default"];
+                  console.log(botStrategyClass);
+                  botStrategy = new botStrategyClass(TERRAIN_MARGIN_WIDTH, 1 - TERRAIN_MARGIN_WIDTH);
+                  bot = {};
+                  bot.type = botType;
+                  bot.player = createPlayer(numPlayers, numPlayers + 1, 'player-bot');
+                  bot.targetX = bot.player.x;
+
+                  bot.tangentListener = function () {
+                    return bot.targetX = botStrategy.getNextProbeLocation(_this2.tangents, bot.player, bot.player.id, _this2.players);
+                  };
+
+                  this.players.push(bot.player);
+                  this.events.addListener('new-tangent', bot.tangentListener);
+                  this.bot = bot;
+                } else {
+                  this.bot = null;
+                }
+
                 this.water = modeGroup.group().polyline(this.wavesPoints(0)).addClass('water');
                 this.groundGroup = modeGroup.group();
 
@@ -1164,9 +1326,11 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 this.groundCoverRight = groundCover.rect(draw.width(), draw.height()).addClass('ground-cover').move(draw.width() * this.treasureLocation.x, -TERRAIN_HEIGHT_SCALE / 2);
                 if (config.showSeaFloor) groundCover.hide();
                 this.groundGroup.back();
-                this.tangentGroup = modeGroup.group().translate(0, TERRAIN_DISTANCE);
+                this.tangentGroup = modeGroup.group().translate(0, TERRAIN_DISTANCE); // Sentinel values to avoid having to deal boundary cases.
 
-              case 35:
+                this.tangents = [this.terrainHeightExt(TERRAIN_MARGIN_WIDTH), this.terrainHeightExt(1.0 - TERRAIN_MARGIN_WIDTH)];
+
+              case 39:
               case "end":
                 return _context3.stop();
             }
@@ -1188,11 +1352,15 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
           while (1) {
             switch (_context4.prev = _context4.next) {
               case 0:
+                // Cleanup timers, etc. created on handleEnterMode
+                if (this.bot !== null) this.events.removeListener('new-tangent', this.bot.tangentListener);
+
+              case 1:
               case "end":
                 return _context4.stop();
             }
           }
-        }, _callee4);
+        }, _callee4, this);
       }));
 
       function handleExitMode() {
@@ -1210,69 +1378,96 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       var _this$game2 = this.game,
           draw = _this$game2.draw,
           config = _this$game2.config,
-          numPlayers = _this$game2.numPlayers;
-      if (this.discardInputs) return;
+          numPlayers = _this$game2.numPlayers; // Some game states do not allow user input
 
-      if (!this.isGameOver) {
-        this.remainingTime = Math.max(0, this.remainingTime - delta);
+      if (this.discardInputs) return; // Leave game mode when the game is over and a player pressed the action button
 
-        if (this.remainingTime === 0) {
-          console.log("Time is up - GAME OVER!");
-          this.gameOver( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
-            return regeneratorRuntime.wrap(function _callee5$(_context5) {
+      if (this.isGameOver) {
+        var action = inputs.findIndex(function (input, i) {
+          return actionPressed(input, lastInputs[i]);
+        }) !== -1;
+
+        if (this.isGameOver && action) {
+          this.discardInputs = true;
+          this.triggerEvent('done');
+        }
+
+        return;
+      } // Check whether the game is lost
+
+
+      this.remainingTime = Math.max(0, this.remainingTime - delta);
+
+      if (this.remainingTime === 0) {
+        console.log("Time is up - GAME OVER!");
+        this.gameOver( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
+          return regeneratorRuntime.wrap(function _callee5$(_context5) {
+            while (1) {
+              switch (_context5.prev = _context5.next) {
+                case 0:
+                  return _context5.abrupt("return", _this5.showLoseSequenceTimeIsUp());
+
+                case 1:
+                case "end":
+                  return _context5.stop();
+              }
+            }
+          }, _callee5);
+        })));
+        return;
+      } else if (this.players.reduce(function (a, c) {
+        return a + c.remainingProbes;
+      }, 0) === 0) {
+        var anyoneProbing = this.players.reduce(function (a, c) {
+          return a || c.probing;
+        }, false);
+
+        if (!anyoneProbing) {
+          console.log("No probes left - GAME OVER!");
+          this.gameOver( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6() {
+            return regeneratorRuntime.wrap(function _callee6$(_context6) {
               while (1) {
-                switch (_context5.prev = _context5.next) {
+                switch (_context6.prev = _context6.next) {
                   case 0:
-                    return _context5.abrupt("return", _this5.showLoseSequenceTimeIsUp());
+                    return _context6.abrupt("return", _this5.showLoseSequenceNoProbesLeft());
 
                   case 1:
                   case "end":
-                    return _context5.stop();
+                    return _context6.stop();
                 }
               }
-            }, _callee5);
+            }, _callee6);
           })));
-        } else if (this.players.reduce(function (a, c) {
-          return a + c.remainingProbes;
-        }, 0) === 0) {
-          var anyoneProbing = this.players.reduce(function (a, c) {
-            return a || c.probing;
-          }, false);
-
-          if (!anyoneProbing) {
-            console.log("No probes left - GAME OVER!");
-            this.gameOver( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6() {
-              return regeneratorRuntime.wrap(function _callee6$(_context6) {
-                while (1) {
-                  switch (_context6.prev = _context6.next) {
-                    case 0:
-                      return _context6.abrupt("return", _this5.showLoseSequenceNoProbesLeft());
-
-                    case 1:
-                    case "end":
-                      return _context6.stop();
-                  }
-                }
-              }, _callee6);
-            })));
-          }
+          return;
         }
-      }
+      } // Discard inputs that don't belong to an active player
+
+
+      inputs = inputs.slice(0, numPlayers);
+      lastInputs = lastInputs.slice(0, numPlayers); // If there is a bot, create fake inputs for it
+
+      if (this.bot !== null) {
+        var _PlayMode$buildBotInp = PlayMode.buildBotInput(this.bot),
+            input = _PlayMode$buildBotInp.input,
+            lastInput = _PlayMode$buildBotInp.lastInput;
+
+        inputs.push(input);
+        lastInputs.push(lastInput);
+      } // Regular move & probe logic
+
 
       inputs.forEach(function (input, playerIndex) {
         var lastInput = lastInputs[playerIndex];
-        var actionDown = input.action && !lastInput.action;
-        if (_this5.isGameOver && actionDown) _this5.triggerEvent('done'); // discard inputs that don't belong to an active player
-
-        if (playerIndex >= numPlayers) return;
+        var action = actionPressed(input, lastInput);
         var player = _this5.players[playerIndex];
 
         if (!player.probing && !_this5.isGameOver) {
+          player.lastX = player.x;
           player.x += SPEED_FACTOR * (delta * input.direction);
           player.x = Math.min(Math.max(TERRAIN_MARGIN_WIDTH, player.x), 1.0 - TERRAIN_MARGIN_WIDTH);
           player.flipX = input.direction === 0 ? player.flipX : input.direction === -1;
 
-          if (actionDown && player.remainingProbes > 0) {
+          if (action && player.remainingProbes > 0) {
             // Switch to probe mode
             // Lower the probe, wait and raise it again
             var terrainHeight = _this5.terrainHeight(player.x);
@@ -1388,6 +1583,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       var h1 = this.terrainHeights[i1];
       var t = xInArray - i0;
       return {
+        x: x,
         value: h0 + t * (h1 - h0),
         slope: (h1 - h0) * (this.terrainHeights.length - 1)
       };
@@ -1415,24 +1611,28 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
         return offset + (v - offset) * factor;
       };
 
-      this.tangentGroup.find(".player-".concat(player.id)).each(function () {
+      this.tangentGroup.find(player.cssClass).each(function () {
         var o = offsetMult(this.opacity(), TANGENT_OPACITY_FADEOUT_FACTOR, TANGENT_MIN_OPACITY);
         this.animate(TANGENT_OPACITY_FADEOUT_DURATION).opacity(o);
       }); // Add the new tangent
 
       var draw = this.game.draw;
       var width = draw.width();
-
-      var _this$terrainHeightEx = this.terrainHeightExt(player.x),
-          value = _this$terrainHeightEx.value,
-          slope = _this$terrainHeightEx.slope;
-
+      var tangent = this.terrainHeightExt(player.x);
+      var x = tangent.x,
+          value = tangent.value,
+          slope = tangent.slope;
       var angle = 180 * Math.atan2(slope * TERRAIN_HEIGHT_SCALE, width) / Math.PI;
-      this.tangentGroup.line(-width * TANGENT_LENGTH / 2, 0, width * TANGENT_LENGTH / 2, 0).addClass("player-".concat(player.id)).transform({
-        translateX: width * player.x,
+      this.tangentGroup.line(-width * TANGENT_LENGTH / 2, 0, width * TANGENT_LENGTH / 2, 0).addClass(player.cssClass).transform({
+        translateX: width * x,
         translateY: TERRAIN_HEIGHT_SCALE * value,
         rotate: angle
       });
+      this.tangents.push(tangent);
+      this.tangents.sort(function (a, b) {
+        return a.x - b.x;
+      });
+      this.events.emit('new-tangent', tangent, this.tangents.indexOf(tangent), this.tangents);
     }
   }, {
     key: "gameOver",
@@ -1563,7 +1763,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 };
 
                 _context11.next = 6;
-                return this.showGameOverSequence(winAnnouncement, treasure, openTreaureChest, ["player-".concat(winner.id)]);
+                return this.showGameOverSequence(winAnnouncement, treasure, openTreaureChest, [winner.cssClass]);
 
               case 6:
               case "end":
@@ -1710,6 +1910,42 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
 
       return showGameOverSequence;
     }()
+  }], [{
+    key: "buildBotInput",
+    value: function buildBotInput(bot) {
+      var botInput = {
+        direction: 0,
+        action: false
+      };
+      var botLastInput = {
+        direction: 0,
+        action: false
+      };
+      var player = bot.player,
+          targetX = bot.targetX;
+      var x = player.x,
+          lastX = player.lastX;
+
+      var _ref5 = x < lastX ? [x, lastX] : [lastX, x],
+          _ref6 = _slicedToArray(_ref5, 2),
+          lower = _ref6[0],
+          upper = _ref6[1];
+
+      if (lower <= targetX && targetX <= upper) {
+        // It's time to probe!
+        player.lastX = x;
+        player.x = targetX;
+        botInput.action = true;
+      } else {
+        // Navigate towards targetX
+        botInput.direction = Math.sign(targetX - player.x);
+      }
+
+      return {
+        input: botInput,
+        lastInput: botLastInput
+      };
+    }
   }]);
 
   return PlayMode;
@@ -1717,7 +1953,11 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = PlayMode;
 
-},{"./game-mode":11,"./terrain":14,"./waves":15,"@popperjs/core":17,"events":19}],10:[function(require,module,exports){
+function actionPressed(input, lastInput) {
+  return input.action && !lastInput.action;
+}
+
+},{"./bot-strategies/base":1,"./bot-strategies/random":2,"./game-mode":13,"./terrain":16,"./waves":17,"@popperjs/core":19,"events":21}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1894,7 +2134,7 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = TitleMode;
 
-},{"./game-mode":11,"./wavy-animation":16}],11:[function(require,module,exports){
+},{"./game-mode":13,"./wavy-animation":18}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2074,7 +2314,7 @@ var GameMode = /*#__PURE__*/function () {
 
 exports["default"] = GameMode;
 
-},{"events":19}],12:[function(require,module,exports){
+},{"events":21}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2625,7 +2865,7 @@ var GradientDescentGame = /*#__PURE__*/function () {
 
 exports["default"] = GradientDescentGame;
 
-},{"./controls/gamepad":2,"./controls/keyboard":3,"./controls/screen":4,"./full-screen-toggle":5,"./game-mode-bottype":6,"./game-mode-numplayers":8,"./game-mode-play":9,"./game-mode-title":10,"@wessberg/pointer-events":18}],13:[function(require,module,exports){
+},{"./controls/gamepad":4,"./controls/keyboard":5,"./controls/screen":6,"./full-screen-toggle":7,"./game-mode-bottype":8,"./game-mode-numplayers":10,"./game-mode-play":11,"./game-mode-title":12,"@wessberg/pointer-events":20}],15:[function(require,module,exports){
 "use strict";
 
 var _game = _interopRequireDefault(require("./game"));
@@ -2805,7 +3045,7 @@ function getCustomConfigUrl() {
   return main;
 })()();
 
-},{"./game":12}],14:[function(require,module,exports){
+},{"./game":14}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2943,7 +3183,7 @@ function terrain(numSamples, length) {
   });
 }
 
-},{}],15:[function(require,module,exports){
+},{}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3016,7 +3256,7 @@ function animatedSVG(svgContainer, numPoints, numSteps, xScale, yScale, duration
   return waves;
 }
 
-},{}],16:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3105,7 +3345,7 @@ function WavyAnimation(shape) {
   };
 }
 
-},{}],17:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 (function (process){
 /**
  * @popperjs/core v2.4.0 - MIT License
@@ -4906,7 +5146,7 @@ exports.popperGenerator = popperGenerator;
 
 }).call(this,require('_process'))
 
-},{"_process":20}],18:[function(require,module,exports){
+},{"_process":22}],20:[function(require,module,exports){
 (function () {
 	'use strict';
 
@@ -6763,7 +7003,7 @@ exports.popperGenerator = popperGenerator;
 }());
 
 
-},{}],19:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -7288,7 +7528,7 @@ function functionBindPolyfill(context) {
   };
 }
 
-},{}],20:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -7474,5 +7714,5 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[13])
+},{}]},{},[15])
 
