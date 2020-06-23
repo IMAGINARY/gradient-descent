@@ -5,7 +5,8 @@ import GameMode from './game-mode';
 import terrain from './terrain';
 import * as waves from './waves';
 import BotStrategyBase from './bot-strategies/base';
-import RandomBotStrategy from './bot-strategies/random';
+import BotStrategyRandom from './bot-strategies/random';
+import BotStrategyTangentIntersection from './bot-strategies/tangent-intersection';
 
 const WATER_HEIGHT_SCALE = 10;
 const NUM_WATER_POINTS = 300;
@@ -180,9 +181,23 @@ export default class PlayMode extends GameMode {
         `player-${playerIndex}`)
       );
     if (addBot) {
-      const botStrategyClass = botType === 'random' ? RandomBotStrategy : BotStrategyBase;
-      console.log(botStrategyClass);
-      const botStrategy = new botStrategyClass(TERRAIN_MARGIN_WIDTH, 1 - TERRAIN_MARGIN_WIDTH);
+      const botStrategyClass = (() => {
+        switch (botType) {
+          case 'random':
+            return BotStrategyRandom;
+          case 'newton':
+            return BotStrategyNewton;
+          case 'tangent-intersection':
+            return BotStrategyTangentIntersection;
+          default:
+            return BotStrategyBase;
+        }
+      })();
+      const botStrategy = new botStrategyClass(
+        TERRAIN_MARGIN_WIDTH,
+        1 - TERRAIN_MARGIN_WIDTH,
+        TREASURE_SIZE
+      );
       const bot = {};
       bot.type = botType;
       bot.player = createPlayer(numPlayers, numPlayers + 1, 'player-bot');
@@ -254,11 +269,7 @@ export default class PlayMode extends GameMode {
     this.tangentGroup = modeGroup.group()
       .translate(0, TERRAIN_DISTANCE);
 
-    // Sentinel values to avoid having to deal boundary cases.
-    this.tangents = [
-      this.terrainHeightExt(TERRAIN_MARGIN_WIDTH),
-      this.terrainHeightExt(1.0 - TERRAIN_MARGIN_WIDTH),
-    ];
+    this.tangents = [];
   }
 
   async handleExitMode() {

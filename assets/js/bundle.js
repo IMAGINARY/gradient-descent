@@ -17,12 +17,16 @@ var BotStrategyBase = /*#__PURE__*/function () {
    * Construct a new bot strategy.
    * @param lower {number} Lower bound for probe location.
    * @param upper {number} Upper bound for probe location.
+   * @param treasureWidth {number} Width of the treasure to search for.
+   *  If two adjacent probes are closer together than treasureWidth, the treasure must be located
+   *  somewhere else.
    */
-  function BotStrategyBase(lower, upper) {
+  function BotStrategyBase(lower, upper, treasureWidth) {
     _classCallCheck(this, BotStrategyBase);
 
     this.lower = lower;
     this.upper = upper;
+    this.treasureWidth = treasureWidth;
   }
   /**
    * Compute the location in [this.lower,this.upper] to probe next. Overwrite in subclasses.
@@ -122,6 +126,209 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
+var _base = _interopRequireDefault(require("./base"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+var BotStrategyTangentIntersection = /*#__PURE__*/function (_BotStrategyBase) {
+  _inherits(BotStrategyTangentIntersection, _BotStrategyBase);
+
+  var _super = _createSuper(BotStrategyTangentIntersection);
+
+  function BotStrategyTangentIntersection() {
+    _classCallCheck(this, BotStrategyTangentIntersection);
+
+    return _super.apply(this, arguments);
+  }
+
+  _createClass(BotStrategyTangentIntersection, [{
+    key: "getNextProbeLocation",
+
+    /**
+     * Return a random next probe location.
+     *
+     * @param tangents {[{x:number,value:number,slope:number}]}
+     * @param player
+     * @param playerIndex {number}
+     * @param players {[]}
+     * @returns {number}
+     */
+    value: function getNextProbeLocation(tangents, player, playerIndex, players) {
+      var _this = this;
+
+      // Filter out-of-range tangents
+      tangents = tangents.filter(function (t) {
+        return _this.lower <= t.x && t.x <= _this.upper;
+      }); // Add sentinel tangents for left and right border
+
+      tangents.unshift({
+        x: this.lower,
+        value: 0,
+        slope: 0.5
+      });
+      tangents.push({
+        x: this.upper,
+        value: 0,
+        slope: -0.5
+      }); // Build list of pairs of adjacent tangents and remove pairs that are too close together
+
+      var tangentPairs = Array.from({
+        length: tangents.length - 1
+      }, function (_, i) {
+        return {
+          left: tangents[i],
+          right: tangents[i + 1]
+        };
+      }).filter(function (pair) {
+        return pair.right.x - pair.left.x >= _this.treasureWidth;
+      }); // Compute a new weighted point for each pair of tangents
+
+      var inBetweenPoints = tangentPairs.map(function (pair) {
+        return computePointBetweenTangents(pair.left, pair.right, _this.treasureWidth / 2);
+      }); // Choose the one with the highest weight
+
+      var newX = inBetweenPoints.reduce(function (acc, cur) {
+        return acc.weight > cur.weight ? acc : cur;
+      }).x;
+      return newX;
+    }
+  }]);
+
+  return BotStrategyTangentIntersection;
+}(_base["default"]);
+
+exports["default"] = BotStrategyTangentIntersection;
+
+function computePointBetweenTangents(left, right, margin) {
+  var intersectionPoint = intersectTangents(left, right);
+  var midPoint = {
+    x: (left.x + right.x) / 2,
+    y: (left.value + right.value) / 2
+  };
+  var leftAtCenter = {
+    x: midPoint.x,
+    y: left.value + left.slope * (right.x - left.x)
+  };
+  var rightAtCenter = {
+    x: midPoint.x,
+    y: right.value - right.slope * (right.x - left.x)
+  };
+  var all = [intersectionPoint, midPoint, leftAtCenter, rightAtCenter];
+  var best = all.filter(function (p) {
+    return p !== null;
+  }).map(function (p) {
+    return Object.assign(p, {
+      weight: weighIntersection(left, right, p, margin)
+    });
+  }).reduce(function (acc, cur) {
+    return acc.weight > cur.weight ? acc : cur;
+  }); // Make sure the new x is far away from both ends
+
+  var minX = left.x + margin;
+  var maxX = right.x - margin;
+  best.x = Math.max(minX, Math.min(best.x, maxX));
+  return best;
+}
+
+function weighIntersection(left, right, intersection, margin) {
+  if (left.value <= intersection.y && right.value <= intersection.y) {
+    // high weight if intersection point probably improves upon its endpoints
+    return 1 + intersection.y;
+  } else {
+    return intersection.y * (right.x - left.x - 2 * margin);
+  }
+}
+
+function intersectTangents(left, right) {
+  var pl = {
+    x: left.x,
+    y: left.value
+  };
+  var vl = {
+    x: 1,
+    y: left.slope
+  };
+  var pr = {
+    x: right.x,
+    y: right.value
+  };
+  var vr = {
+    x: -1,
+    y: -right.slope
+  };
+  var ll = {
+    start: pl,
+    end: add(pl, vl)
+  };
+  var lr = {
+    start: pr,
+    end: add(pr, vr)
+  };
+  var p = intersectLines(ll, lr);
+  var inInterval = p !== null // the two lines intersect
+  && left.x < p.x && p.x < right.x; // intersection point is in between the two endpoints
+
+  return inInterval ? p : null;
+}
+
+function add(p, v) {
+  return {
+    x: p.x + v.x,
+    y: p.y + v.y
+  };
+}
+
+function intersectLines(l1, l2) {
+  var d1x = l1.end.x - l1.start.x;
+  var d1y = l1.end.y - l1.start.y;
+  var d2x = l2.end.x - l2.start.x;
+  var d2y = l2.end.y - l2.start.y;
+  var denominator = d2y * d1x - d2x * d1y;
+
+  if (denominator === 0) {
+    return null;
+  }
+
+  var d12x = l1.start.x - l2.start.x;
+  var d12y = l1.start.y - l2.start.y;
+  var numerator = d2x * d12y - d2y * d12x;
+  var t = numerator / denominator;
+  return {
+    x: l1.start.x + t * d1x,
+    y: l1.start.y + t * d1y
+  };
+}
+
+},{"./base":1}],4:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -201,7 +408,7 @@ var Controls = /*#__PURE__*/function () {
 
 exports["default"] = Controls;
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -315,7 +522,7 @@ var GamepadControls = /*#__PURE__*/function (_Controls) {
 
 exports["default"] = GamepadControls;
 
-},{"./controls":3}],5:[function(require,module,exports){
+},{"./controls":4}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -425,7 +632,7 @@ var KeyboardControls = /*#__PURE__*/function (_Controls) {
 
 exports["default"] = KeyboardControls;
 
-},{"./controls":3}],6:[function(require,module,exports){
+},{"./controls":4}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -579,7 +786,7 @@ var ScreenControls = /*#__PURE__*/function (_Controls) {
 
 exports["default"] = ScreenControls;
 
-},{"./controls":3}],7:[function(require,module,exports){
+},{"./controls":4}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -649,7 +856,7 @@ var FullScreenToggle = /*#__PURE__*/function () {
 
 exports["default"] = FullScreenToggle;
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -687,7 +894,7 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
-var BOT_TYPE_ORDER = ["none", "random"];
+var BOT_TYPE_ORDER = ['none', 'random', 'tangent-intersection'];
 
 var BotTypeMode = /*#__PURE__*/function (_MenuMode) {
   _inherits(BotTypeMode, _MenuMode);
@@ -727,7 +934,7 @@ var BotTypeMode = /*#__PURE__*/function (_MenuMode) {
 
 exports["default"] = BotTypeMode;
 
-},{"./game-mode-menu":9}],9:[function(require,module,exports){
+},{"./game-mode-menu":10}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -897,7 +1104,7 @@ var MenuMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = MenuMode;
 
-},{"./game-mode":13}],10:[function(require,module,exports){
+},{"./game-mode":14}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -978,7 +1185,7 @@ var PlayerNumberMode = /*#__PURE__*/function (_MenuMode) {
 
 exports["default"] = PlayerNumberMode;
 
-},{"./game-mode-menu":9}],11:[function(require,module,exports){
+},{"./game-mode-menu":10}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -999,6 +1206,8 @@ var waves = _interopRequireWildcard(require("./waves"));
 var _base = _interopRequireDefault(require("./bot-strategies/base"));
 
 var _random = _interopRequireDefault(require("./bot-strategies/random"));
+
+var _tangentIntersection = _interopRequireDefault(require("./bot-strategies/tangent-intersection"));
 
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
 
@@ -1276,9 +1485,23 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 });
 
                 if (addBot) {
-                  botStrategyClass = botType === 'random' ? _random["default"] : _base["default"];
-                  console.log(botStrategyClass);
-                  botStrategy = new botStrategyClass(TERRAIN_MARGIN_WIDTH, 1 - TERRAIN_MARGIN_WIDTH);
+                  botStrategyClass = function () {
+                    switch (botType) {
+                      case 'random':
+                        return _random["default"];
+
+                      case 'newton':
+                        return BotStrategyNewton;
+
+                      case 'tangent-intersection':
+                        return _tangentIntersection["default"];
+
+                      default:
+                        return _base["default"];
+                    }
+                  }();
+
+                  botStrategy = new botStrategyClass(TERRAIN_MARGIN_WIDTH, 1 - TERRAIN_MARGIN_WIDTH, TREASURE_SIZE);
                   bot = {};
                   bot.type = botType;
                   bot.player = createPlayer(numPlayers, numPlayers + 1, 'player-bot');
@@ -1326,9 +1549,8 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 this.groundCoverRight = groundCover.rect(draw.width(), draw.height()).addClass('ground-cover').move(draw.width() * this.treasureLocation.x, -TERRAIN_HEIGHT_SCALE / 2);
                 if (config.showSeaFloor) groundCover.hide();
                 this.groundGroup.back();
-                this.tangentGroup = modeGroup.group().translate(0, TERRAIN_DISTANCE); // Sentinel values to avoid having to deal boundary cases.
-
-                this.tangents = [this.terrainHeightExt(TERRAIN_MARGIN_WIDTH), this.terrainHeightExt(1.0 - TERRAIN_MARGIN_WIDTH)];
+                this.tangentGroup = modeGroup.group().translate(0, TERRAIN_DISTANCE);
+                this.tangents = [];
 
               case 39:
               case "end":
@@ -1957,7 +2179,7 @@ function actionPressed(input, lastInput) {
   return input.action && !lastInput.action;
 }
 
-},{"./bot-strategies/base":1,"./bot-strategies/random":2,"./game-mode":13,"./terrain":16,"./waves":17,"@popperjs/core":19,"events":21}],12:[function(require,module,exports){
+},{"./bot-strategies/base":1,"./bot-strategies/random":2,"./bot-strategies/tangent-intersection":3,"./game-mode":14,"./terrain":17,"./waves":18,"@popperjs/core":20,"events":22}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2134,7 +2356,7 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = TitleMode;
 
-},{"./game-mode":13,"./wavy-animation":18}],13:[function(require,module,exports){
+},{"./game-mode":14,"./wavy-animation":19}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2314,7 +2536,7 @@ var GameMode = /*#__PURE__*/function () {
 
 exports["default"] = GameMode;
 
-},{"events":21}],14:[function(require,module,exports){
+},{"events":22}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2865,7 +3087,7 @@ var GradientDescentGame = /*#__PURE__*/function () {
 
 exports["default"] = GradientDescentGame;
 
-},{"./controls/gamepad":4,"./controls/keyboard":5,"./controls/screen":6,"./full-screen-toggle":7,"./game-mode-bottype":8,"./game-mode-numplayers":10,"./game-mode-play":11,"./game-mode-title":12,"@wessberg/pointer-events":20}],15:[function(require,module,exports){
+},{"./controls/gamepad":5,"./controls/keyboard":6,"./controls/screen":7,"./full-screen-toggle":8,"./game-mode-bottype":9,"./game-mode-numplayers":11,"./game-mode-play":12,"./game-mode-title":13,"@wessberg/pointer-events":21}],16:[function(require,module,exports){
 "use strict";
 
 var _game = _interopRequireDefault(require("./game"));
@@ -3045,7 +3267,7 @@ function getCustomConfigUrl() {
   return main;
 })()();
 
-},{"./game":14}],16:[function(require,module,exports){
+},{"./game":15}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3183,7 +3405,7 @@ function terrain(numSamples, length) {
   });
 }
 
-},{}],17:[function(require,module,exports){
+},{}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3256,7 +3478,7 @@ function animatedSVG(svgContainer, numPoints, numSteps, xScale, yScale, duration
   return waves;
 }
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3345,7 +3567,7 @@ function WavyAnimation(shape) {
   };
 }
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 (function (process){
 /**
  * @popperjs/core v2.4.0 - MIT License
@@ -5146,7 +5368,7 @@ exports.popperGenerator = popperGenerator;
 
 }).call(this,require('_process'))
 
-},{"_process":22}],20:[function(require,module,exports){
+},{"_process":23}],21:[function(require,module,exports){
 (function () {
 	'use strict';
 
@@ -7003,7 +7225,7 @@ exports.popperGenerator = popperGenerator;
 }());
 
 
-},{}],21:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -7528,7 +7750,7 @@ function functionBindPolyfill(context) {
   };
 }
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -7714,5 +7936,5 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[15])
+},{}]},{},[16])
 

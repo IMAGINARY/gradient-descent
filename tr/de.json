@@ -5,7 +5,8 @@
   "choose-bot-type": "Wähle die Art des Bots",
   "bot-types": {
     "none": "Ohne",
-    "random": "Zufall"
+    "random": "Zufall",
+    "tangent-intersection": "Benachbarte Tangenten"
   },
   "remaining-time": "Zeit:",
   "remaining-probes": "Sonden:",
