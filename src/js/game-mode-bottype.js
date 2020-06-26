@@ -1,7 +1,7 @@
 /* globals IMAGINARY */
 import MenuMode from './game-mode-menu';
 
-const BOT_TYPE_ORDER = ['none', 'random', 'tangent-intersection'];
+const BOT_TYPE_ORDER = ['none', 'random', 'gradient-descent', 'tangent-intersection'];
 
 export default class BotTypeMode extends MenuMode {
   getMenuTitle() {

@@ -2,7 +2,7 @@ import BotStrategyBase from './base';
 
 export default class BotStrategyTangentIntersection extends BotStrategyBase {
   /**
-   * Return a random next probe location.
+   * TODO: Document
    *
    * @param tangents {[{x:number,value:number,slope:number}]}
    * @param player
@@ -11,18 +11,9 @@ export default class BotStrategyTangentIntersection extends BotStrategyBase {
    * @returns {number}
    */
   getNextProbeLocation(tangents, player, playerIndex, players) {
-    // Filter out-of-range tangents
-    tangents = tangents.filter(t => this.lower <= t.x && t.x <= this.upper);
-
-    // Add sentinel tangents for left and right border
-    tangents.unshift({ x: this.lower, value: 0, slope: 0.5 });
-    tangents.push({ x: this.upper, value: 0, slope: -0.5 });
-
     // Build list of pairs of adjacent tangents and remove pairs that are too close together
-    const tangentPairs = Array.from(
-      { length: tangents.length - 1 },
-      (_, i) => ({ left: tangents[i], right: tangents[i + 1] })
-    ).filter(pair => pair.right.x - pair.left.x >= this.treasureWidth);
+    const tangentPairs = this.buildTangentPairsInRange(tangents, 0, 0.5, 0, -0.5)
+      .filter(pair => pair.right.x - pair.left.x >= this.treasureWidth);
 
     // Compute a new weighted point for each pair of tangents
     const inBetweenPoints = tangentPairs.map(pair => computePointBetweenTangents(

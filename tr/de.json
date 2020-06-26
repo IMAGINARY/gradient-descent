@@ -6,6 +6,7 @@
   "bot-types": {
     "none": "Ohne",
     "random": "Zufall",
+    "gradient-descent": "Gradientenverfahren",
     "tangent-intersection": "Benachbarte Tangenten"
   },
   "remaining-time": "Zeit:",

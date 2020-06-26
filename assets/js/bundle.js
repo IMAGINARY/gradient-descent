@@ -6,6 +6,18 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(n); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -44,6 +56,112 @@ var BotStrategyBase = /*#__PURE__*/function () {
     value: function getNextProbeLocation(tangents, player, playerIndex, players) {
       return Math.max(this.lower, Math.min(player.x, this.upper));
     }
+  }, {
+    key: "clamp",
+    value: function clamp(x) {
+      return Math.max(this.lower, Math.min(x, this.upper));
+    }
+  }, {
+    key: "getAdjacentTangentDistance",
+    value: function getAdjacentTangentDistance(x, tangents) {
+      var _this = this;
+
+      console.assert(this.lower <= x && x <= this.upper, "x=".concat(x, " out of range [").concat(this.lower, ",").concat(this.upper, "]"));
+      var positions = tangents.filter(function (t) {
+        return _this.lower <= t.x && t.x < _this.upper;
+      }).reduce(function (acc, cur) {
+        return acc.add(cur.x);
+      }, new Set()).add(this.lower).add(this.upper);
+      var sortedPositions = Array.from(positions.values()).sort();
+      var rightIndex = sortedPositions.findIndex(function (p) {
+        return x <= p;
+      });
+      var left = sortedPositions[Math.max(0, rightIndex - 1)];
+      var right = sortedPositions[rightIndex];
+      console.log(sortedPositions, x, rightIndex);
+      return right - left;
+    }
+  }, {
+    key: "getOppositeTangentDistance",
+    value: function getOppositeTangentDistance(tangentX, x, tangents, lowerValue, lowerSlope, upperValue, upperSlope) {
+      console.assert(this.lower <= x && x <= this.upper, "x=".concat(x, " out of range [").concat(this.lower, ",").concat(this.upper, "]"));
+      console.assert(this.lower <= tangentX && tangentX <= this.upper, "tangentX=".concat(tangentX, " out of range [").concat(this.lower, ",").concat(this.upper, "]"));
+      var lowerTangent = {
+        x: this.lower,
+        value: lowerValue,
+        slope: lowerSlope
+      };
+      var upperTangent = {
+        x: this.upper,
+        value: upperValue,
+        slope: upperSlope
+      };
+
+      if (tangentX < x) {
+        var rightIndex = tangents.map(function (t) {
+          return t.x;
+        }).findIndex(function (tx) {
+          return x <= tx;
+        });
+        var right = rightIndex === -1 ? upperTangent : tangents[rightIndex];
+        return right;
+      } else {
+        var tangentsRev = _toConsumableArray(tangents).reverse();
+
+        var leftIndex = tangentsRev.map(function (t) {
+          return t.x;
+        }).findIndex(function (tx) {
+          return tx <= x;
+        });
+        var left = leftIndex === -1 ? lowerTangent : tangentsRev[leftIndex];
+        return left;
+      }
+    }
+  }, {
+    key: "buildTangentPairsInRange",
+    value: function buildTangentPairsInRange(tangents, lowerValue, lowerSlope, upperValue, upperSlope) {
+      var _this2 = this;
+
+      // Filter out-of-range tangents
+      tangents = tangents.filter(function (t) {
+        return _this2.lower <= t.x && t.x <= _this2.upper;
+      }); // Add sentinel tangents for left and right border
+
+      tangents.unshift({
+        x: this.lower,
+        value: lowerValue,
+        slope: lowerSlope
+      });
+      tangents.push({
+        x: this.upper,
+        value: upperValue,
+        slope: upperSlope
+      }); // Build list of pairs of adjacent tangents
+
+      var tangentPairs = Array.from({
+        length: tangents.length - 1
+      }, function (_, i) {
+        return {
+          left: tangents[i],
+          right: tangents[i + 1]
+        };
+      });
+      return tangentPairs;
+    }
+  }, {
+    key: "findLargestUnknownTerritory",
+    value: function findLargestUnknownTerritory(tangents) {
+      var _this3 = this;
+
+      // Build list of pairs of adjacent tangents and remove pairs that are too close together
+      var tangentPairs = this.buildTangentPairsInRange(tangents, 0, 0, 0, 0).filter(function (pair) {
+        return pair.right.x - pair.left.x >= _this3.treasureWidth;
+      });
+      var largestUnknownTerritory = tangentPairs.reduce(function (acc, cur) {
+        return cur.right.x - cur.left.x > acc.right.x - acc.left.x ? cur : acc;
+      });
+      return largestUnknownTerritory;
+    }
   }]);
 
   return BotStrategyBase;
@@ -52,6 +170,225 @@ var BotStrategyBase = /*#__PURE__*/function () {
 exports["default"] = BotStrategyBase;
 
 },{}],2:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _base = _interopRequireDefault(require("./base"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { return function () { var Super = _getPrototypeOf(Derived), result; if (_isNativeReflectConstruct()) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+var INITIAL_ALPHA = 1.0 / Math.pow(2, 7);
+var SIGMA = 0.5;
+var RHO = 0.5;
+var LOCAL_MIN_SLOPE = 0.2;
+/**
+ * This is a backtracking gradient descent strategy using the Armijo step size condidition.
+ */
+
+var BotStrategyGradientDescent = /*#__PURE__*/function (_BotStrategyBase) {
+  _inherits(BotStrategyGradientDescent, _BotStrategyBase);
+
+  var _super = _createSuper(BotStrategyGradientDescent);
+
+  function BotStrategyGradientDescent(lower, upper, treasureWidth) {
+    var _this;
+
+    _classCallCheck(this, BotStrategyGradientDescent);
+
+    _this = _super.call(this, lower, upper, treasureWidth);
+    _this.gda = null;
+    _this.lastTarget = null;
+    _this.locations = new Set();
+    return _this;
+  }
+  /**
+   * Return a random next probe location.
+   *
+   * @param tangents {[{x:number,value:number,slope:number}]}
+   * @param player
+   * @param playerIndex {number}
+   * @param players {[]}
+   * @returns {number}
+   */
+
+
+  _createClass(BotStrategyGradientDescent, [{
+    key: "getNextProbeLocation",
+    value: function getNextProbeLocation(tangents, player, playerIndex, players) {
+      var _this2 = this;
+
+      var x;
+
+      if (this.lastTarget === null) {
+        // There is no last target -> probe at the current location
+        x = player.x;
+      } else {
+        // There is a last target
+        var lastTargetTangent = tangents.find(function (t) {
+          return t.x === _this2.lastTarget;
+        }) || null;
+
+        if (lastTargetTangent === null) {
+          // The player didn't probe at the last target yet -> send the player there again
+          x = this.lastTarget;
+        } else {
+          // There is a tangent for the last target -> continue from there
+          try {
+            // Try to do a local step
+            x = this.getNextProbeLocationLocal(lastTargetTangent, tangents);
+          } catch (e) {
+            console.log('BotStrategyGradientDescent', e.message); // Local step failed -> do a global step
+
+            x = this.getNextProbeLocationGlobal(tangents);
+          }
+        }
+      }
+
+      this.locations.add(x);
+      this.lastTarget = x;
+      return x;
+    }
+  }, {
+    key: "getNextProbeLocationLocal",
+    value: function getNextProbeLocationLocal(currentTangent, tangents) {
+      console.log('BotStrategyGradientDescent', 'Local step with ', currentTangent);
+
+      if (Math.abs(currentTangent.slope) < LOCAL_MIN_SLOPE) {
+        throw new Error('Local minimum reached');
+      }
+
+      if (this.gda === null) {
+        this.locations.add(currentTangent.x);
+        this.gda = new GradientDescentArmijo();
+      }
+
+      var x;
+
+      do {
+        x = this.clamp(this.gda.step(currentTangent)); // TODO: Do not look for the adjacent tangents but for the last Armijo tangents and the
+        // TODO: tangent on the opposite side of x
+        // NOTE: This doesn't care about overshooting. Even though it could easily be prevented,
+        // the regular gradient descent algorithm doesn't do it so we don't do it either
+
+        var oppositeTangent = this.getOppositeTangentDistance(this.gda.lastArmijoTangent.x, x, tangents);
+        var oppositeTangentDistance = Math.abs(this.gda.lastArmijoTangent.x - oppositeTangent.x);
+        var localMinimumInBetween = this.gda.lastArmijoTangent.slope * oppositeTangent.slope < 0;
+        var tooNarrow = oppositeTangentDistance < this.treasureWidth;
+        console.log("oppositeTangentDistance", oppositeTangentDistance, "tooNarrow", tooNarrow);
+
+        if (x === this.gda.lastArmijoTangent.x || localMinimumInBetween && tooNarrow) {
+          // No useful progress possible -> do global search step
+          throw new Error('No local progress possible');
+        }
+      } while (this.locations.has(x)); // don't probe the same position twice
+
+
+      return x;
+    }
+  }, {
+    key: "getNextProbeLocationGlobal",
+    value: function getNextProbeLocationGlobal(tangents) {
+      var _this3 = this;
+
+      console.log('BotStrategyGradientDescent', 'Global step');
+
+      try {
+        // Try to find a tangent that we didn't use so far and that's above all currently known local maxima
+        var bestLocalMaximum = tangents.filter(function (t) {
+          return Math.abs(t.slope) < LOCAL_MIN_SLOPE;
+        }).reduce(function (acc, cur) {
+          return cur.value > acc.value ? cur : acc;
+        }, 0);
+        var unknownTangentsEqualGreaterLocalMaximum = tangents.filter(function (t) {
+          return t.value >= bestLocalMaximum && !_this3.locations.has(t.x);
+        });
+
+        var bestTangentReducer = function bestTangentReducer(acc, cur) {
+          return acc.value > cur.value ? acc : cur;
+        }; // The following will throw an error if the array is empty -> continue with catch-clause.
+
+
+        var bestTangent = unknownTangentsEqualGreaterLocalMaximum.reduce(bestTangentReducer); // We didn't probe at that location ourselves, but we can assume we did
+
+        this.locations.add(bestTangent.x); // Start a local search from the new starting point
+
+        this.gda = null;
+        return this.getNextProbeLocationLocal(bestTangent);
+      } catch (e) {
+        // Jump to the mid point of the largest unknown territory
+        this.gda = null;
+        var largestUnknownTerritory = this.findLargestUnknownTerritory(tangents);
+        return (largestUnknownTerritory.left.x + largestUnknownTerritory.right.x) / 2;
+      }
+    }
+  }]);
+
+  return BotStrategyGradientDescent;
+}(_base["default"]);
+
+exports["default"] = BotStrategyGradientDescent;
+
+var GradientDescentArmijo = /*#__PURE__*/function () {
+  function GradientDescentArmijo() {
+    _classCallCheck(this, GradientDescentArmijo);
+
+    this.lastArmijoTangent = null;
+    this.alpha = INITIAL_ALPHA;
+  }
+
+  _createClass(GradientDescentArmijo, [{
+    key: "step",
+    value: function step(tangent) {
+      if (!this.lastArmijoTangent) {
+        this.lastArmijoTangent = tangent;
+        this.alpha = INITIAL_ALPHA;
+      }
+
+      var armijo = tangent.value > this.lastArmijoTangent.value + this.alpha * SIGMA * Math.abs(this.lastArmijoTangent.slope);
+
+      if (armijo) {
+        this.lastArmijoTangent = tangent;
+        this.alpha = INITIAL_ALPHA;
+        return this.step(tangent);
+      } else {
+        var x = this.lastArmijoTangent.x + this.alpha * this.lastArmijoTangent.slope;
+        console.log('alpha', this.alpha, 't', tangent, 'x', x);
+        this.alpha *= RHO;
+        return x;
+      }
+    }
+  }]);
+
+  return GradientDescentArmijo;
+}();
+
+},{"./base":1}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -118,7 +455,7 @@ var BotStrategyRandom = /*#__PURE__*/function (_BotStrategyBase) {
 
 exports["default"] = BotStrategyRandom;
 
-},{"./base":1}],3:[function(require,module,exports){
+},{"./base":1}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -167,7 +504,7 @@ var BotStrategyTangentIntersection = /*#__PURE__*/function (_BotStrategyBase) {
     key: "getNextProbeLocation",
 
     /**
-     * Return a random next probe location.
+     * TODO: Document
      *
      * @param tangents {[{x:number,value:number,slope:number}]}
      * @param player
@@ -178,30 +515,8 @@ var BotStrategyTangentIntersection = /*#__PURE__*/function (_BotStrategyBase) {
     value: function getNextProbeLocation(tangents, player, playerIndex, players) {
       var _this = this;
 
-      // Filter out-of-range tangents
-      tangents = tangents.filter(function (t) {
-        return _this.lower <= t.x && t.x <= _this.upper;
-      }); // Add sentinel tangents for left and right border
-
-      tangents.unshift({
-        x: this.lower,
-        value: 0,
-        slope: 0.5
-      });
-      tangents.push({
-        x: this.upper,
-        value: 0,
-        slope: -0.5
-      }); // Build list of pairs of adjacent tangents and remove pairs that are too close together
-
-      var tangentPairs = Array.from({
-        length: tangents.length - 1
-      }, function (_, i) {
-        return {
-          left: tangents[i],
-          right: tangents[i + 1]
-        };
-      }).filter(function (pair) {
+      // Build list of pairs of adjacent tangents and remove pairs that are too close together
+      var tangentPairs = this.buildTangentPairsInRange(tangents, 0, 0.5, 0, -0.5).filter(function (pair) {
         return pair.right.x - pair.left.x >= _this.treasureWidth;
       }); // Compute a new weighted point for each pair of tangents
 
@@ -321,7 +636,7 @@ function intersectLines(l1, l2) {
   };
 }
 
-},{"./base":1}],4:[function(require,module,exports){
+},{"./base":1}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -408,7 +723,7 @@ var Controls = /*#__PURE__*/function () {
 
 exports["default"] = Controls;
 
-},{}],5:[function(require,module,exports){
+},{}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -522,7 +837,7 @@ var GamepadControls = /*#__PURE__*/function (_Controls) {
 
 exports["default"] = GamepadControls;
 
-},{"./controls":4}],6:[function(require,module,exports){
+},{"./controls":5}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -632,7 +947,7 @@ var KeyboardControls = /*#__PURE__*/function (_Controls) {
 
 exports["default"] = KeyboardControls;
 
-},{"./controls":4}],7:[function(require,module,exports){
+},{"./controls":5}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -786,7 +1101,7 @@ var ScreenControls = /*#__PURE__*/function (_Controls) {
 
 exports["default"] = ScreenControls;
 
-},{"./controls":4}],8:[function(require,module,exports){
+},{"./controls":5}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -856,7 +1171,7 @@ var FullScreenToggle = /*#__PURE__*/function () {
 
 exports["default"] = FullScreenToggle;
 
-},{}],9:[function(require,module,exports){
+},{}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -894,7 +1209,7 @@ function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Re
 
 function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
 
-var BOT_TYPE_ORDER = ['none', 'random', 'tangent-intersection'];
+var BOT_TYPE_ORDER = ['none', 'random', 'gradient-descent', 'tangent-intersection'];
 
 var BotTypeMode = /*#__PURE__*/function (_MenuMode) {
   _inherits(BotTypeMode, _MenuMode);
@@ -934,7 +1249,7 @@ var BotTypeMode = /*#__PURE__*/function (_MenuMode) {
 
 exports["default"] = BotTypeMode;
 
-},{"./game-mode-menu":10}],10:[function(require,module,exports){
+},{"./game-mode-menu":11}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1104,7 +1419,7 @@ var MenuMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = MenuMode;
 
-},{"./game-mode":14}],11:[function(require,module,exports){
+},{"./game-mode":15}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1185,7 +1500,7 @@ var PlayerNumberMode = /*#__PURE__*/function (_MenuMode) {
 
 exports["default"] = PlayerNumberMode;
 
-},{"./game-mode-menu":10}],12:[function(require,module,exports){
+},{"./game-mode-menu":11}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1208,6 +1523,8 @@ var _base = _interopRequireDefault(require("./bot-strategies/base"));
 var _random = _interopRequireDefault(require("./bot-strategies/random"));
 
 var _tangentIntersection = _interopRequireDefault(require("./bot-strategies/tangent-intersection"));
+
+var _gradientDescent = _interopRequireDefault(require("./bot-strategies/gradient-descent"));
 
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
 
@@ -1353,7 +1670,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       var _handleEnterMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
         var _this2 = this;
 
-        var _this$game, draw, config, numPlayers, botType, $gameStats, $remainingTimeContainer, $remainingProbesContainer, modeGroup, createPlayer, addBot, botStrategyClass, botStrategy, bot, newTerrainHeights, terrainHeights, terrainPoints, behindGroundGroup, treasure, groundCover;
+        var _this$game, draw, config, numPlayers, botType, $gameStats, $remainingTimeContainer, $remainingProbesContainer, modeGroup, createPlayer, addBot, botStrategyClass, botStrategy, bot, nextTarget, newTerrainHeights, terrainHeights, terrainPoints, behindGroundGroup, treasure, groundCover;
 
         return regeneratorRuntime.wrap(function _callee3$(_context3) {
           while (1) {
@@ -1363,6 +1680,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 this.isGameOver = false;
                 this.discardInputs = false;
                 this.remainingTime = config.maxTime * 1000;
+                this.tangents = [];
                 this.$overlay = $('<div class="play" />').appendTo(this.game.overlay);
                 $gameStats = $('<div class="game-stats"/>').appendTo(this.$overlay);
                 $remainingTimeContainer = $('<div class="remaining-time"/>').text(IMAGINARY.i18n.t('remaining-time')).appendTo($gameStats);
@@ -1493,6 +1811,9 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                       case 'newton':
                         return BotStrategyNewton;
 
+                      case 'gradient-descent':
+                        return _gradientDescent["default"];
+
                       case 'tangent-intersection':
                         return _tangentIntersection["default"];
 
@@ -1505,10 +1826,15 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                   bot = {};
                   bot.type = botType;
                   bot.player = createPlayer(numPlayers, numPlayers + 1, 'player-bot');
-                  bot.targetX = bot.player.x;
+
+                  nextTarget = function nextTarget() {
+                    return botStrategy.getNextProbeLocation(_this2.tangents, bot.player, bot.player.id, _this2.players);
+                  };
+
+                  bot.targetX = nextTarget();
 
                   bot.tangentListener = function () {
-                    return bot.targetX = botStrategy.getNextProbeLocation(_this2.tangents, bot.player, bot.player.id, _this2.players);
+                    return bot.targetX = nextTarget();
                   };
 
                   this.players.push(bot.player);
@@ -1550,7 +1876,6 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 if (config.showSeaFloor) groundCover.hide();
                 this.groundGroup.back();
                 this.tangentGroup = modeGroup.group().translate(0, TERRAIN_DISTANCE);
-                this.tangents = [];
 
               case 39:
               case "end":
@@ -1686,7 +2011,8 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
         if (!player.probing && !_this5.isGameOver) {
           player.lastX = player.x;
           player.x += SPEED_FACTOR * (delta * input.direction);
-          player.x = Math.min(Math.max(TERRAIN_MARGIN_WIDTH, player.x), 1.0 - TERRAIN_MARGIN_WIDTH);
+          player.x = Math.min(Math.max(TERRAIN_MARGIN_WIDTH, player.x), 1.0 - TERRAIN_MARGIN_WIDTH); // TODO: Limit bot position to bot.targetX
+
           player.flipX = input.direction === 0 ? player.flipX : input.direction === -1;
 
           if (action && player.remainingProbes > 0) {
@@ -2179,7 +2505,7 @@ function actionPressed(input, lastInput) {
   return input.action && !lastInput.action;
 }
 
-},{"./bot-strategies/base":1,"./bot-strategies/random":2,"./bot-strategies/tangent-intersection":3,"./game-mode":14,"./terrain":17,"./waves":18,"@popperjs/core":20,"events":22}],13:[function(require,module,exports){
+},{"./bot-strategies/base":1,"./bot-strategies/gradient-descent":2,"./bot-strategies/random":3,"./bot-strategies/tangent-intersection":4,"./game-mode":15,"./terrain":18,"./waves":19,"@popperjs/core":21,"events":23}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2356,7 +2682,7 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = TitleMode;
 
-},{"./game-mode":14,"./wavy-animation":19}],14:[function(require,module,exports){
+},{"./game-mode":15,"./wavy-animation":20}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2536,7 +2862,7 @@ var GameMode = /*#__PURE__*/function () {
 
 exports["default"] = GameMode;
 
-},{"events":22}],15:[function(require,module,exports){
+},{"events":23}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3087,7 +3413,7 @@ var GradientDescentGame = /*#__PURE__*/function () {
 
 exports["default"] = GradientDescentGame;
 
-},{"./controls/gamepad":5,"./controls/keyboard":6,"./controls/screen":7,"./full-screen-toggle":8,"./game-mode-bottype":9,"./game-mode-numplayers":11,"./game-mode-play":12,"./game-mode-title":13,"@wessberg/pointer-events":21}],16:[function(require,module,exports){
+},{"./controls/gamepad":6,"./controls/keyboard":7,"./controls/screen":8,"./full-screen-toggle":9,"./game-mode-bottype":10,"./game-mode-numplayers":12,"./game-mode-play":13,"./game-mode-title":14,"@wessberg/pointer-events":22}],17:[function(require,module,exports){
 "use strict";
 
 var _game = _interopRequireDefault(require("./game"));
@@ -3267,7 +3593,7 @@ function getCustomConfigUrl() {
   return main;
 })()();
 
-},{"./game":15}],17:[function(require,module,exports){
+},{"./game":16}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3405,7 +3731,7 @@ function terrain(numSamples, length) {
   });
 }
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3478,7 +3804,7 @@ function animatedSVG(svgContainer, numPoints, numSteps, xScale, yScale, duration
   return waves;
 }
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3567,7 +3893,7 @@ function WavyAnimation(shape) {
   };
 }
 
-},{}],20:[function(require,module,exports){
+},{}],21:[function(require,module,exports){
 (function (process){
 /**
  * @popperjs/core v2.4.0 - MIT License
@@ -5368,7 +5694,7 @@ exports.popperGenerator = popperGenerator;
 
 }).call(this,require('_process'))
 
-},{"_process":23}],21:[function(require,module,exports){
+},{"_process":24}],22:[function(require,module,exports){
 (function () {
 	'use strict';
 
@@ -7225,7 +7551,7 @@ exports.popperGenerator = popperGenerator;
 }());
 
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -7750,7 +8076,7 @@ function functionBindPolyfill(context) {
   };
 }
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -7936,5 +8262,5 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[16])
+},{}]},{},[17])
 

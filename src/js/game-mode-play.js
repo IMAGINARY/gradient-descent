@@ -7,6 +7,7 @@ import * as waves from './waves';
 import BotStrategyBase from './bot-strategies/base';
 import BotStrategyRandom from './bot-strategies/random';
 import BotStrategyTangentIntersection from './bot-strategies/tangent-intersection';
+import BotStrategyGradientDescent from './bot-strategies/gradient-descent';
 
 const WATER_HEIGHT_SCALE = 10;
 const NUM_WATER_POINTS = 300;
@@ -66,6 +67,8 @@ export default class PlayMode extends GameMode {
     this.discardInputs = false;
 
     this.remainingTime = config.maxTime * 1000;
+
+    this.tangents = [];
 
     this.$overlay = $('<div class="play" />').appendTo(this.game.overlay);
     const $gameStats = $('<div class="game-stats"/>').appendTo(this.$overlay);
@@ -187,6 +190,8 @@ export default class PlayMode extends GameMode {
             return BotStrategyRandom;
           case 'newton':
             return BotStrategyNewton;
+          case 'gradient-descent':
+            return BotStrategyGradientDescent;
           case 'tangent-intersection':
             return BotStrategyTangentIntersection;
           default:
@@ -201,13 +206,14 @@ export default class PlayMode extends GameMode {
       const bot = {};
       bot.type = botType;
       bot.player = createPlayer(numPlayers, numPlayers + 1, 'player-bot');
-      bot.targetX = bot.player.x;
-      bot.tangentListener = () => bot.targetX = botStrategy.getNextProbeLocation(
+      const nextTarget = () => botStrategy.getNextProbeLocation(
         this.tangents,
         bot.player,
         bot.player.id,
         this.players,
       );
+      bot.targetX = nextTarget();
+      bot.tangentListener = () => bot.targetX = nextTarget();
       this.players.push(bot.player);
       this.events.addListener('new-tangent', bot.tangentListener);
       this.bot = bot;
@@ -268,8 +274,6 @@ export default class PlayMode extends GameMode {
 
     this.tangentGroup = modeGroup.group()
       .translate(0, TERRAIN_DISTANCE);
-
-    this.tangents = [];
   }
 
   async handleExitMode() {
@@ -358,6 +362,7 @@ export default class PlayMode extends GameMode {
           player.x += SPEED_FACTOR * (delta * input.direction);
           player.x = Math.min(Math.max(TERRAIN_MARGIN_WIDTH, player.x),
             1.0 - TERRAIN_MARGIN_WIDTH);
+          // TODO: Limit bot position to bot.targetX
           player.flipX = input.direction === 0 ? player.flipX : input.direction === -1;
           if (action && player.remainingProbes > 0) {
             // Switch to probe mode
