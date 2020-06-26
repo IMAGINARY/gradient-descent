@@ -5,7 +5,7 @@
   "useKeyboardControls": true,
   "maxPlayers": 2,
   "maxTime": 60,
-  "maxProbes": 10,
+  "maxProbes": 20,
   "continuousGame": false,
   "fullScreenButton": true,
   "debugControls": false
