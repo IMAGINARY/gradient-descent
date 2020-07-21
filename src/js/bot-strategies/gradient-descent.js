@@ -6,7 +6,7 @@ const RHO = 0.5;
 const LOCAL_MIN_SLOPE = 0.2;
 
 /**
- * This is a backtracking gradient descent strategy using the Armijo step size condidition.
+ * This is a backtracking gradient descent strategy using the Armijo step size condition.
  */
 export default class BotStrategyGradientDescent extends BotStrategyBase {
 

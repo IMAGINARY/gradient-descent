@@ -208,7 +208,7 @@ var SIGMA = 0.5;
 var RHO = 0.5;
 var LOCAL_MIN_SLOPE = 0.2;
 /**
- * This is a backtracking gradient descent strategy using the Armijo step size condidition.
+ * This is a backtracking gradient descent strategy using the Armijo step size condition.
  */
 
 var BotStrategyGradientDescent = /*#__PURE__*/function (_BotStrategyBase) {
