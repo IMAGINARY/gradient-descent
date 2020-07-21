@@ -12,7 +12,7 @@ export default class MenuMode extends GameMode {
 
     const menuItems = this.getMenuItems();
 
-    this.selectedIndex = 0;
+    this.selectedIndex = this.getDefaultItemIndex();
     $('<div class="text text-center menu-title" />')
       .text(this.getMenuTitle())
       .appendTo($overlay);
@@ -75,6 +75,15 @@ export default class MenuMode extends GameMode {
    */
   getMenuItems() {
     return ['One', 'Two'];
+  }
+
+  /**
+   * Get the index of the default menu item. This can be used to preselect menu items in subclasses.
+   *
+   * @returns {number}
+   */
+  getDefaultItemIndex() {
+    return 0;
   }
 
   processSelection(itemIndex) {

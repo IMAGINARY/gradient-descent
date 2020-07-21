@@ -17,6 +17,10 @@ export default class PlayerNumberMode extends MenuMode {
     return this._menuItems;
   }
 
+  getDefaultItemIndex() {
+    return this.game.numPlayers - 1;
+  }
+
   processSelection(selectedIndex) {
     super.processSelection(selectedIndex);
     this.game.numPlayers = selectedIndex + 1;

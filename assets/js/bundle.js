@@ -1236,6 +1236,12 @@ var BotTypeMode = /*#__PURE__*/function (_MenuMode) {
       });
     }
   }, {
+    key: "getDefaultItemIndex",
+    value: function getDefaultItemIndex() {
+      var index = BOT_TYPE_ORDER.indexOf(this.game.botType);
+      return index !== -1 ? index : 0;
+    }
+  }, {
     key: "processSelection",
     value: function processSelection(selectedIndex) {
       _get(_getPrototypeOf(BotTypeMode.prototype), "processSelection", this).call(this, selectedIndex);
@@ -1309,7 +1315,7 @@ var MenuMode = /*#__PURE__*/function (_GameMode) {
               case 0:
                 $overlay = $(this.game.overlay);
                 menuItems = this.getMenuItems();
-                this.selectedIndex = 0;
+                this.selectedIndex = this.getDefaultItemIndex();
                 $('<div class="text text-center menu-title" />').text(this.getMenuTitle()).appendTo($overlay);
                 $selector = $('<div class="menu-selector" />').addClass("menu-selector-with-".concat(menuItems.length)).appendTo($overlay);
 
@@ -1409,6 +1415,17 @@ var MenuMode = /*#__PURE__*/function (_GameMode) {
     value: function getMenuItems() {
       return ['One', 'Two'];
     }
+    /**
+     * Get the index of the default menu item. This can be used to preselect menu items in subclasses.
+     *
+     * @returns {number}
+     */
+
+  }, {
+    key: "getDefaultItemIndex",
+    value: function getDefaultItemIndex() {
+      return 0;
+    }
   }, {
     key: "processSelection",
     value: function processSelection(itemIndex) {}
@@ -1485,6 +1502,11 @@ var PlayerNumberMode = /*#__PURE__*/function (_MenuMode) {
     key: "getMenuItems",
     value: function getMenuItems() {
       return this._menuItems;
+    }
+  }, {
+    key: "getDefaultItemIndex",
+    value: function getDefaultItemIndex() {
+      return this.game.numPlayers - 1;
     }
   }, {
     key: "processSelection",

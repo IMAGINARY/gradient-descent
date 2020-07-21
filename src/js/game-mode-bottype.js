@@ -13,6 +13,11 @@ export default class BotTypeMode extends MenuMode {
     return BOT_TYPE_ORDER.map(key => botTypeStrings[key]);
   }
 
+  getDefaultItemIndex() {
+    const index = BOT_TYPE_ORDER.indexOf(this.game.botType);
+    return index !== -1 ? index : 0;
+  }
+
   processSelection(selectedIndex) {
     super.processSelection(selectedIndex);
     this.game.botType = BOT_TYPE_ORDER[selectedIndex];
