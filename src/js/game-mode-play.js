@@ -414,14 +414,20 @@ export default class PlayMode extends GameMode {
         translateY: y
       });
 
-      player.$remainingProbes.text(padRemainingProbes(player.remainingProbes));
-      if (player.remainingProbes === 0)
-        player.$remainingProbes.addClass("blinking");
+      const remainingProbesStr = padRemainingProbes(player.remainingProbes);
+      if (player.$remainingProbes.text() !== remainingProbesStr) {
+        player.$remainingProbes.text(remainingProbesStr);
+        if (player.remainingProbes === 0)
+          player.$remainingProbes.addClass("blinking");
+      }
     });
 
-    this.$remainingTime.text(padRemainingTime(Math.ceil(this.remainingTime / 1000.0)));
-    if (this.remainingTime === 0)
-      this.$remainingTime.addClass("blinking");
+    const renmainingTimeStr = padRemainingTime(Math.ceil(this.remainingTime / 1000.0));
+    if (this.$remainingTime.text() !== renmainingTimeStr) {
+      this.$remainingTime.text(renmainingTimeStr);
+      if (this.remainingTime === 0)
+        this.$remainingTime.addClass("blinking");
+    }
   }
 
   terrainHeight(x) {
