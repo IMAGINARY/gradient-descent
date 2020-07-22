@@ -95,6 +95,8 @@ export default class PlayMode extends GameMode {
       .addClass('draw')
       .translate(0, WATER_DISTANCE);
 
+
+    const padRemainingProbes = num => pad(num, String(this.game.config.maxProbes).length, ' ');
     const createPlayer = (playerIndex, numPlayers, cssClass) => {
       const x = (playerIndex + 1) / (numPlayers + 1);
       const group = modeGroup.group();
@@ -114,6 +116,9 @@ export default class PlayMode extends GameMode {
       const doProbe = function (terrainHeight) {
         this.probing = true;
         this.remainingProbes = Math.max(0, this.remainingProbes - 1);
+        this.$remainingProbes.text(padRemainingProbes(this.remainingProbes));
+        if (this.remainingProbes === 0)
+          this.$remainingProbes.addClass("blinking");
         const probeHeight = TERRAIN_DISTANCE + TERRAIN_HEIGHT_SCALE * terrainHeight;
         const probeDuration = probeHeight * (PROBE_MIN_DURATION / TERRAIN_DISTANCE);
 
@@ -137,7 +142,7 @@ export default class PlayMode extends GameMode {
       }
 
       // Add an element for displaying the number of remaining probes
-      const $remainingProbes = $(`<span class="counter ${cssClass}"/>`)
+      const $remainingProbes = $(`<span class="counter ${cssClass}">${config.maxProbes}</span>`)
         .appendTo(this.$remainingProbes);
 
       // Move boat in front of the probe
@@ -324,8 +329,17 @@ export default class PlayMode extends GameMode {
       return;
     }
 
+    // Update remaining time
+    const newRemainingTime = Math.max(0, this.remainingTime - delta);
+    if (this.remainingTime !== newRemainingTime) {
+      const padRemainingTime = num => pad(num, String(this.game.config.maxTime).length, ' ');
+      this.remainingTime = newRemainingTime;
+      this.$remainingTime.text(padRemainingTime(Math.ceil(this.remainingTime / 1000.0)));
+      if (this.remainingTime === 0)
+        this.$remainingTime.addClass("blinking");
+    }
+
     // Check whether the game is lost
-    this.remainingTime = Math.max(0, this.remainingTime - delta);
     if (this.remainingTime === 0) {
       console.log("Time is up - GAME OVER!");
       this.gameOver(async () => this.showLoseSequenceTimeIsUp());
@@ -394,10 +408,6 @@ export default class PlayMode extends GameMode {
 
     this.water.plot(this.wavesPoints(ts / WATER_LOOP_DURATION));
 
-    const pad = (num, places, char) => String(num).padStart(places, char);
-    const padRemainingProbes = num => pad(num, String(this.game.config.maxProbes).length, ' ');
-    const padRemainingTime = num => pad(num, String(this.game.config.maxTime).length, ' ');
-
     this.players.forEach((player, playerIndex) => {
       const x = player.x;
       const y = WATER_HEIGHT_SCALE * waves.height(x, ts / WATER_LOOP_DURATION);
@@ -413,21 +423,7 @@ export default class PlayMode extends GameMode {
         translateX: x * draw.width(),
         translateY: y
       });
-
-      const remainingProbesStr = padRemainingProbes(player.remainingProbes);
-      if (player.$remainingProbes.text() !== remainingProbesStr) {
-        player.$remainingProbes.text(remainingProbesStr);
-        if (player.remainingProbes === 0)
-          player.$remainingProbes.addClass("blinking");
-      }
     });
-
-    const renmainingTimeStr = padRemainingTime(Math.ceil(this.remainingTime / 1000.0));
-    if (this.$remainingTime.text() !== renmainingTimeStr) {
-      this.$remainingTime.text(renmainingTimeStr);
-      if (this.remainingTime === 0)
-        this.$remainingTime.addClass("blinking");
-    }
   }
 
   terrainHeight(x) {
@@ -606,4 +602,8 @@ export default class PlayMode extends GameMode {
 
 function actionPressed(input, lastInput) {
   return input.action && !lastInput.action;
+}
+
+function pad(num, places, char) {
+  return String(num).padStart(places, char)
 }
