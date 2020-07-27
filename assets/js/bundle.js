@@ -3476,11 +3476,11 @@ function loadConfig(_x) {
 /**
  * Return the URL of the user-supplied config file or {null} if it is not present.
  *
- * A custom config file URL can be provided via the 'config' query string variable. It must not
- * contain references to parent directories ('..').
+ * A custom config file name can be provided via the 'config' query string variable.
+ * Allowed file names must match the regex /^[A-Za-z0\-_.]+$/.
  *
- * @returns {URL|null} User-supplied config or {null} if not supplied.
- * @throws {Error} If the user-supplied config contains a reference to parent directories.
+ * @returns {URL|null} User-supplied config URL or {null} if not supplied.
+ * @throws {Error} If the user-supplied config file name doesn't match the regex.
  */
 
 
@@ -3545,11 +3545,12 @@ function getCustomConfigUrl() {
     return null;
   } else {
     var customConfigName = urlSearchParams.get('config');
+    var whitelistRegex = /^[A-Za-z0\-_.]+$/;
 
-    if (/\.\./.test(customConfigName)) {
-      throw new Error("Custom config path ".concat(customConfigName, " must not contain references to parent directories and will be ignored."));
-    } else {
+    if (whitelistRegex.test(customConfigName)) {
       return new URL(customConfigName, window.location.href);
+    } else {
+      throw new Error("Custom config path ".concat(customConfigName, " must match ").concat(whitelistRegex.toString(), "."));
     }
   }
 }
