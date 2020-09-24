@@ -18,7 +18,7 @@ export default class BotStrategyGradientDescent extends BotStrategyBase {
   }
 
   /**
-   * Return a random next probe location.
+   * Return next probe location based on gradient descent.
    *
    * @param tangents {[{x:number,value:number,slope:number}]}
    * @param player
