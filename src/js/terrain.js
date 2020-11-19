@@ -1,3 +1,15 @@
+import assert from 'assert';
+
+// Returns an integer in [l,u)
+function randIndex(l, u) {
+  assert(Number.isInteger(l) && l >= 0);
+  assert(Number.isInteger(u) && u >= 0);
+  assert(l < u);
+
+  const r = l + (u - l) * Math.random();
+  return Math.max(l, Math.min(Math.floor(r), u - 1));
+}
+
 function smoothChaikin(arr, num, open = true) {
   if (num === 0)
     return arr;
@@ -19,7 +31,7 @@ function smoothChaikin(arr, num, open = true) {
 
 function subdivide(length, leftHeight, rightHeight) {
   return {
-    index: Math.floor(length * Math.random()),
+    index: randIndex(0, length),
     height: Math.max(leftHeight, rightHeight) * Math.random(),
   };
 }
@@ -36,18 +48,23 @@ function generateInnerTerrainHeights(heights, leftHeight, rightHeight) {
   return heights;
 }
 
-function generateTerrainPoints(numPoints, marginWidth = 0.1, marginHeight = 0.2, jitter = 0.25) {
+function generateTerrainPoints(numPoints, marginWidth = 0.1, marginHeight = 0.2, jitter = 0.25, tilt = 4) {
   const heights = new Float32Array(numPoints);
-  const marginIndices = [
-    Math.floor(marginWidth * numPoints),
-    Math.floor(marginWidth + (1 - 2 * marginWidth) * numPoints),
-  ];
+
+  const leftMarginIndex = Math.floor(marginWidth * numPoints);
+  const rightMarginIndex = Math.floor((1 - marginWidth) * (numPoints - 1));
+
+  assert(leftMarginIndex + 1 < rightMarginIndex);
+  assert(marginHeight >= 0.0 && marginHeight < 1.0);
+  const maxHeightIndex = randIndex(leftMarginIndex + 1, rightMarginIndex);
+  const r = 1 - Math.pow(Math.random(), tilt); // tendency towards 0 or 1 depending on tilt
+  const maxHeight = marginHeight + Math.max(Number.EPSILON, r * (1 - marginHeight));
+
   const predefinedHeights = [
     [0, Math.random() * marginHeight],
-    [marginIndices[0], marginHeight],
-    [marginIndices[0] + 1 + Math.floor(Math.random() * (marginIndices[1] - marginIndices[0])),
-     1.0],
-    [marginIndices[1], marginHeight],
+    [leftMarginIndex, marginHeight],
+    [maxHeightIndex, maxHeight],
+    [rightMarginIndex, marginHeight],
     [numPoints - 1, Math.random() * marginHeight],
   ];
 
@@ -97,6 +114,7 @@ const defaultOptions = {
   marginWidth: 0.1,
   marginHeight: 0.1,
   jitter: 0.25,
+  tilt: 4,
   smoothing: 6,
 };
 
@@ -106,7 +124,8 @@ export default function terrain(numSamples, length, options = {}) {
     numSamples,
     options.marginWidth,
     options.marginHeight,
-    options.jitter
+    options.jitter,
+    options.tilt,
   );
   const smoothTerrainPoints = smoothChaikin(roughTerrainPoints, options.smoothing);
   const smoothTerrainHeights = convertPointsToHeights(smoothTerrainPoints, length);

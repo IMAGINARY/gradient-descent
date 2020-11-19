@@ -6,6 +6,7 @@
   "maxPlayers": 2,
   "maxTime": 60,
   "maxProbes": 20,
+  "maxDepthTilt": 4,
   "continuousGame": false,
   "fullScreenButton": true,
   "debugControls": false

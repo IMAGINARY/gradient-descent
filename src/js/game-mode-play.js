@@ -232,7 +232,7 @@ export default class PlayMode extends GameMode {
 
     this.groundGroup = modeGroup.group();
     const newTerrainHeights = () => {
-      const terrainOptions = { marginWidth: TERRAIN_MARGIN_WIDTH };
+      const terrainOptions = { marginWidth: TERRAIN_MARGIN_WIDTH, tilt: game.config.maxDepthTilt };
       return terrain(MAX_TERRAIN_EXTREMA, NUM_TERRAIN_POINTS, terrainOptions);
     }
     const terrainHeights = game.map ? game.map : newTerrainHeights();
@@ -447,7 +447,12 @@ export default class PlayMode extends GameMode {
 
   locateTreasure() {
     const argmax = array => [].reduce.call(array, (m, c, i, arr) => c > arr[m] ? i : m, 0);
-    const treasureIndex = argmax(this.terrainHeights);
+    const margin = Math.floor(this.terrainHeights.length * TERRAIN_MARGIN_WIDTH) + 1;
+    const terrainHeightNoMargin = this.terrainHeights.slice(
+      margin,
+      this.terrainHeights.length - margin
+    );
+    const treasureIndex = margin + argmax(terrainHeightNoMargin);
     return {
       x: treasureIndex / (this.terrainHeights.length - 1),
       y: this.terrainHeights[treasureIndex],

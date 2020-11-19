@@ -12,6 +12,7 @@ const defaultConfig = {
   maxProbes: Number.POSITIVE_INFINITY,
   continuousGame: false,
   showSeaFloor: false,
+  maxDepthTilt: 4,
   fullScreenButton: true,
   debugControls: false,
   map: null,
