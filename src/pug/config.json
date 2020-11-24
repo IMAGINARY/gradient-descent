@@ -1,5 +1,6 @@
 {
   "siteName": "Gradient Descent",
   "siteDescription": "A game of learning the concepts behind gradient descent by exploring the depths looking for treasure",
-  "siteURL": "http://imaginary.github.io/gradient-descent"
+  "siteURL": "http://imaginary.github.io/gradient-descent",
+  "basePath": ""
 }

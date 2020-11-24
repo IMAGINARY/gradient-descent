@@ -9,6 +9,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Added
 
 - Skip cache when fetching the config file.
+- Add hashes to the precompiled CSS and JS filenames in order to avoid the cache.
 
 ## [1.2.1] - 2020-11-24
 
