@@ -6,6 +6,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Skip cache when fetching the config file.
+
 ## [1.2.1] - 2020-11-24
 
 ### Fixed

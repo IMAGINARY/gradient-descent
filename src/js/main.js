@@ -25,7 +25,9 @@ const defaultConfig = {
  * @return {Promise<any>}
  */
 async function loadConfig(uri) {
-  const response = await fetch(uri);
+  const response = await fetch(uri, {
+    cache: 'no-store',
+  });
   if (response.status >= 200 && response.status < 300) {
     try {
       const config = await response.json();
