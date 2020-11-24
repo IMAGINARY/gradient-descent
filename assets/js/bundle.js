@@ -2944,6 +2944,7 @@ var GradientDescentGame = /*#__PURE__*/function () {
     this.config = config;
     this.inputs = this.createInputs();
     this.inputsLast = this.createInputs();
+    this.animationFrameRequestId = 0;
     this.gameLoop = null;
     this.isPaused = false;
     this.modes = {};
@@ -3196,6 +3197,8 @@ var GradientDescentGame = /*#__PURE__*/function () {
     value: function run() {
       var _this = this;
 
+      window.cancelAnimationFrame(this.animationFrameRequestId);
+
       if (!this.gameLoop) {
         var lastTs = 0;
         var lag = 0;
@@ -3214,12 +3217,12 @@ var GradientDescentGame = /*#__PURE__*/function () {
             _this.currentMode.draw(delta, ts);
 
             lastTs = ts;
-            window.requestAnimationFrame(_this.gameLoop);
+            _this.animationFrameRequestId = window.requestAnimationFrame(_this.gameLoop);
           }
         };
       }
 
-      window.requestAnimationFrame(this.gameLoop);
+      this.animationFrameRequestId = window.requestAnimationFrame(this.gameLoop);
     }
     /**
      * Pauses the game.
