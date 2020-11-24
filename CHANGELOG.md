@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [1.2.1] - 2020-11-24
+
+### Fixed
+
+- Increased resource consumption every time the game mode is switched
+- Faster water waves animation using SMIL
+- Use same styling for light and dark modes
+
 ## [1.2.0] - 2020-11-19
 
 ### Added
@@ -45,7 +53,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Initial game
 
-[unreleased]: https://github.com/IMAGINARY/gradient-descent/compare/v1.2.0...HEAD
+[unreleased]: https://github.com/IMAGINARY/gradient-descent/compare/v1.2.1...HEAD
+[1.2.1]: https://github.com/IMAGINARY/gradient-descent/compare/v1.2.1...v1.2.0
 [1.2.0]: https://github.com/IMAGINARY/gradient-descent/compare/v1.2.0...v1.1.1
 [1.1.1]: https://github.com/IMAGINARY/gradient-descent/compare/v1.1.1...v1.1.0
 [1.1.0]: https://github.com/IMAGINARY/gradient-descent/compare/v1.1.0...v1.0.0
