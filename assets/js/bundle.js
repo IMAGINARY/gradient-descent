@@ -1594,6 +1594,7 @@ function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.g
 
 var WATER_HEIGHT_SCALE = 10;
 var NUM_WATER_POINTS = 300;
+var WATER_FPS = 5;
 var WATER_DISTANCE = 200;
 var WATER_LOOP_DURATION = 20 * 1000;
 var BOAT_DRAFT = 18;
@@ -1872,7 +1873,8 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                   this.bot = null;
                 }
 
-                this.water = modeGroup.group().polyline(this.wavesPoints(0)).addClass('water');
+                this.water = modeGroup.group().attr('id', 'water').addClass('water');
+                waves.animatedSVGPolyline(this.water, NUM_WATER_POINTS, WATER_LOOP_DURATION / 1000 * WATER_FPS, game.draw.width(), WATER_HEIGHT_SCALE, WATER_LOOP_DURATION);
                 this.groundGroup = modeGroup.group();
 
                 newTerrainHeights = function newTerrainHeights() {
@@ -1906,7 +1908,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 this.groundGroup.back();
                 this.tangentGroup = modeGroup.group().translate(0, TERRAIN_DISTANCE);
 
-              case 40:
+              case 41:
               case "end":
                 return _context3.stop();
             }
@@ -2118,22 +2120,18 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
           numPlayers = _this$game3.numPlayers; // Move boats
       // Draw bottom
       // etc...
+      // The water animation uses SVG animations (via SMIL), so we have to use it's timestamp for
+      // animating the boat's rotation and vertical position.
 
-      this.water.plot(this.wavesPoints(ts / WATER_LOOP_DURATION));
+      var waterTs = draw.node.getCurrentTime() * 1000;
       this.players.forEach(function (player, playerIndex) {
         var x = player.x;
-        var y = WATER_HEIGHT_SCALE * waves.height(x, ts / WATER_LOOP_DURATION);
-        var slope = WATER_HEIGHT_SCALE * waves.slope(x, ts / WATER_LOOP_DURATION);
-        var angle = 0.25 * 180 * Math.atan2(slope, draw.width()) / Math.PI;
-        var boatTransform = {
-          rotate: angle
-        };
-        if (player.flipX) boatTransform.flip = 'x';
-        player.boat.transform(boatTransform);
-        player.group.transform({
-          translateX: x * draw.width(),
-          translateY: y
-        });
+        var y = WATER_HEIGHT_SCALE * waves.height(x, waterTs / WATER_LOOP_DURATION);
+        var slope = WATER_HEIGHT_SCALE * waves.slope(x, waterTs / WATER_LOOP_DURATION);
+        var angle = 0.25 * 180 * Math.atan2(slope, draw.width()) / Math.PI; // Animating by setting CSS attributes seems to be more efficient than setting SVG attributes
+
+        player.boat.node.style.transform = "rotate(".concat(angle, "deg) scale(").concat(player.flipX ? -1 : 1, ",1)");
+        player.group.node.style.transform = "translate(".concat(x * draw.width(), "px,").concat(y, "px)");
       });
     }
   }, {
@@ -3795,7 +3793,7 @@ exports.height = height;
 exports.slope = slope;
 exports.heights = heights;
 exports.points = points;
-exports.animatedSVG = animatedSVG;
+exports.animatedSVGPolyline = animatedSVGPolyline;
 // The water surface consists of superimposed sin waves that are moving with respect to ts.
 // Fixing x, the frequency factors with respect to ts are [1,-1,2,3].
 // Since the lowest common denominator of these factors is 6 and the base frequency is 1 / (2 * PI),
@@ -3832,13 +3830,11 @@ function points(arr, t) {
 }
 /*
  * Experimental: Create an SVG wave shape that animates via the <animate> tag.
- * This will probably doesn't work in a lot of browsers.
- * Problems: It's not possible to the the timestamp (progress) of the animation,
- * which would be needed to keep it in sync with other elements in the scene.
+ * Probably, this doesn't work in all browsers. :-(
  */
 
 
-function animatedSVG(svgContainer, numPoints, numSteps, xScale, yScale, duration) {
+function animatedSVGPolyline(svgContainer, numPoints, numSteps, xScale, yScale, duration) {
   var p = Array(numPoints).fill(null);
   var keyframes = Array(numSteps).fill(null).map(function (_, i) {
     return Array.from(points(p, i / (numSteps - 1), xScale, yScale));

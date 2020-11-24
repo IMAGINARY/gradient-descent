@@ -11,6 +11,7 @@ import BotStrategyGradientDescent from './bot-strategies/gradient-descent';
 
 const WATER_HEIGHT_SCALE = 10;
 const NUM_WATER_POINTS = 300;
+const WATER_FPS = 5;
 const WATER_DISTANCE = 200;
 const WATER_LOOP_DURATION = 20 * 1000;
 
@@ -226,9 +227,13 @@ export default class PlayMode extends GameMode {
       this.bot = null;
     }
 
-    this.water = modeGroup.group()
-      .polyline(this.wavesPoints(0))
-      .addClass('water');
+    this.water = modeGroup.group().attr('id', 'water').addClass('water');
+    waves.animatedSVGPolyline(this.water,
+      NUM_WATER_POINTS,
+      (WATER_LOOP_DURATION / 1000) * WATER_FPS,
+      game.draw.width(),
+      WATER_HEIGHT_SCALE,
+      WATER_LOOP_DURATION);
 
     this.groundGroup = modeGroup.group();
     const newTerrainHeights = () => {
@@ -406,23 +411,18 @@ export default class PlayMode extends GameMode {
     // Draw bottom
     // etc...
 
-    this.water.plot(this.wavesPoints(ts / WATER_LOOP_DURATION));
+    // The water animation uses SVG animations (via SMIL), so we have to use it's timestamp for
+    // animating the boat's rotation and vertical position.
+    const waterTs = draw.node.getCurrentTime() * 1000;
 
     this.players.forEach((player, playerIndex) => {
       const x = player.x;
-      const y = WATER_HEIGHT_SCALE * waves.height(x, ts / WATER_LOOP_DURATION);
-      const slope = WATER_HEIGHT_SCALE * waves.slope(x, ts / WATER_LOOP_DURATION);
+      const y = WATER_HEIGHT_SCALE * waves.height(x, waterTs / WATER_LOOP_DURATION);
+      const slope = WATER_HEIGHT_SCALE * waves.slope(x, waterTs / WATER_LOOP_DURATION);
       const angle = 0.25 * 180 * Math.atan2(slope, draw.width()) / Math.PI;
-      const boatTransform = {
-        rotate: angle,
-      };
-      if (player.flipX)
-        boatTransform.flip = 'x';
-      player.boat.transform(boatTransform);
-      player.group.transform({
-        translateX: x * draw.width(),
-        translateY: y
-      });
+      // Animating by setting CSS attributes seems to be more efficient than setting SVG attributes
+      player.boat.node.style.transform = `rotate(${angle}deg) scale(${player.flipX ? -1 : 1},1)`;
+      player.group.node.style.transform = `translate(${x * draw.width()}px,${y}px)`;
     });
   }
 

@@ -39,11 +39,9 @@ export function points(arr, t, xScale = 1.0, yScale = 1.0) {
 
 /*
  * Experimental: Create an SVG wave shape that animates via the <animate> tag.
- * This will probably doesn't work in a lot of browsers.
- * Problems: It's not possible to the the timestamp (progress) of the animation,
- * which would be needed to keep it in sync with other elements in the scene.
+ * Probably, this doesn't work in all browsers. :-(
  */
-export function animatedSVG(svgContainer, numPoints, numSteps, xScale, yScale, duration) {
+export function animatedSVGPolyline(svgContainer, numPoints, numSteps, xScale, yScale, duration) {
   const p = Array(numPoints).fill(null);
   const keyframes = Array(numSteps)
     .fill(null)
@@ -61,4 +59,3 @@ export function animatedSVG(svgContainer, numPoints, numSteps, xScale, yScale, d
 
   return waves;
 }
-
