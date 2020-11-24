@@ -1,6 +1,6 @@
 {
   "name": "gradient-descent",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "description": "A game of learning the concepts behind gradient descent by exploring the depths looking for treasure",
   "repository": "github:IMAGINARY/gradient-descent",
   "author": "Eric Londaits <eric.londaits@imaginary.org>",
