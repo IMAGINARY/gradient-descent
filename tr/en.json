@@ -2,12 +2,23 @@
   "press-to-start": "Press a button to start",
   "press-to-restart": "Press a button to restart",
   "choose-num-players": "Choose number of players",
-  "choose-bot-type": "Choose the bot type",
+  "choose-bot-type": {
+    "difficulty": "Choose the difficulty level of the bot",
+    "strategy": "Choose the bot type"
+  },
   "bot-types": {
-    "none": "None",
-    "random": "Random",
-    "gradient-descent": "Gradient descent",
-    "tangent-intersection": "Adjacent tangents"
+    "difficulty": {
+      "none": "None",
+      "random": "Easy",
+      "gradient-descent": "Medium",
+      "tangent-intersection": "Hard"
+    },
+    "strategy": {
+      "none": "None",
+      "random": "Random",
+      "gradient-descent": "Gradient descent",
+      "tangent-intersection": "Adjacent tangents"
+    }
   },
   "remaining-time": "Time:",
   "remaining-probes": "Probes:",

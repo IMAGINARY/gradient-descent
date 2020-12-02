@@ -7,6 +7,7 @@ const defaultConfig = {
   useScreenControls: true,
   useKeyboardControls: true,
   botType: null,
+  botTypeLabels: 'difficulty',
   maxPlayers: 2,
   maxTime: Number.POSITIVE_INFINITY,
   maxProbes: Number.POSITIVE_INFINITY,

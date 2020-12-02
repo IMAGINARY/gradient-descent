@@ -14,6 +14,7 @@ A config file is loaded when opening the application. It supports the following 
 - **useScreenControls** (boolean, default: `true`): Shows on-screen controllers.
 - **useKeyboardControls** (boolean, default: `true`): Control the game via keyboard (player 1: <kbd>←</kbd><kbd>↓</kbd><kbd>→</kbd> resp. <kbd>←</kbd><kbd>Space</kbd><kbd>→</kbd>, player 2: <kbd>A</kbd><kbd>S</kbd><kbd>D</kbd>).
 - **botType** (`"none", "random", "gradient-descent", "tangent-intersection"` or `null`, default: `null`): Set the type of bot player to use. Let the user choose if `null`.
+- **botTypeLabels** (`"difficulty"` or `"strategy"`, default: `"difficulty"`): Set the type of labels used to describe the bot type (`"difficulty"`: difficulty level, `"strategy"`: name of the bot strategy)
 - **maxPlayers** (integer, default: 2): Maximum number of players (between 1 and 4).
 - **maxTime** (integer or string `"Infinity"`, default: `"Infinity"`): Maximum number seconds until the game is over.
 - **maxProbes** (integer or string `"Infinity"`, default: `"Infinity"`): Maximum number of probes until the game is over.

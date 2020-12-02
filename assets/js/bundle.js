@@ -1225,12 +1225,13 @@ var BotTypeMode = /*#__PURE__*/function (_MenuMode) {
   _createClass(BotTypeMode, [{
     key: "getMenuTitle",
     value: function getMenuTitle() {
-      return IMAGINARY.i18n.t('choose-bot-type');
+      return IMAGINARY.i18n.t('choose-bot-type')[this.game.config.botTypeLabels];
     }
   }, {
     key: "getMenuItems",
     value: function getMenuItems() {
-      var botTypeStrings = IMAGINARY.i18n.t('bot-types');
+      var botTypeStrings = IMAGINARY.i18n.t('bot-types')[this.game.config.botTypeLabels];
+      console.log(botTypeStrings);
       return BOT_TYPE_ORDER.map(function (key) {
         return botTypeStrings[key];
       });
@@ -3458,6 +3459,7 @@ var defaultConfig = {
   useScreenControls: true,
   useKeyboardControls: true,
   botType: null,
+  botTypeLabels: 'difficulty',
   maxPlayers: 2,
   maxTime: Number.POSITIVE_INFINITY,
   maxProbes: Number.POSITIVE_INFINITY,
