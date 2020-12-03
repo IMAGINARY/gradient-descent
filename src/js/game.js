@@ -9,6 +9,8 @@ import ScreenControls from './controls/screen';
 import KeyboardControls from "./controls/keyboard";
 import FullScreenToggle from './full-screen-toggle';
 import BotTypeMode from './game-mode-bottype';
+import Jukebox from './audio';
+import * as audioResources from './audio-resources'
 
 /**
  * The main application
@@ -38,6 +40,8 @@ export default class GradientDescentGame {
 
     this.botType = this.config.botType;
     this.numPlayers = this.config.maxPlayers;
+
+    this.jukebox = Jukebox;
 
     this.map = config.map;
   }
@@ -91,6 +95,17 @@ export default class GradientDescentGame {
       this.debugControlsPane.classList.add('debug-pane');
       this.debugControlsPane.classList.add('debug-pane-controls');
       minAspectRatioContainer.appendChild(this.debugControlsPane);
+    }
+
+    try {
+      const soundPromises = Object.entries(audioResources.sounds)
+        .map(([id, res]) => this.jukebox.registerSound(id, res));
+      const musicPromises = Object.entries(audioResources.musics)
+        .map(([id, res]) => this.jukebox.registerMusic(id, res));
+      await Promise.all([...soundPromises, ...musicPromises]);
+    } catch (err) {
+      console.err('Unable to load game audio.', err);
+      throw err;
     }
 
     await this.registerMode('title', new TitleMode(this));
@@ -196,7 +211,7 @@ export default class GradientDescentGame {
           this.currentMode.handleInputs(this.inputs, this.inputsLast, delta, ts);
           this.currentMode.draw(delta, ts);
           lastTs = ts;
-          
+
           this.animationFrameRequestId = window.requestAnimationFrame(this.gameLoop);
         }
       };

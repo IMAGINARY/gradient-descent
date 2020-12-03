@@ -19,7 +19,8 @@ const REV_MANIFEST = './pug/rev-manifest.json';
 
 const paths = {
   html: {
-    src: ['./pug/**/*.pug', '!./pug/include/**/*.pug', '!./pug/tpl/**/*.pug', '!./pug/sections/**/*.pug'],
+    src: ['./pug/**/*.pug', '!./pug/include/**/*.pug', '!./pug/tpl/**/*.pug',
+          '!./pug/sections/**/*.pug'],
     watchSrc: ['./pug/**/*.pug', REV_MANIFEST],
     dest: `${OUTPUT_DIR}`,
   },
@@ -27,21 +28,24 @@ const paths = {
     src: './sass/**/*.scss',
     watchSrc: './sass/**/*.scss',
     dest: `${OUTPUT_DIR}/assets/css`,
-    clean: [`${OUTPUT_DIR}/assets/css/default-??????????.css`, `${OUTPUT_DIR}/assets/css/default-??????????.css.map`],
+    clean: [`${OUTPUT_DIR}/assets/css/default-??????????.css`,
+            `${OUTPUT_DIR}/assets/css/default-??????????.css.map`],
   },
   scripts: {
     src: './js/main.js',
     watchSrc: ['./js/**/*.js', '!./js/dependencies.js'],
     dest: `${OUTPUT_DIR}/assets/js`,
     filename: 'bundle',
-    clean: [`${OUTPUT_DIR}/assets/js/bundle-??????????.min.js`, `${OUTPUT_DIR}/assets/js/bundle-??????????.min.js.map`],
+    clean: [`${OUTPUT_DIR}/assets/js/bundle-??????????.min.js`,
+            `${OUTPUT_DIR}/assets/js/bundle-??????????.min.js.map`],
   },
   dependencies: {
     src: './js/dependencies.js',
     watchSrc: './js/dependencies.js',
     dest: `${OUTPUT_DIR}/assets/js`,
     filename: 'dependencies',
-    clean: [`${OUTPUT_DIR}/assets/js/dependencies-??????????.min.js`, `${OUTPUT_DIR}/assets/js/dependencies-??????????.min.js.map`],
+    clean: [`${OUTPUT_DIR}/assets/js/dependencies-??????????.min.js`,
+            `${OUTPUT_DIR}/assets/js/dependencies-??????????.min.js.map`],
   },
 };
 
@@ -129,7 +133,7 @@ function watch() {
   gulp.watch(paths.dependencies.watchSrc, dependencies);
 }
 
-const build = gulp.parallel(html, styles, scripts, dependencies);
+const build = gulp.series(styles, dependencies, scripts, html);
 
 exports.html = html;
 exports.styles = styles;
