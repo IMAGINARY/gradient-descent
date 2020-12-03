@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [1.4.0] - 2020-12-03
+
 ### Added
 - Add `botTypeLabels` config option for switching between different sets of labels (`difficulty`, `strategy`) in the bot type menu
 
@@ -63,7 +65,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Initial game
 
-[unreleased]: https://github.com/IMAGINARY/gradient-descent/compare/v1.3.0...HEAD
+[unreleased]: https://github.com/IMAGINARY/gradient-descent/compare/v1.4.0...HEAD
+[1.4.0]: https://github.com/IMAGINARY/gradient-descent/compare/v1.4.0...v1.3.0
 [1.3.0]: https://github.com/IMAGINARY/gradient-descent/compare/v1.3.0...v1.2.1
 [1.2.1]: https://github.com/IMAGINARY/gradient-descent/compare/v1.2.1...v1.2.0
 [1.2.0]: https://github.com/IMAGINARY/gradient-descent/compare/v1.2.0...v1.1.1
