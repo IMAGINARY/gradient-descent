@@ -5,3 +5,5 @@ work
 
 # Useful during development to avoid modifying the default config file
 config.local.json
+config.*.local.json
+config.local.*.json
