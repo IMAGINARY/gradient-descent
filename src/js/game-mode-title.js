@@ -2,14 +2,26 @@
 import {localeInit} from "./i18n";
 import GameMode from './game-mode';
 import WavyAnimation from './wavy-animation';
+import { Music } from './audio';
 
 export default class TitleMode extends GameMode {
+  constructor(game) {
+    super(game);
+    this.sounds = {
+      title: game.jukebox.getSound('gameLogoAppears'),
+      select: game.jukebox.getSound('selectItem'),
+    };
+    this.music = game.jukebox.getMusic('title');
+  }
+
   async preLoadAssets() {
     this.logoSprite = await this.game.loadSVGSymbol('assets/img/descent-logo.svg');
     this.poly = this.logoSprite.findOne('#descent');
   }
 
   async handleEnterMode() {
+    this.music.play();
+
     const { draw } = this.game;
     const pressToStart = document.createElement('div');
     pressToStart.classList.add('title-press-to-start');
@@ -34,6 +46,8 @@ export default class TitleMode extends GameMode {
     this.wavyStep = WavyAnimation(this.logoSprite, { duration: 3500 });
 
     this.animCounter = 0;
+
+    this.sounds.title.play();
   }
 
   async handleExitMode() {
@@ -48,6 +62,7 @@ export default class TitleMode extends GameMode {
     // If any button was pressed
     if (inputs
       .find((ctrl, i) => ctrl.action && !lastInputs[i].action)) {
+      this.sounds.select.play();
       this.triggerEvent('done');
     }
   }

@@ -5,9 +5,28 @@ Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports.musics = exports.sounds = void 0;
-var sounds = {};
+var PREFIX = './assets/audio';
+var sounds = {
+  gameLogoAppears: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
+  changeItem: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
+  selectItem: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
+  clockTick: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
+  boatMove: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
+  probeDown: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
+  probeUp: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
+  probeHit: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
+  probeMiss: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
+  revealSeaFloor: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
+  treasureOpen: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
+  gameOverWin: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
+  gameOverLose: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")]
+};
 exports.sounds = sounds;
-var musics = {};
+var musics = {
+  title: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
+  menu: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
+  play: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")]
+};
 exports.musics = musics;
 
 },{}],2:[function(require,module,exports){
@@ -1922,9 +1941,17 @@ var MenuMode = /*#__PURE__*/function (_GameMode) {
   var _super = _createSuper(MenuMode);
 
   function MenuMode(game) {
+    var _this;
+
     _classCallCheck(this, MenuMode);
 
-    return _super.call(this, game);
+    _this = _super.call(this, game);
+    _this.sounds = {
+      changeItem: game.jukebox.getSound('changeItem'),
+      selectItem: game.jukebox.getSound('selectItem')
+    };
+    _this.music = game.jukebox.getMusic('menu');
+    return _this;
   }
 
   _createClass(MenuMode, [{
@@ -1936,6 +1963,7 @@ var MenuMode = /*#__PURE__*/function (_GameMode) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
+                this.music.play();
                 $overlay = $(this.game.overlay);
                 menuItemsSpecs = this.getMenuItems();
                 this.selectedIndex = this.getDefaultItemIndex();
@@ -1960,7 +1988,7 @@ var MenuMode = /*#__PURE__*/function (_GameMode) {
 
                 this.$selectorItems = $selector.children();
 
-              case 8:
+              case 9:
               case "end":
                 return _context.stop();
             }
@@ -1998,10 +2026,10 @@ var MenuMode = /*#__PURE__*/function (_GameMode) {
   }, {
     key: "handleInputs",
     value: function handleInputs(inputs, lastInputs, delta, ts) {
-      var _this = this;
+      var _this2 = this;
 
       var clampIndex = function clampIndex(i) {
-        return Math.max(0, Math.min(i, _this.$selectorItems.length - 1));
+        return Math.max(0, Math.min(i, _this2.$selectorItems.length - 1));
       };
 
       for (var i = 0; i < inputs.length; ++i) {
@@ -2013,9 +2041,11 @@ var MenuMode = /*#__PURE__*/function (_GameMode) {
           this.$selectorItems.eq(this.selectedIndex).removeClass('selected');
           this.selectedIndex = clampIndex(this.selectedIndex + input.direction);
           this.$selectorItems.eq(this.selectedIndex).addClass('selected');
+          this.sounds.changeItem.play();
         }
 
         if (input.action && !lastInput.action) {
+          this.sounds.selectItem.play();
           this.processSelection(this.selectedIndex);
           this.triggerEvent('done');
           break;
@@ -2278,6 +2308,20 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
     };
 
     _this.bot = null;
+    _this.sounds = {
+      clockTick: _this.game.jukebox.getSound('clockTick'),
+      boatMove: _this.game.jukebox.getSound('boatMove'),
+      probeDown: _this.game.jukebox.getSound('probeDown'),
+      probeUp: _this.game.jukebox.getSound('probeUp'),
+      probeHit: _this.game.jukebox.getSound('probeHit'),
+      probeMiss: _this.game.jukebox.getSound('probeMiss'),
+      revealSeaFloor: _this.game.jukebox.getSound('revealSeaFloor'),
+      treasureOpen: _this.game.jukebox.getSound('treasureOpen'),
+      gameOverWin: _this.game.jukebox.getSound('gameOverWin'),
+      gameOverLose: _this.game.jukebox.getSound('gameOverLose'),
+      restart: _this.game.jukebox.getSound('selectItem')
+    };
+    _this.music = _this.game.jukebox.getMusic('play');
     return _this;
   }
 
@@ -2340,6 +2384,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
           while (1) {
             switch (_context3.prev = _context3.next) {
               case 0:
+                this.music.play();
                 _this$game = this.game, draw = _this$game.draw, config = _this$game.config, numPlayers = _this$game.numPlayers, botType = _this$game.botType;
                 this.isGameOver = false;
                 this.discardInputs = false;
@@ -2555,7 +2600,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                   return _this2.discardInputs = false;
                 });
 
-              case 45:
+              case 46:
               case "end":
                 return _context3.stop();
             }
@@ -2613,6 +2658,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
         }) !== -1;
 
         if (this.isGameOver && action) {
+          this.sounds.restart.play();
           this.discardInputs = true;
           this.triggerEvent('done');
         }
@@ -2625,6 +2671,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
 
       if (this.remainingTime !== newRemainingTime) {
         this.remainingTime = newRemainingTime;
+        if (Math.ceil(this.remainingTime / 1000.0) !== Math.ceil(newRemainingTime / 1000.0)) this.sounds.clockTick.play();
       } // Check whether the game is lost
 
 
@@ -2745,6 +2792,24 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 }
               }, _callee8);
             })));
+
+            var probeDownSoundPlaying = _this5.sounds.probeDown.play();
+
+            down.then(function () {
+              probeDownSoundPlaying.stop();
+
+              if (treasureFound) {
+                _this5.sounds.probeHit.play();
+              } else {
+                _this5.sounds.probeMiss.play();
+              }
+
+              var probeUpSoundPlaying = _this5.sounds.probeUp.play();
+
+              up.then(function () {
+                return probeUpSoundPlaying.stop();
+              });
+            });
             console.log("Player ".concat(playerIndex, " is probing at:"), {
               x: player.x,
               y: terrainHeight
@@ -2904,30 +2969,33 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
     value: function () {
       var _uncoverGround = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee10() {
         var duration,
+            playingSound,
             draw,
             circularEaseIn,
             animateDx,
             animateDxPromise,
+            animatePromise,
             _args10 = arguments;
         return regeneratorRuntime.wrap(function _callee10$(_context10) {
           while (1) {
             switch (_context10.prev = _context10.next) {
               case 0:
                 duration = _args10.length > 0 && _args10[0] !== undefined ? _args10[0] : UNCOVER_DURATION;
+                playingSound = this.sounds.revealSeaFloor.play();
                 draw = this.game.draw;
 
                 if (!(duration === 0)) {
-                  _context10.next = 7;
+                  _context10.next = 8;
                   break;
                 }
 
                 // uncover immediately
                 this.groundCoverLeft.dx(-draw.width());
                 this.groundCoverRight.dx(draw.width());
-                _context10.next = 11;
+                _context10.next = 14;
                 break;
 
-              case 7:
+              case 8:
                 // uncover using an animation
                 // (using an animation with duration 0 still takes > 0s for unknown reasons)
                 circularEaseIn = function circularEaseIn(pos) {
@@ -2944,9 +3012,13 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                   });
                 };
 
-                return _context10.abrupt("return", Promise.all([animateDxPromise(this.groundCoverLeft, -draw.width()), animateDxPromise(this.groundCoverRight, draw.width())]));
+                animatePromise = Promise.all([animateDxPromise(this.groundCoverLeft, -draw.width()), animateDxPromise(this.groundCoverRight, draw.width())]);
+                animatePromise["finally"](function () {
+                  return playingSound.stop();
+                });
+                return _context10.abrupt("return", animatePromise);
 
-              case 11:
+              case 14:
               case "end":
                 return _context10.stop();
             }
@@ -3058,10 +3130,14 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                   _this7.treasureOpened.show();
 
                   _this7.treasureClosed.hide();
+
+                  _this7.sounds.treasureOpen.play();
                 };
 
                 _context12.next = 6;
-                return this.showGameOverSequence($winAnnouncement, $treasure, openTreaureChest, [winner.cssClass]);
+                return this.showGameOverSequence($winAnnouncement, function () {
+                  return _this7.sounds.gameOverWin.play();
+                }, $treasure, openTreaureChest, [winner.cssClass]);
 
               case 6:
               case "end":
@@ -3081,12 +3157,16 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
     key: "showLoseSequenceTimeIsUp",
     value: function () {
       var _showLoseSequenceTimeIsUp = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee13() {
+        var _this8 = this;
+
         return regeneratorRuntime.wrap(function _callee13$(_context13) {
           while (1) {
             switch (_context13.prev = _context13.next) {
               case 0:
                 _context13.next = 2;
-                return this.showGameOverSequence((0, _i18n.localeInit)($('<span>'), 'time-is-up'), (0, _i18n.localeInit)($('<span>'), 'game-over'));
+                return this.showGameOverSequence((0, _i18n.localeInit)($('<span>'), 'time-is-up'), function () {
+                  return _this8.sounds.gameOverLose.play();
+                }, (0, _i18n.localeInit)($('<span>'), 'game-over'));
 
               case 2:
               case "end":
@@ -3106,12 +3186,16 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
     key: "showLoseSequenceNoProbesLeft",
     value: function () {
       var _showLoseSequenceNoProbesLeft = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee14() {
+        var _this9 = this;
+
         return regeneratorRuntime.wrap(function _callee14$(_context14) {
           while (1) {
             switch (_context14.prev = _context14.next) {
               case 0:
                 _context14.next = 2;
-                return this.showGameOverSequence((0, _i18n.localeInit)($('<span>'), 'no-probes-left'), (0, _i18n.localeInit)($('<span>'), 'game-over'));
+                return this.showGameOverSequence((0, _i18n.localeInit)($('<span>'), 'no-probes-left'), function () {
+                  return _this9.sounds.gameOverLose.play();
+                }, (0, _i18n.localeInit)($('<span>'), 'game-over'));
 
               case 2:
               case "end":
@@ -3130,7 +3214,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
   }, {
     key: "showGameOverSequence",
     value: function () {
-      var _showGameOverSequence = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee15(firstMessageElem, secondMessageElem) {
+      var _showGameOverSequence = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee15(firstMessageElem, firstMessageCallback, secondMessageElem) {
         var secondMessageCallback,
             cssClasses,
             draw,
@@ -3147,8 +3231,8 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
           while (1) {
             switch (_context15.prev = _context15.next) {
               case 0:
-                secondMessageCallback = _args15.length > 2 && _args15[2] !== undefined ? _args15[2] : Function.prototype;
-                cssClasses = _args15.length > 3 && _args15[3] !== undefined ? _args15[3] : [];
+                secondMessageCallback = _args15.length > 3 && _args15[3] !== undefined ? _args15[3] : Function.prototype;
+                cssClasses = _args15.length > 4 && _args15[4] !== undefined ? _args15[4] : [];
                 draw = this.game.draw;
 
                 delay = function delay(ms) {
@@ -3181,19 +3265,20 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 createAutoUpdatingPopper($announcementAnchor.get(0), $endingSequenceDiv.get(0), {
                   placement: 'top'
                 });
-                _context15.next = 18;
+                firstMessageCallback();
+                _context15.next = 19;
                 return delay(ENDING_SEQUENCE_SND_DELAY);
 
-              case 18:
+              case 19:
                 $secondMessageDiv.css("visibility", "visible");
                 secondMessageCallback();
-                _context15.next = 22;
+                _context15.next = 23;
                 return delay(ENDING_SEQUENCE_RESTART_DELAY);
 
-              case 22:
+              case 23:
                 $restartDiv.css("visibility", "visible");
 
-              case 23:
+              case 24:
               case "end":
                 return _context15.stop();
             }
@@ -3201,7 +3286,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
         }, _callee15, this);
       }));
 
-      function showGameOverSequence(_x5, _x6) {
+      function showGameOverSequence(_x5, _x6, _x7) {
         return _showGameOverSequence.apply(this, arguments);
       }
 
@@ -3285,6 +3370,8 @@ var _gameMode = _interopRequireDefault(require("./game-mode"));
 
 var _wavyAnimation = _interopRequireDefault(require("./wavy-animation"));
 
+var _audio = require("./audio");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -3318,10 +3405,18 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
 
   var _super = _createSuper(TitleMode);
 
-  function TitleMode() {
+  function TitleMode(game) {
+    var _this;
+
     _classCallCheck(this, TitleMode);
 
-    return _super.apply(this, arguments);
+    _this = _super.call(this, game);
+    _this.sounds = {
+      title: game.jukebox.getSound('gameLogoAppears'),
+      select: game.jukebox.getSound('selectItem')
+    };
+    _this.music = game.jukebox.getMusic('title');
+    return _this;
   }
 
   _createClass(TitleMode, [{
@@ -3362,6 +3457,7 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
           while (1) {
             switch (_context2.prev = _context2.next) {
               case 0:
+                this.music.play();
                 draw = this.game.draw;
                 pressToStart = document.createElement('div');
                 pressToStart.classList.add('title-press-to-start');
@@ -3386,8 +3482,9 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
                   duration: 3500
                 });
                 this.animCounter = 0;
+                this.sounds.title.play();
 
-              case 13:
+              case 15:
               case "end":
                 return _context2.stop();
             }
@@ -3435,6 +3532,7 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
       if (inputs.find(function (ctrl, i) {
         return ctrl.action && !lastInputs[i].action;
       })) {
+        this.sounds.select.play();
         this.triggerEvent('done');
       }
     }
@@ -3450,7 +3548,7 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = TitleMode;
 
-},{"./game-mode":17,"./i18n":19,"./wavy-animation":24}],17:[function(require,module,exports){
+},{"./audio":2,"./game-mode":17,"./i18n":19,"./wavy-animation":24}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
