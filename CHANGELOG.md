@@ -6,6 +6,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Changed
+- Move water surface and sea floor towards the bottom of the screen
+
 ## [1.4.0] - 2020-12-03
 
 ### Added

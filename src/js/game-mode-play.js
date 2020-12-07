@@ -12,7 +12,7 @@ import BotStrategyGradientDescent from './bot-strategies/gradient-descent';
 const WATER_HEIGHT_SCALE = 10;
 const NUM_WATER_POINTS = 300;
 const WATER_FPS = 5;
-const WATER_DISTANCE = 200;
+const WATER_DISTANCE = 260;
 const WATER_LOOP_DURATION = 20 * 1000;
 
 const BOAT_DRAFT = 18;
