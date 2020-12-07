@@ -5,9 +5,16 @@ export default class MenuMode extends GameMode {
 
   constructor(game) {
     super(game);
+    this.sounds = {
+      changeItem: game.jukebox.getSound('changeItem'),
+      selectItem: game.jukebox.getSound('selectItem'),
+    }
+    this.music = game.jukebox.getMusic('menu');
   }
 
   async handleEnterMode() {
+    this.music.play();
+
     const $overlay = $(this.game.overlay);
 
     const menuItems = this.getMenuItems();
@@ -43,9 +50,11 @@ export default class MenuMode extends GameMode {
         this.$selectorItems.eq(this.selectedIndex).removeClass('selected');
         this.selectedIndex = clampIndex(this.selectedIndex + input.direction);
         this.$selectorItems.eq(this.selectedIndex).addClass('selected');
+        this.sounds.changeItem.play();
       }
 
       if (input.action && !lastInput.action) {
+        this.sounds.selectItem.play();
         this.processSelection(this.selectedIndex);
         this.triggerEvent('done');
         break;

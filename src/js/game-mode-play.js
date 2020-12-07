@@ -50,6 +50,20 @@ export default class PlayMode extends GameMode {
     const wavesPoints = Array(NUM_WATER_POINTS).fill(null);
     this.wavesPoints = t => waves.points(wavesPoints, t, game.draw.width(), WATER_HEIGHT_SCALE);
     this.bot = null;
+    this.sounds = {
+      clockTick: this.game.jukebox.getSound('clockTick'),
+      boatMove: this.game.jukebox.getSound('boatMove'),
+      probeDown: this.game.jukebox.getSound('probeDown'),
+      probeUp: this.game.jukebox.getSound('probeUp'),
+      probeHit: this.game.jukebox.getSound('probeHit'),
+      probeMiss: this.game.jukebox.getSound('probeMiss'),
+      revealSeaFloor: this.game.jukebox.getSound('revealSeaFloor'),
+      treasureOpen: this.game.jukebox.getSound('treasureOpen'),
+      gameOverWin: this.game.jukebox.getSound('gameOverWin'),
+      gameOverLose: this.game.jukebox.getSound('gameOverLose'),
+      restart: this.game.jukebox.getSound('selectItem'),
+    };
+    this.music = this.game.jukebox.getMusic('play');
   }
 
   async preLoadAssets() {
@@ -62,6 +76,8 @@ export default class PlayMode extends GameMode {
   }
 
   async handleEnterMode() {
+    this.music.play();
+
     const { draw, config, numPlayers, botType } = this.game;
 
     this.isGameOver = false;
@@ -328,6 +344,7 @@ export default class PlayMode extends GameMode {
     if (this.isGameOver) {
       const action = inputs.findIndex((input, i) => actionPressed(input, lastInputs[i])) !== -1;
       if (this.isGameOver && action) {
+        this.sounds.restart.play();
         this.discardInputs = true;
         this.triggerEvent('done');
       }
@@ -339,7 +356,12 @@ export default class PlayMode extends GameMode {
     if (this.remainingTime !== newRemainingTime) {
       const padRemainingTime = num => pad(num, String(this.game.config.maxTime).length, ' ');
       this.remainingTime = newRemainingTime;
-      this.$remainingTime.text(padRemainingTime(Math.ceil(this.remainingTime / 1000.0)));
+      const newRemainingTimeString = padRemainingTime(Math.ceil(this.remainingTime / 1000.0));
+      if (this.remainingTimeString !== newRemainingTimeString) {
+        this.remainingTimeString = newRemainingTimeString;
+        this.$remainingTime.text(this.remainingTimeString);
+        this.sounds.clockTick.play();
+      }
       if (this.remainingTime === 0)
         this.$remainingTime.addClass("blinking");
     }
@@ -396,6 +418,17 @@ export default class PlayMode extends GameMode {
                 console.log("Treasure found - GAME OVER!");
                 await this.gameOver(async () => this.showWinSequence(player));
               }
+            });
+            const probeDownSoundPlaying = this.sounds.probeDown.play();
+            down.then(() => {
+              probeDownSoundPlaying.stop();
+              if (treasureFound) {
+                this.sounds.probeHit.play();
+              } else {
+                this.sounds.probeMiss.play();
+              }
+              const probeUpSoundPlaying = this.sounds.probeUp.play();
+              up.then(() => probeUpSoundPlaying.stop());
             });
 
             console.log(`Player ${playerIndex} is probing at:`,
@@ -501,6 +534,7 @@ export default class PlayMode extends GameMode {
   }
 
   async uncoverGround(duration = UNCOVER_DURATION) {
+    const playingSound = this.sounds.revealSeaFloor.play();
     const { draw } = this.game;
     if (duration === 0) {
       // uncover immediately
@@ -512,10 +546,12 @@ export default class PlayMode extends GameMode {
       const circularEaseIn = pos => -(Math.sqrt(1 - (pos * pos)) - 1);
       const animateDx = (e, dx) => e.animate(duration).dx(dx);
       const animateDxPromise = (e, dx) => new Promise(resolve => animateDx(e, dx).after(resolve));
-      return Promise.all([
+      const animatePromise = Promise.all([
         animateDxPromise(this.groundCoverLeft, -draw.width()),
         animateDxPromise(this.groundCoverRight, draw.width())
       ]);
+      animatePromise.finally(() => playingSound.stop());
+      return animatePromise;
     }
   }
 
@@ -529,10 +565,12 @@ export default class PlayMode extends GameMode {
     const openTreaureChest = () => {
       this.treasureOpened.show();
       this.treasureClosed.hide();
+      this.sounds.treasureOpen.play();
     }
 
     await this.showGameOverSequence(
       winAnnouncement,
+      () => this.sounds.gameOverWin.play(),
       treasure,
       openTreaureChest,
       [winner.cssClass]
@@ -542,21 +580,28 @@ export default class PlayMode extends GameMode {
   async showLoseSequenceTimeIsUp() {
     await this.showGameOverSequence(
       IMAGINARY.i18n.t('time-is-up'),
+      () => this.sounds.gameOverLose.play(),
       IMAGINARY.i18n.t('game-over'),
+      () => true,
+      []
     );
   }
 
   async showLoseSequenceNoProbesLeft() {
     await this.showGameOverSequence(
       IMAGINARY.i18n.t('no-probes-left'),
+      () => this.sounds.gameOverLose.play(),
       IMAGINARY.i18n.t('game-over'),
+      () => true,
+      [],
     );
   }
 
   async showGameOverSequence(firstMessage,
+                             firstMessageCallback,
                              secondMessage,
-                             secondMessageCallback = Function.prototype,
-                             cssClasses = []) {
+                             secondMessageCallback,
+                             cssClasses) {
     const { draw } = this.game;
 
     const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
@@ -595,6 +640,7 @@ export default class PlayMode extends GameMode {
       {
         placement: 'top',
       });
+    firstMessageCallback();
 
     await delay(ENDING_SEQUENCE_SND_DELAY);
     $secondMessageDiv.css("visibility", "visible");
