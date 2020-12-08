@@ -32,6 +32,8 @@ async function getDefaultConfig() {
     maxDepthTilt: 4,
     fullScreenButton: true,
     languageButton: true,
+    audioButton: true,
+    muteAudio: false,
     debugControls: false,
     map: null,
   };

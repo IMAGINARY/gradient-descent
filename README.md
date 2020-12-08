@@ -34,6 +34,9 @@ A config file is loaded when opening the application. It supports the following 
   supplied map. See [below](#setting-a-sea-floor-map) for details.
 - **continuousGame** (boolean, default: `false`): Skip the title screen and time limit,
   auto-restart.
+- **audioButton** (boolean, default: `true`): Show a button to (un-)mute audio.
+- **muteAudio** (boolean, default: `false`): Set whether audio should be initially muted (will be
+  overridden by certain browsers).
 - **fullScreenButton** (boolean, default: `true`): Show a button to toggle full-screen mode.
 - **languageButton** (boolean, default: `true`): Show a button to cycle through the languages defined via `languages`.
 - **debugControls** (boolean, default: `false`): Shows debugging data for controls.

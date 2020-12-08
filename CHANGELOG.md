@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Add music and sound effects
+- Add `audioButton` config option to show/hide button for toggling audio playback
+- Add `muteAudio` config option to set whether audio should be muted initially
+
 ## [1.7.1]
 
 ### Modified
@@ -148,15 +154,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 [1.4.1]: https://github.com/IMAGINARY/gradient-descent/compare/v1.4.1...v1.4.0
 
 [1.4.0]: https://github.com/IMAGINARY/gradient-descent/compare/v1.4.0...v1.3.0
-
 [1.3.0]: https://github.com/IMAGINARY/gradient-descent/compare/v1.3.0...v1.2.1
-
 [1.2.1]: https://github.com/IMAGINARY/gradient-descent/compare/v1.2.1...v1.2.0
-
 [1.2.0]: https://github.com/IMAGINARY/gradient-descent/compare/v1.2.0...v1.1.1
-
 [1.1.1]: https://github.com/IMAGINARY/gradient-descent/compare/v1.1.1...v1.1.0
-
 [1.1.0]: https://github.com/IMAGINARY/gradient-descent/compare/v1.1.0...v1.0.0
-
 [1.0.0]: https://github.com/IMAGINARY/gradient-descent/tree/v1.0.0
