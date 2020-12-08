@@ -22,6 +22,9 @@ A config file is loaded when opening the application. It supports the following 
 - **maxDepthTilt** (float >= 0, default: `4`): Tilt the sea floor generation towards shallow [0,1) or deep (1,∞).
 - **map** (array or `null`, default: `null`): If `null`, auto-generate a map. Otherwise, use the supplied map. See [below](#setting-a-sea-floor-map) for details.
 - **continuousGame** (boolean, default: `false`): Skip the title screen and time limit, auto-restart.
+- **audioButton** (boolean, default: `true`): Show a button to (un-)mute audio.
+- **muteAudio** (boolean, default: `false`): Set whether audio should be initially muted (will be
+  overridden by certain browsers).
 - **fullScreenButton** (boolean, default: `true`): Show a button to toggle full-screen mode.
 - **debugControls** (boolean, default: `false`): Shows debugging data for controls.
 

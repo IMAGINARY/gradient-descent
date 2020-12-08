@@ -7,6 +7,7 @@ import PlayerNumberMode from './game-mode-numplayers';
 import GamepadControls from "./controls/gamepad";
 import ScreenControls from './controls/screen';
 import KeyboardControls from "./controls/keyboard";
+import AudioToggle from './audio-toggle';
 import FullScreenToggle from './full-screen-toggle';
 import BotTypeMode from './game-mode-bottype';
 import Jukebox from './audio';
@@ -80,6 +81,12 @@ export default class GradientDescentGame {
     if (this.config.useGamepads) {
       this.controls.gamepad = new GamepadControls(this.config.maxPlayers);
     }
+
+    if (this.config.audioButton) {
+      this.audioToggle = new AudioToggle();
+      minAspectRatioContainer.appendChild(this.audioToggle.element);
+    }
+    Jukebox.mute(this.config.muteAudio);
 
     if (this.config.fullScreenButton) {
       this.fullScreenToggle = new FullScreenToggle();

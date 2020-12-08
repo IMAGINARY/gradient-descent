@@ -289,20 +289,31 @@ body {
   .overlay .game-stats * .counter {
     margin-left: 1ex; }
 
+.toggle-button, .top-toggle-button, .fullscreen-button, .audio-button {
+  color: #ffec02;
+  opacity: 0.6; }
+  .toggle-button:hover, .top-toggle-button:hover, .fullscreen-button:hover, .audio-button:hover {
+    opacity: 0.8; }
+  .toggle-button:active, .top-toggle-button:active, .fullscreen-button:active, .audio-button:active {
+    opacity: 1.0; }
+  .toggle-button *, .top-toggle-button *, .fullscreen-button *, .audio-button * {
+    margin-top: -0.1ex;
+    font-size: 188%; }
+
+.top-toggle-button, .fullscreen-button, .audio-button {
+  margin: 1ex 1ex 1ex 1ex;
+  padding-top: 0ex; }
+
 .fullscreen-button {
   position: absolute;
   top: 0;
   right: 0;
-  margin: 1ex 1ex 1ex 1ex;
-  padding: 0ex 0ex 2ex 2ex;
-  color: #ffec02;
-  opacity: 0.6; }
-  .fullscreen-button:hover {
-    opacity: 0.8; }
-  .fullscreen-button:active {
-    opacity: 1.0; }
-  .fullscreen-button * {
-    margin-top: -0.1ex;
-    font-size: 188%; }
+  padding-left: 2ex; }
 
-/*# sourceMappingURL=default-e2a5370965.css.map */
+.audio-button {
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding-right: 2ex; }
+
+/*# sourceMappingURL=default-5e270152dc.css.map */

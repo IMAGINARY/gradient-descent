@@ -1,6 +1,10 @@
 const PREFIX = './assets/audio'
 
 const sounds = {
+  silence: [
+    `${PREFIX}/silence.webm`,
+    `${PREFIX}/silence.mp3`,
+  ],
   gameLogoAppears: [
     `${PREFIX}/silence.webm`,
     `${PREFIX}/silence.mp3`,

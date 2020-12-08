@@ -1,0 +1,41 @@
+.toggle-button {
+  color: $color-yellow;
+  opacity: 0.6;
+
+  &:hover {
+    opacity: 0.8;
+  }
+
+  &:active {
+    opacity: 1.0;
+  }
+
+  & * {
+    margin-top: -0.1ex;
+    font-size: 188%;
+  }
+}
+
+.top-toggle-button {
+  @extend .toggle-button;
+  margin: 1ex 1ex 1ex 1ex;
+  padding-top: 0ex;
+}
+
+.fullscreen-button {
+  @extend .top-toggle-button;
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding-left: 2ex;
+}
+
+.audio-button {
+  @extend .top-toggle-button;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding-right: 2ex;
+}
+
+

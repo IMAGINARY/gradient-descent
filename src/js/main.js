@@ -15,6 +15,8 @@ const defaultConfig = {
   showSeaFloor: false,
   maxDepthTilt: 4,
   fullScreenButton: true,
+  audioButton: true,
+  muteAudio: false,
   debugControls: false,
   map: null,
 };

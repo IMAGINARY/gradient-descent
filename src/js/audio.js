@@ -1,9 +1,10 @@
-import { Howl } from 'howler';
+import { EventEmitter } from 'events';
+import { Howl, Howler } from 'howler';
+
+import * as audioResources from './audio-resources'
 
 const SOUND_FADE_DURATION = 250;
 const MUSIC_FADE_DURATION = 500;
-
-const SILENCE_DATA_URI = 'data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAAABmYWN0BAAAAAAAAABkYXRhAAAAAA==';
 
 class Loader {
   constructor(loadFunc) {
@@ -18,7 +19,6 @@ class Loader {
   }
 }
 
-
 class Sound {
   constructor(loadedHowl) {
     this._howl = loadedHowl;
@@ -28,19 +28,30 @@ class Sound {
   }
 
   play() {
-    const id = this._howl.play();
-    const isPlaying = () => this._howl.playing(id);
-    const stop = () => {
-      if (isPlaying()) {
-        const v = this._howl.volume(id);
-        this._howl.fade(v, 0.0, v * SOUND_FADE_DURATION, id);
+    if (Jukebox.isUnlocked()) {
+      const id = this._howl.play();
+      const isPlaying = () => this._howl.playing(id);
+      const stop = () => {
+        if (isPlaying()) {
+          const v = this._howl.volume(id);
+          this._howl.fade(v, 0.0, v * SOUND_FADE_DURATION, id);
+        }
       }
+
+      const playingSound = { isPlaying, stop };
+      Sound._playingSounds.set(id, playingSound);
+
+      return playingSound;
+    } else {
+      // Do not actually put sounds into queue.
+      // Otherwise all queued sounds will start playing once the audio context is started.
+      let isPlaying = true;
+      const stop = () => {
+        isPlaying = false;
+      }
+      setTimeout(stop, this._howl.duration());
+      return { isPlaying: () => isPlaying, stop };
     }
-
-    const playingSound = { isPlaying, stop };
-    Sound._playingSounds.set(id, playingSound);
-
-    return playingSound;
   }
 
   static stop() {
@@ -51,10 +62,14 @@ class Sound {
     resources = typeof resources === 'string' ? [resources] : resources;
     return await Sound._loader.load(resources);
   }
+
+  static _init() {
+    Sound._loader = new Loader(preloadSound);
+    Sound._playingSounds = new Map();
+  }
 }
 
-Sound._loader = new Loader(preloadSound);
-Sound._playingSounds = new Map();
+Sound._init();
 
 class Loop {
   constructor(loadedHowl) {
@@ -91,7 +106,7 @@ class MusicController {
   constructor() {
     this._loader = new Loader(preloadLoop);
     this._loops = {
-      0: new Loop(new Howl({ src: [SILENCE_DATA_URI], preload: true, loop: true })),
+      0: new Loop(new Howl({ src: audioResources.sounds.silence, preload: true, loop: true })),
     };
     this._currentLoopId = 0;
     this._counter = 0;
@@ -169,9 +184,13 @@ class Music {
     const id = await Music._controller.addLoop(resources);
     return new Music(id);
   }
+
+  static _init() {
+    Music._controller = new MusicController();
+  }
 }
 
-Music._controller = new MusicController();
+Music._init();
 
 async function preloadSound(resources) {
   const loadedHowl = await preloadHowl({ src: resources, loop: false });
@@ -225,9 +244,55 @@ export default class Jukebox {
   static getMusic(name) {
     return this._musics[name];
   }
-}
 
-Jukebox._sounds = {};
-Jukebox._musics = {};
+  static isMuted() {
+    return Jukebox._isMuted;
+  }
+
+  static mute(muted) {
+    Howler.mute(muted);
+    if (Jukebox._isMuted !== muted) {
+      Jukebox._isMuted = muted;
+      Jukebox._eventEmitter.emit(muted ? 'mute' : 'unmute');
+    }
+  }
+
+  static isUnlocked() {
+    return Jukebox._isAudioUnlocked;
+  }
+
+  static on(eventName, listener) {
+    Jukebox._eventEmitter.on(eventName, listener);
+  }
+
+  static off(eventName, listener) {
+    Jukebox._eventEmitter.off(eventName, listener);
+  }
+
+  static once(eventName, listener) {
+    Jukebox._eventEmitter.once(eventName, listener);
+  }
+
+  static _init() {
+    Jukebox._eventEmitter = new EventEmitter();
+
+    Jukebox._sounds = {};
+    Jukebox._musics = {};
+    Jukebox._isMuted = false;
+    Jukebox._isAudioUnlocked = false;
+
+    new Howl({
+      src: audioResources.sounds.silence,
+      autoplay: true,
+      preload: true,
+      onplay: () => {
+        Jukebox._isAudioUnlocked = true;
+        Jukebox._eventEmitter.emit('unlock');
+      },
+    });
+
+  }
+}
+Jukebox._init();
 
 export { Sound, Music, Jukebox };

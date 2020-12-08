@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Add music and sound effects
+- Add `audioButton` config option to show/hide button for toggling audio playback
+- Add `muteAudio` config option to set whether audio should be muted initially
+
 ## [1.4.0] - 2020-12-03
 
 ### Added

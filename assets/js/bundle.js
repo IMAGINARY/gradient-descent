@@ -7,6 +7,7 @@ Object.defineProperty(exports, "__esModule", {
 exports.musics = exports.sounds = void 0;
 var PREFIX = './assets/audio';
 var sounds = {
+  silence: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
   gameLogoAppears: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
   changeItem: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
   selectItem: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
@@ -35,9 +36,93 @@ exports.musics = musics;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
+exports["default"] = void 0;
+
+var _audio = _interopRequireDefault(require("./audio"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var AudioToggle = /*#__PURE__*/function () {
+  function AudioToggle() {
+    var _this = this;
+
+    _classCallCheck(this, AudioToggle);
+
+    this.audioButton = document.createElement('div');
+    this.audioButton.classList.add('audio-button');
+    this.muteIcon = document.createElement('i');
+    this.muteIcon.classList.add('fas', 'fa-sm', 'fa-volume-up');
+    this.audioButton.appendChild(this.muteIcon);
+    this.unmuteIcon = document.createElement('i');
+    this.unmuteIcon.classList.add('fas', 'fa-volume-mute');
+    this.audioButton.appendChild(this.unmuteIcon);
+    var listener = this.audioChangeHandler.bind(this);
+
+    _audio["default"].on('mute', listener);
+
+    _audio["default"].on('unmute', listener);
+
+    _audio["default"].on('unlock', listener);
+
+    this.audioChangeHandler();
+
+    this.audioButton.onpointerup = function () {
+      return _this.tryToggleAudio();
+    };
+
+    this.element = this.audioButton;
+  }
+
+  _createClass(AudioToggle, [{
+    key: "_isOn",
+    value: function _isOn() {
+      return !_audio["default"].isMuted() && _audio["default"].isUnlocked();
+    }
+  }, {
+    key: "audioChangeHandler",
+    value: function audioChangeHandler() {
+      var isOn = this._isOn();
+
+      this.muteIcon.style.display = !isOn ? 'none' : 'block';
+      this.unmuteIcon.style.display = isOn ? 'none' : 'block';
+    }
+  }, {
+    key: "tryToggleAudio",
+    value: function tryToggleAudio() {
+      _audio["default"].mute(this._isOn());
+    }
+  }]);
+
+  return AudioToggle;
+}();
+
+exports["default"] = AudioToggle;
+
+},{"./audio":3}],3:[function(require,module,exports){
+"use strict";
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
 exports.Music = exports.Sound = exports.Jukebox = exports["default"] = void 0;
 
+var _events = require("events");
+
 var _howler = require("howler");
+
+var audioResources = _interopRequireWildcard(require("./audio-resources"));
+
+function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
+
+function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
 
@@ -57,7 +142,6 @@ function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _d
 
 var SOUND_FADE_DURATION = 250;
 var MUSIC_FADE_DURATION = 500;
-var SILENCE_DATA_URI = 'data:audio/wav;base64,UklGRjIAAABXQVZFZm10IBIAAAABAAEAQB8AAEAfAAABAAgAAABmYWN0BAAAAAAAAABkYXRhAAAAAA==';
 
 var Loader = /*#__PURE__*/function () {
   function Loader(loadFunc) {
@@ -131,28 +215,46 @@ var Sound = /*#__PURE__*/function () {
     value: function play() {
       var _this2 = this;
 
-      var id = this._howl.play();
+      if (Jukebox.isUnlocked()) {
+        var id = this._howl.play();
 
-      var isPlaying = function isPlaying() {
-        return _this2._howl.playing(id);
-      };
+        var isPlaying = function isPlaying() {
+          return _this2._howl.playing(id);
+        };
 
-      var stop = function stop() {
-        if (isPlaying()) {
-          var v = _this2._howl.volume(id);
+        var stop = function stop() {
+          if (isPlaying()) {
+            var v = _this2._howl.volume(id);
 
-          _this2._howl.fade(v, 0.0, v * SOUND_FADE_DURATION, id);
-        }
-      };
+            _this2._howl.fade(v, 0.0, v * SOUND_FADE_DURATION, id);
+          }
+        };
 
-      var playingSound = {
-        isPlaying: isPlaying,
-        stop: stop
-      };
+        var playingSound = {
+          isPlaying: isPlaying,
+          stop: stop
+        };
 
-      Sound._playingSounds.set(id, playingSound);
+        Sound._playingSounds.set(id, playingSound);
 
-      return playingSound;
+        return playingSound;
+      } else {
+        // Do not actually put sounds into queue.
+        // Otherwise all queued sounds will start playing once the audio context is started.
+        var _isPlaying = true;
+
+        var _stop = function _stop() {
+          _isPlaying = false;
+        };
+
+        setTimeout(_stop, this._howl.duration());
+        return {
+          isPlaying: function isPlaying() {
+            return _isPlaying;
+          },
+          stop: _stop
+        };
+      }
     }
   }], [{
     key: "stop",
@@ -190,14 +292,20 @@ var Sound = /*#__PURE__*/function () {
 
       return create;
     }()
+  }, {
+    key: "_init",
+    value: function _init() {
+      Sound._loader = new Loader(preloadSound);
+      Sound._playingSounds = new Map();
+    }
   }]);
 
   return Sound;
 }();
 
 exports.Sound = Sound;
-Sound._loader = new Loader(preloadSound);
-Sound._playingSounds = new Map();
+
+Sound._init();
 
 var Loop = /*#__PURE__*/function () {
   function Loop(loadedHowl) {
@@ -255,7 +363,7 @@ var MusicController = /*#__PURE__*/function () {
     this._loader = new Loader(preloadLoop);
     this._loops = {
       0: new Loop(new _howler.Howl({
-        src: [SILENCE_DATA_URI],
+        src: audioResources.sounds.silence,
         preload: true,
         loop: true
       }))
@@ -405,13 +513,19 @@ var Music = /*#__PURE__*/function () {
 
       return create;
     }()
+  }, {
+    key: "_init",
+    value: function _init() {
+      Music._controller = new MusicController();
+    }
   }]);
 
   return Music;
 }();
 
 exports.Music = Music;
-Music._controller = new MusicController();
+
+Music._init();
 
 function preloadSound(_x5) {
   return _preloadSound.apply(this, arguments);
@@ -606,16 +720,71 @@ var Jukebox = /*#__PURE__*/function () {
     value: function getMusic(name) {
       return this._musics[name];
     }
+  }, {
+    key: "isMuted",
+    value: function isMuted() {
+      return Jukebox._isMuted;
+    }
+  }, {
+    key: "mute",
+    value: function mute(muted) {
+      _howler.Howler.mute(muted);
+
+      if (Jukebox._isMuted !== muted) {
+        Jukebox._isMuted = muted;
+
+        Jukebox._eventEmitter.emit(muted ? 'mute' : 'unmute');
+      }
+    }
+  }, {
+    key: "isUnlocked",
+    value: function isUnlocked() {
+      return Jukebox._isAudioUnlocked;
+    }
+  }, {
+    key: "on",
+    value: function on(eventName, listener) {
+      Jukebox._eventEmitter.on(eventName, listener);
+    }
+  }, {
+    key: "off",
+    value: function off(eventName, listener) {
+      Jukebox._eventEmitter.off(eventName, listener);
+    }
+  }, {
+    key: "once",
+    value: function once(eventName, listener) {
+      Jukebox._eventEmitter.once(eventName, listener);
+    }
+  }, {
+    key: "_init",
+    value: function _init() {
+      Jukebox._eventEmitter = new _events.EventEmitter();
+      Jukebox._sounds = {};
+      Jukebox._musics = {};
+      Jukebox._isMuted = false;
+      Jukebox._isAudioUnlocked = false;
+      new _howler.Howl({
+        src: audioResources.sounds.silence,
+        autoplay: true,
+        preload: true,
+        onplay: function onplay() {
+          Jukebox._isAudioUnlocked = true;
+
+          Jukebox._eventEmitter.emit('unlock');
+        }
+      });
+    }
   }]);
 
   return Jukebox;
 }();
 
 exports.Jukebox = exports["default"] = Jukebox;
-Jukebox._sounds = {};
-Jukebox._musics = {};
 
-},{"howler":30}],3:[function(require,module,exports){
+Jukebox._init();
+
+},{"./audio-resources":1,"events":30,"howler":31}],4:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -786,7 +955,7 @@ var BotStrategyBase = /*#__PURE__*/function () {
 
 exports["default"] = BotStrategyBase;
 
-},{}],4:[function(require,module,exports){
+},{}],5:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1005,7 +1174,7 @@ var GradientDescentArmijo = /*#__PURE__*/function () {
   return GradientDescentArmijo;
 }();
 
-},{"./base":3}],5:[function(require,module,exports){
+},{"./base":4}],6:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1072,7 +1241,7 @@ var BotStrategyRandom = /*#__PURE__*/function (_BotStrategyBase) {
 
 exports["default"] = BotStrategyRandom;
 
-},{"./base":3}],6:[function(require,module,exports){
+},{"./base":4}],7:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1253,7 +1422,7 @@ function intersectLines(l1, l2) {
   };
 }
 
-},{"./base":3}],7:[function(require,module,exports){
+},{"./base":4}],8:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1340,7 +1509,7 @@ var Controls = /*#__PURE__*/function () {
 
 exports["default"] = Controls;
 
-},{}],8:[function(require,module,exports){
+},{}],9:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1454,7 +1623,7 @@ var GamepadControls = /*#__PURE__*/function (_Controls) {
 
 exports["default"] = GamepadControls;
 
-},{"./controls":7}],9:[function(require,module,exports){
+},{"./controls":8}],10:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1564,7 +1733,7 @@ var KeyboardControls = /*#__PURE__*/function (_Controls) {
 
 exports["default"] = KeyboardControls;
 
-},{"./controls":7}],10:[function(require,module,exports){
+},{"./controls":8}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1718,7 +1887,7 @@ var ScreenControls = /*#__PURE__*/function (_Controls) {
 
 exports["default"] = ScreenControls;
 
-},{"./controls":7}],11:[function(require,module,exports){
+},{"./controls":8}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1788,7 +1957,7 @@ var FullScreenToggle = /*#__PURE__*/function () {
 
 exports["default"] = FullScreenToggle;
 
-},{}],12:[function(require,module,exports){
+},{}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1873,7 +2042,7 @@ var BotTypeMode = /*#__PURE__*/function (_MenuMode) {
 
 exports["default"] = BotTypeMode;
 
-},{"./game-mode-menu":13}],13:[function(require,module,exports){
+},{"./game-mode-menu":14}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2065,7 +2234,7 @@ var MenuMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = MenuMode;
 
-},{"./game-mode":17}],14:[function(require,module,exports){
+},{"./game-mode":18}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2151,7 +2320,7 @@ var PlayerNumberMode = /*#__PURE__*/function (_MenuMode) {
 
 exports["default"] = PlayerNumberMode;
 
-},{"./game-mode-menu":13}],15:[function(require,module,exports){
+},{"./game-mode-menu":14}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3210,7 +3379,7 @@ function pad(num, places, _char) {
   return String(num).padStart(places, _char);
 }
 
-},{"./bot-strategies/base":3,"./bot-strategies/gradient-descent":4,"./bot-strategies/random":5,"./bot-strategies/tangent-intersection":6,"./game-mode":17,"./terrain":20,"./waves":21,"@popperjs/core":23,"events":29}],16:[function(require,module,exports){
+},{"./bot-strategies/base":4,"./bot-strategies/gradient-descent":5,"./bot-strategies/random":6,"./bot-strategies/tangent-intersection":7,"./game-mode":18,"./terrain":21,"./waves":22,"@popperjs/core":24,"events":30}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3400,7 +3569,7 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = TitleMode;
 
-},{"./audio":2,"./game-mode":17,"./wavy-animation":22}],17:[function(require,module,exports){
+},{"./audio":3,"./game-mode":18,"./wavy-animation":23}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3580,7 +3749,7 @@ var GameMode = /*#__PURE__*/function () {
 
 exports["default"] = GameMode;
 
-},{"events":29}],18:[function(require,module,exports){
+},{"events":30}],19:[function(require,module,exports){
 "use strict";
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
@@ -3603,6 +3772,8 @@ var _gamepad = _interopRequireDefault(require("./controls/gamepad"));
 var _screen = _interopRequireDefault(require("./controls/screen"));
 
 var _keyboard = _interopRequireDefault(require("./controls/keyboard"));
+
+var _audioToggle = _interopRequireDefault(require("./audio-toggle"));
 
 var _fullScreenToggle = _interopRequireDefault(require("./full-screen-toggle"));
 
@@ -3718,6 +3889,13 @@ var GradientDescentGame = /*#__PURE__*/function () {
                   this.controls.gamepad = new _gamepad["default"](this.config.maxPlayers);
                 }
 
+                if (this.config.audioButton) {
+                  this.audioToggle = new _audioToggle["default"]();
+                  minAspectRatioContainer.appendChild(this.audioToggle.element);
+                }
+
+                _audio["default"].mute(this.config.muteAudio);
+
                 if (this.config.fullScreenButton) {
                   this.fullScreenToggle = new _fullScreenToggle["default"]();
                   minAspectRatioContainer.appendChild(this.fullScreenToggle.element);
@@ -3734,7 +3912,7 @@ var GradientDescentGame = /*#__PURE__*/function () {
                   minAspectRatioContainer.appendChild(this.debugControlsPane);
                 }
 
-                _context.prev = 18;
+                _context.prev = 20;
                 soundPromises = Object.entries(audioResources.sounds).map(function (_ref) {
                   var _ref2 = _slicedToArray(_ref, 2),
                       id = _ref2[0],
@@ -3749,50 +3927,50 @@ var GradientDescentGame = /*#__PURE__*/function () {
 
                   return _this.jukebox.registerMusic(id, res);
                 });
-                _context.next = 23;
+                _context.next = 25;
                 return Promise.all([].concat(_toConsumableArray(soundPromises), _toConsumableArray(musicPromises)));
 
-              case 23:
-                _context.next = 29;
+              case 25:
+                _context.next = 31;
                 break;
 
-              case 25:
-                _context.prev = 25;
-                _context.t0 = _context["catch"](18);
+              case 27:
+                _context.prev = 27;
+                _context.t0 = _context["catch"](20);
                 console.err('Unable to load game audio.', _context.t0);
                 throw _context.t0;
 
-              case 29:
-                _context.next = 31;
-                return this.registerMode('title', new _gameModeTitle["default"](this));
-
               case 31:
                 _context.next = 33;
-                return this.registerMode('bottype', new _gameModeBottype["default"](this));
+                return this.registerMode('title', new _gameModeTitle["default"](this));
 
               case 33:
                 _context.next = 35;
-                return this.registerMode('numplayers', new _gameModeNumplayers["default"](this));
+                return this.registerMode('bottype', new _gameModeBottype["default"](this));
 
               case 35:
                 _context.next = 37;
-                return this.registerMode('play', new _gameModePlay["default"](this));
+                return this.registerMode('numplayers', new _gameModeNumplayers["default"](this));
 
               case 37:
+                _context.next = 39;
+                return this.registerMode('play', new _gameModePlay["default"](this));
+
+              case 39:
                 if (!this.config.continuousGame) {
-                  _context.next = 43;
+                  _context.next = 45;
                   break;
                 }
 
                 this.transition('play', 'done', 'play');
-                _context.next = 41;
+                _context.next = 43;
                 return this.setMode('play');
 
-              case 41:
-                _context.next = 53;
+              case 43:
+                _context.next = 55;
                 break;
 
-              case 43:
+              case 45:
                 showBotType = this.config.botType === null;
                 showNumPlayers = this.config.maxPlayers > 1;
                 afterNumPlayers = showBotType ? 'bottype' : 'play';
@@ -3801,15 +3979,15 @@ var GradientDescentGame = /*#__PURE__*/function () {
                 this.transition('numplayers', 'done', afterNumPlayers);
                 this.transition('bottype', 'done', 'play');
                 this.transition('play', 'done', 'title');
-                _context.next = 53;
+                _context.next = 55;
                 return this.setMode('title');
 
-              case 53:
+              case 55:
               case "end":
                 return _context.stop();
             }
           }
-        }, _callee, this, [[18, 25]]);
+        }, _callee, this, [[20, 27]]);
       }));
 
       function init() {
@@ -4196,7 +4374,7 @@ var GradientDescentGame = /*#__PURE__*/function () {
 
 exports["default"] = GradientDescentGame;
 
-},{"./audio":2,"./audio-resources":1,"./controls/gamepad":8,"./controls/keyboard":9,"./controls/screen":10,"./full-screen-toggle":11,"./game-mode-bottype":12,"./game-mode-numplayers":14,"./game-mode-play":15,"./game-mode-title":16,"@wessberg/pointer-events":24}],19:[function(require,module,exports){
+},{"./audio":3,"./audio-resources":1,"./audio-toggle":2,"./controls/gamepad":9,"./controls/keyboard":10,"./controls/screen":11,"./full-screen-toggle":12,"./game-mode-bottype":13,"./game-mode-numplayers":15,"./game-mode-play":16,"./game-mode-title":17,"@wessberg/pointer-events":25}],20:[function(require,module,exports){
 "use strict";
 
 var _game = _interopRequireDefault(require("./game"));
@@ -4221,6 +4399,8 @@ var defaultConfig = {
   showSeaFloor: false,
   maxDepthTilt: 4,
   fullScreenButton: true,
+  audioButton: true,
+  muteAudio: false,
   debugControls: false,
   map: null
 };
@@ -4381,7 +4561,7 @@ function getCustomConfigUrl() {
   return main;
 })()();
 
-},{"./game":18}],20:[function(require,module,exports){
+},{"./game":19}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4541,7 +4721,7 @@ function terrain(numSamples, length) {
   });
 }
 
-},{"assert":25}],21:[function(require,module,exports){
+},{"assert":26}],22:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4612,7 +4792,7 @@ function animatedSVGPolyline(svgContainer, numPoints, numSteps, xScale, yScale, 
   return waves;
 }
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4701,7 +4881,7 @@ function WavyAnimation(shape) {
   };
 }
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 (function (process){(function (){
 /**
  * @popperjs/core v2.5.4 - MIT License
@@ -6572,7 +6752,7 @@ exports.preventOverflow = preventOverflow$1;
 
 }).call(this)}).call(this,require('_process'))
 
-},{"_process":32}],24:[function(require,module,exports){
+},{"_process":33}],25:[function(require,module,exports){
 (function () {
 	'use strict';
 
@@ -8429,7 +8609,7 @@ exports.preventOverflow = preventOverflow$1;
 }());
 
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 (function (global){(function (){
 'use strict';
 
@@ -8940,7 +9120,7 @@ var objectKeys = Object.keys || function (obj) {
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"object-assign":31,"util/":28}],26:[function(require,module,exports){
+},{"object-assign":32,"util/":29}],27:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -8965,14 +9145,14 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 (function (process,global){(function (){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -9563,7 +9743,7 @@ function hasOwnProperty(obj, prop) {
 
 }).call(this)}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./support/isBuffer":27,"_process":32,"inherits":26}],29:[function(require,module,exports){
+},{"./support/isBuffer":28,"_process":33,"inherits":27}],30:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -10088,7 +10268,7 @@ function functionBindPolyfill(context) {
   };
 }
 
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 (function (global){(function (){
 /*!
  *  howler.js v2.2.1
@@ -13318,7 +13498,7 @@ function functionBindPolyfill(context) {
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 /*
 object-assign
 (c) Sindre Sorhus
@@ -13410,7 +13590,7 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 	return to;
 };
 
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -13596,5 +13776,5 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[19])
+},{}]},{},[20])
 
