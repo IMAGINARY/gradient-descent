@@ -136,6 +136,13 @@ Note that `gulp html` needs to be run after `gulp styles`, `gulp scripts` and `g
 since the html files need to be updated in order to point to the updated build artifacts.
 `gulp build` will run all task in order and take care of `html`.
 
+### Serving and automatic reloading
+
+```
+cd src
+npx reload -d .. -w ../index.html -p [free port]
+```
+
 ## Credits
 
 Developed by Christian Stussak and Eric Londaits for IMAGINARY gGmbH.
