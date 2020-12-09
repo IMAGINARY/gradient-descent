@@ -11,37 +11,55 @@ const rename = require('gulp-rename');
 const touch = require('gulp-touch-fd');
 const rev = require('gulp-rev');
 const del = require('del');
+
 const pugHelper = require('./helpers/pug-helper');
 const pugData = require('./pug/data.js');
 
 const OUTPUT_DIR = '..';
-const REV_MANIFEST = './pug/rev-manifest.json';
 
 const paths = {
   html: {
-    src: ['./pug/**/*.pug', '!./pug/include/**/*.pug', '!./pug/tpl/**/*.pug', '!./pug/sections/**/*.pug'],
-    watchSrc: ['./pug/**/*.pug', REV_MANIFEST],
+    src: ['./pug/**/*.pug', '!./pug/include/**/*.pug', '!./pug/tpl/**/*.pug',
+          '!./pug/sections/**/*.pug'],
+    watchSrc: [
+      './pug/**/*.pug',
+      pugData.revManifestPath('styles'),
+      pugData.revManifestPath('scripts'),
+      pugData.revManifestPath('dependencies'),
+    ],
     dest: `${OUTPUT_DIR}`,
   },
   styles: {
     src: './sass/**/*.scss',
     watchSrc: './sass/**/*.scss',
     dest: `${OUTPUT_DIR}/assets/css`,
-    clean: [`${OUTPUT_DIR}/assets/css/default-??????????.css`, `${OUTPUT_DIR}/assets/css/default-??????????.css.map`],
+    revManifest: pugData.revManifestPath('styles'),
+    clean: [
+      `${OUTPUT_DIR}/assets/css/default-??????????.css`,
+      `${OUTPUT_DIR}/assets/css/default-??????????.css.map`
+    ],
   },
   scripts: {
     src: './js/main.js',
     watchSrc: ['./js/**/*.js', '!./js/dependencies.js'],
     dest: `${OUTPUT_DIR}/assets/js`,
+    revManifest: pugData.revManifestPath('scripts'),
     filename: 'bundle',
-    clean: [`${OUTPUT_DIR}/assets/js/bundle-??????????.min.js`, `${OUTPUT_DIR}/assets/js/bundle-??????????.min.js.map`],
+    clean: [
+      `${OUTPUT_DIR}/assets/js/bundle-??????????.min.js`,
+      `${OUTPUT_DIR}/assets/js/bundle-??????????.min.js.map`
+    ],
   },
   dependencies: {
     src: './js/dependencies.js',
     watchSrc: './js/dependencies.js',
     dest: `${OUTPUT_DIR}/assets/js`,
+    revManifest: pugData.revManifestPath('dependencies'),
     filename: 'dependencies',
-    clean: [`${OUTPUT_DIR}/assets/js/dependencies-??????????.min.js`, `${OUTPUT_DIR}/assets/js/dependencies-??????????.min.js.map`],
+    clean: [
+      `${OUTPUT_DIR}/assets/js/dependencies-??????????.min.js`,
+      `${OUTPUT_DIR}/assets/js/dependencies-??????????.min.js.map`
+    ],
   },
 };
 
@@ -52,12 +70,8 @@ function html() {
       pretty: true,
       data: Object.assign({}, pugData),
     }))
-    .pipe(rename({
-      extname: '.html',
-    }))
-    .pipe(
-      gulp.dest(paths.html.dest)
-    )
+    .pipe(rename({ extname: '.html' }))
+    .pipe(gulp.dest(paths.html.dest))
     .pipe(touch());
 }
 
@@ -83,14 +97,15 @@ function styles() {
     .pipe(rev())
     .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest(paths.styles.dest))
-    .pipe(rev.manifest(REV_MANIFEST, { merge: true }))
+    .pipe(rev.manifest(paths.styles.revManifest))
     .pipe(gulp.dest('.'));
 }
 
-function es(entrypoint, outputName) {
+function es({ src, dest, revManifest, filename, clean }) {
+  safeClean(clean);
   return browserify({
     extensions: ['.js', '.jsx'],
-    entries: entrypoint,
+    entries: src,
     debug: true,
   })
     .transform('babelify', { presets: ['@babel/env'], sourceMaps: true })
@@ -99,27 +114,25 @@ function es(entrypoint, outputName) {
       console.error(msg);
     })
     .bundle()
-    .pipe(source(`${outputName}.js`))
+    .pipe(source(`${filename}.js`))
     .pipe(buffer())
     .pipe(sourcemaps.init({ loadMaps: true }))
     .pipe(gulp.dest(paths.scripts.dest))
     .pipe(uglify())
-    .pipe(rename(`${outputName}.min.js`))
+    .pipe(rename(`${filename}.min.js`))
     .pipe(rev())
     .pipe(sourcemaps.write('.'))
-    .pipe(gulp.dest(paths.scripts.dest))
-    .pipe(rev.manifest(REV_MANIFEST, { merge: true }))
+    .pipe(gulp.dest(dest))
+    .pipe(rev.manifest(revManifest))
     .pipe(gulp.dest('.'));
 }
 
 function dependencies() {
-  safeClean(paths.dependencies.clean);
-  return es(paths.dependencies.src, paths.dependencies.filename);
+  return es(paths['dependencies']);
 }
 
 function scripts() {
-  safeClean(paths.scripts.clean);
-  return es(paths.scripts.src, paths.scripts.filename);
+  return es(paths['scripts']);
 }
 
 function watch() {
@@ -129,7 +142,7 @@ function watch() {
   gulp.watch(paths.dependencies.watchSrc, dependencies);
 }
 
-const build = gulp.parallel(html, styles, scripts, dependencies);
+const build = gulp.series(gulp.parallel(styles, scripts, dependencies), html);
 
 exports.html = html;
 exports.styles = styles;

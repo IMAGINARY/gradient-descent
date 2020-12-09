@@ -89,23 +89,28 @@ To make any modifications re-compilation is necessary. You should install:
 - **yarn**
 - **gulp** (install globally)
 
-Afterwards run the following in the command line:
+Afterwards run the following in the command line to install dependencies:
 
 ```
 cd src
 yarn
 ```
 
-After it runs succesfuly you can compile as needed:
+After the dependencies have been installed successfully, you can compile as needed:
 
 - **sass (stylesheets)**
     ```
     gulp styles
     ```
-  
+
 - **scripts (ES6)**
     ```
     gulp scripts
+    ```
+
+- **dependencies (ES6)**
+    ```
+    gulp dependencies
     ```
 
 - **pug (HTML pages)**
@@ -117,6 +122,19 @@ After it runs succesfuly you can compile as needed:
     ```
     yarn run build
     ```
+  respectively
+    ```
+    gulp build
+    ```
+
+- **watch for changes and recompile as needed**
+    ```
+    gulp build
+    ```
+
+Note that `gulp html` needs to be run after `gulp styles`, `gulp scripts` and `gulp dependencies`
+since the html files need to be updated in order to point to the updated build artifacts.
+`gulp build` will run all task in order and take care of `html`.
 
 ## Credits
 

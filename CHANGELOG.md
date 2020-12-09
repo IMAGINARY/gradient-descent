@@ -7,12 +7,19 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ## [Unreleased]
 
 ### Changed
+
 - Move water surface and sea floor towards the bottom of the screen
+
+### Fixed
+
+- Parallelism in `gulp build` and `gulp watch`
 
 ## [1.4.0] - 2020-12-03
 
 ### Added
-- Add `botTypeLabels` config option for switching between different sets of labels (`difficulty`, `strategy`) in the bot type menu
+
+- Add `botTypeLabels` config option for switching between different sets of labels
+  (`difficulty`, `strategy`) in the bot type menu
 
 ## [1.3.0] - 2020-11-24
 
