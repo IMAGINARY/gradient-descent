@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [1.4.1]
+
+### Added
+
+- `reload` package for auto-reloading during development
+
 ### Changed
 
 - Move water surface and sea floor towards the bottom of the screen
@@ -40,7 +46,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- Set `maxDepthTilt` config option to tilt the sea floor generation towards shallow [0,1) or deep (1,∞) 
+- Set `maxDepthTilt` config option to tilt the sea floor generation towards shallow [0,1) or deep (
+  1,∞)
 - This change log
 
 ### Fixed
@@ -57,7 +64,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- Add `random`, `gradient-descent` and `tangent-intersection` bots 
+- Add `random`, `gradient-descent` and `tangent-intersection` bots
 - Let first player also probe via <kbd>SPACE</kbd>
 - Add `showSeaFloor` config option
 - Add `game.showSeaFloor(animate)` method
@@ -75,11 +82,20 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Initial game
 
-[unreleased]: https://github.com/IMAGINARY/gradient-descent/compare/v1.4.0...HEAD
+[unreleased]: https://github.com/IMAGINARY/gradient-descent/compare/v1.4.1...HEAD
+
+[1.4.1]: https://github.com/IMAGINARY/gradient-descent/compare/v1.4.1...v1.4.0
+
 [1.4.0]: https://github.com/IMAGINARY/gradient-descent/compare/v1.4.0...v1.3.0
+
 [1.3.0]: https://github.com/IMAGINARY/gradient-descent/compare/v1.3.0...v1.2.1
+
 [1.2.1]: https://github.com/IMAGINARY/gradient-descent/compare/v1.2.1...v1.2.0
+
 [1.2.0]: https://github.com/IMAGINARY/gradient-descent/compare/v1.2.0...v1.1.1
+
 [1.1.1]: https://github.com/IMAGINARY/gradient-descent/compare/v1.1.1...v1.1.0
+
 [1.1.0]: https://github.com/IMAGINARY/gradient-descent/compare/v1.1.0...v1.0.0
+
 [1.0.0]: https://github.com/IMAGINARY/gradient-descent/tree/v1.0.0
