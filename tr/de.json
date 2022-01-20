@@ -8,7 +8,7 @@
   },
   "bot-types": {
     "difficulty": {
-      "none": "None",
+      "none": "Ohne",
       "random": "Leicht",
       "gradient-descent": "Mittel",
       "tangent-intersection": "Schwer"
