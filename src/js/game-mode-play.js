@@ -38,6 +38,10 @@ const TANGENT_OPACITY_FADEOUT_DURATION = 500;
 
 const TREASURE_SIZE = 0.03;
 
+const START_SEQUENCE_FST_DELAY = 500;
+const START_SEQUENCE_AFTER_FST_DELAY = 2000;
+const START_SEQUENCE_AFTER_SND_DELAY = 1000;
+
 const UNCOVER_DURATION = 2000;
 const ENDING_SEQUENCE_FST_DELAY = 0;
 const ENDING_SEQUENCE_SND_DELAY = 1000;
@@ -284,6 +288,13 @@ export default class PlayMode extends GameMode {
 
     this.tangentGroup = modeGroup.group()
       .translate(0, TERRAIN_DISTANCE);
+
+    this.discardInputs = true;
+    this.showGameStartSequence(
+        IMAGINARY.i18n.t('objective'),
+        IMAGINARY.i18n.t('go'),
+        () => this.discardInputs = false
+    );
   }
 
   async handleExitMode() {
@@ -337,11 +348,7 @@ export default class PlayMode extends GameMode {
     // Update remaining time
     const newRemainingTime = Math.max(0, this.remainingTime - delta);
     if (this.remainingTime !== newRemainingTime) {
-      const padRemainingTime = num => pad(num, String(this.game.config.maxTime).length, ' ');
       this.remainingTime = newRemainingTime;
-      this.$remainingTime.text(padRemainingTime(Math.ceil(this.remainingTime / 1000.0)));
-      if (this.remainingTime === 0)
-        this.$remainingTime.addClass("blinking");
     }
 
     // Check whether the game is lost
@@ -410,6 +417,14 @@ export default class PlayMode extends GameMode {
     // Move boats
     // Draw bottom
     // etc...
+
+    const padRemainingTime = num => pad(num, String(this.game.config.maxTime).length, ' ');
+    const remainingTimeText = padRemainingTime(Math.ceil(this.remainingTime / 1000.0));
+    if(remainingTimeText !== this.$remainingTime.text()) {
+      this.$remainingTime.text(remainingTimeText);
+    }
+    if (this.remainingTime === 0)
+      this.$remainingTime.addClass("blinking");
 
     // The water animation uses SVG animations (via SMIL), so we have to use it's timestamp for
     // animating the boat's rotation and vertical position.
@@ -519,6 +534,53 @@ export default class PlayMode extends GameMode {
     }
   }
 
+  async showGameStartSequence(firstMessage,
+                             secondMessage,
+                             secondMessageCallback = Function.prototype,
+                             cssClasses = []) {
+    const { draw } = this.game;
+
+    const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+    const $firstMessageDiv = $('<div>').text(firstMessage);
+    const $secondMessageDiv = $('<div>').text(secondMessage)
+        .css('visibility', 'hidden');
+
+    const $startSequenceDiv = $('<div class="announcement-sequences-text" />')
+        .addClass(cssClasses)
+        .append([$firstMessageDiv, $('<br>'), $secondMessageDiv]);
+
+    const top = 100 * (WATER_DISTANCE + TERRAIN_DISTANCE) / draw.height();
+    const $announcementAnchor = $('<div class="announcement-sequences-text-anchor" />')
+        .css({
+          left: `50%`,
+          top: `${top}%`,
+          width: "0px",
+          height: "0px",
+        });
+
+    await delay(START_SEQUENCE_FST_DELAY);
+    this.$endingSequenceContainer.empty().append([$announcementAnchor, $startSequenceDiv]);
+
+    // popper.js places the ending sequence text in a popup-like fashion above the announcement
+    // anchor and makes sure that is does not move off the screen if the anchor is to close to a
+    // screen edge.
+    createPopper(
+        $announcementAnchor.get(0),
+        $startSequenceDiv.get(0),
+        {
+          placement: 'top',
+        });
+
+    await delay(START_SEQUENCE_AFTER_FST_DELAY);
+
+    $secondMessageDiv.css("visibility", "visible");
+    secondMessageCallback();
+
+    await delay(START_SEQUENCE_AFTER_SND_DELAY);
+    this.$endingSequenceContainer.empty()
+  }
+
   async showWinSequence(winner) {
     const winAnnouncement = IMAGINARY.i18n.t('win-announcement-begin')
       + (winner.id + 1)
@@ -569,13 +631,13 @@ export default class PlayMode extends GameMode {
     const $restartDiv = $('<div class="blinking">').text(restartMessage)
       .css('visibility', 'hidden');
 
-    const $endingSequenceDiv = $('<div class="ending-sequences-text" />')
+    const $endingSequenceDiv = $('<div class="announcement-sequences-text" />')
       .addClass(cssClasses)
       .append([$firstMessageDiv, $secondMessageDiv, $('<br>'), $restartDiv]);
 
     const left = 100 * this.treasureLocation.x;
     const top = 100 * (WATER_DISTANCE + TERRAIN_DISTANCE) / draw.height();
-    const $announcementAnchor = $('<div class="ending-sequences-text-anchor" />')
+    const $announcementAnchor = $('<div class="announcement-sequences-text-anchor" />')
       .css({
         left: `${left}%`,
         top: `${top}%`,

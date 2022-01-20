@@ -56,13 +56,13 @@ $player-colors: $color-player-0, $color-player-1, $color-player-2, $color-player
 }
 
 .overlay {
-  .ending-sequences-text {
+  .announcement-sequences-text {
     text-align: center;
     text-transform: uppercase;
     padding-bottom: 0.25ex;
   }
 
-  .ending-sequences-text-anchor {
+  .announcement-sequences-text-anchor {
     position: absolute;
   }
 

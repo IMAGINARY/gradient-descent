@@ -1615,6 +1615,9 @@ var TANGENT_MIN_OPACITY = 0.25;
 var TANGENT_OPACITY_FADEOUT_FACTOR = 0.9;
 var TANGENT_OPACITY_FADEOUT_DURATION = 500;
 var TREASURE_SIZE = 0.03;
+var START_SEQUENCE_FST_DELAY = 500;
+var START_SEQUENCE_AFTER_FST_DELAY = 2000;
+var START_SEQUENCE_AFTER_SND_DELAY = 1000;
 var UNCOVER_DURATION = 2000;
 var ENDING_SEQUENCE_FST_DELAY = 0;
 var ENDING_SEQUENCE_SND_DELAY = 1000;
@@ -1908,8 +1911,12 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 if (config.showSeaFloor) groundCover.hide();
                 this.groundGroup.back();
                 this.tangentGroup = modeGroup.group().translate(0, TERRAIN_DISTANCE);
+                this.discardInputs = true;
+                this.showGameStartSequence(IMAGINARY.i18n.t('objective'), IMAGINARY.i18n.t('go'), function () {
+                  return _this2.discardInputs = false;
+                });
 
-              case 41:
+              case 43:
               case "end":
                 return _context3.stop();
             }
@@ -1978,13 +1985,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       var newRemainingTime = Math.max(0, this.remainingTime - delta);
 
       if (this.remainingTime !== newRemainingTime) {
-        var padRemainingTime = function padRemainingTime(num) {
-          return pad(num, String(_this5.game.config.maxTime).length, ' ');
-        };
-
         this.remainingTime = newRemainingTime;
-        this.$remainingTime.text(padRemainingTime(Math.ceil(this.remainingTime / 1000.0)));
-        if (this.remainingTime === 0) this.$remainingTime.addClass("blinking");
       } // Check whether the game is lost
 
 
@@ -2116,12 +2117,25 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
   }, {
     key: "draw",
     value: function draw(delta, ts) {
+      var _this6 = this;
+
       var _this$game3 = this.game,
           draw = _this$game3.draw,
           numPlayers = _this$game3.numPlayers; // Move boats
       // Draw bottom
       // etc...
-      // The water animation uses SVG animations (via SMIL), so we have to use it's timestamp for
+
+      var padRemainingTime = function padRemainingTime(num) {
+        return pad(num, String(_this6.game.config.maxTime).length, ' ');
+      };
+
+      var remainingTimeText = padRemainingTime(Math.ceil(this.remainingTime / 1000.0));
+
+      if (remainingTimeText !== this.$remainingTime.text()) {
+        this.$remainingTime.text(remainingTimeText);
+      }
+
+      if (this.remainingTime === 0) this.$remainingTime.addClass("blinking"); // The water animation uses SVG animations (via SMIL), so we have to use it's timestamp for
       // animating the boat's rotation and vertical position.
 
       var waterTs = draw.node.getCurrentTime() * 1000;
@@ -2308,15 +2322,90 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       return uncoverGround;
     }()
   }, {
-    key: "showWinSequence",
+    key: "showGameStartSequence",
     value: function () {
-      var _showWinSequence = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee11(winner) {
-        var _this6 = this;
-
-        var winAnnouncement, randomElement, treasure, openTreaureChest;
+      var _showGameStartSequence = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee11(firstMessage, secondMessage) {
+        var secondMessageCallback,
+            cssClasses,
+            draw,
+            delay,
+            $firstMessageDiv,
+            $secondMessageDiv,
+            $startSequenceDiv,
+            top,
+            $announcementAnchor,
+            _args11 = arguments;
         return regeneratorRuntime.wrap(function _callee11$(_context11) {
           while (1) {
             switch (_context11.prev = _context11.next) {
+              case 0:
+                secondMessageCallback = _args11.length > 2 && _args11[2] !== undefined ? _args11[2] : Function.prototype;
+                cssClasses = _args11.length > 3 && _args11[3] !== undefined ? _args11[3] : [];
+                draw = this.game.draw;
+
+                delay = function delay(ms) {
+                  return new Promise(function (resolve) {
+                    return setTimeout(resolve, ms);
+                  });
+                };
+
+                $firstMessageDiv = $('<div>').text(firstMessage);
+                $secondMessageDiv = $('<div>').text(secondMessage).css('visibility', 'hidden');
+                $startSequenceDiv = $('<div class="announcement-sequences-text" />').addClass(cssClasses).append([$firstMessageDiv, $('<br>'), $secondMessageDiv]);
+                top = 100 * (WATER_DISTANCE + TERRAIN_DISTANCE) / draw.height();
+                $announcementAnchor = $('<div class="announcement-sequences-text-anchor" />').css({
+                  left: "50%",
+                  top: "".concat(top, "%"),
+                  width: "0px",
+                  height: "0px"
+                });
+                _context11.next = 11;
+                return delay(START_SEQUENCE_FST_DELAY);
+
+              case 11:
+                this.$endingSequenceContainer.empty().append([$announcementAnchor, $startSequenceDiv]); // popper.js places the ending sequence text in a popup-like fashion above the announcement
+                // anchor and makes sure that is does not move off the screen if the anchor is to close to a
+                // screen edge.
+
+                (0, _core.createPopper)($announcementAnchor.get(0), $startSequenceDiv.get(0), {
+                  placement: 'top'
+                });
+                _context11.next = 15;
+                return delay(START_SEQUENCE_AFTER_FST_DELAY);
+
+              case 15:
+                $secondMessageDiv.css("visibility", "visible");
+                secondMessageCallback();
+                _context11.next = 19;
+                return delay(START_SEQUENCE_AFTER_SND_DELAY);
+
+              case 19:
+                this.$endingSequenceContainer.empty();
+
+              case 20:
+              case "end":
+                return _context11.stop();
+            }
+          }
+        }, _callee11, this);
+      }));
+
+      function showGameStartSequence(_x2, _x3) {
+        return _showGameStartSequence.apply(this, arguments);
+      }
+
+      return showGameStartSequence;
+    }()
+  }, {
+    key: "showWinSequence",
+    value: function () {
+      var _showWinSequence = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee12(winner) {
+        var _this7 = this;
+
+        var winAnnouncement, randomElement, treasure, openTreaureChest;
+        return regeneratorRuntime.wrap(function _callee12$(_context12) {
+          while (1) {
+            switch (_context12.prev = _context12.next) {
               case 0:
                 winAnnouncement = IMAGINARY.i18n.t('win-announcement-begin') + (winner.id + 1) + IMAGINARY.i18n.t('win-announcement-end');
 
@@ -2327,23 +2416,23 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 treasure = randomElement(IMAGINARY.i18n.t('treasures'));
 
                 openTreaureChest = function openTreaureChest() {
-                  _this6.treasureOpened.show();
+                  _this7.treasureOpened.show();
 
-                  _this6.treasureClosed.hide();
+                  _this7.treasureClosed.hide();
                 };
 
-                _context11.next = 6;
+                _context12.next = 6;
                 return this.showGameOverSequence(winAnnouncement, treasure, openTreaureChest, [winner.cssClass]);
 
               case 6:
               case "end":
-                return _context11.stop();
+                return _context12.stop();
             }
           }
-        }, _callee11, this);
+        }, _callee12, this);
       }));
 
-      function showWinSequence(_x2) {
+      function showWinSequence(_x4) {
         return _showWinSequence.apply(this, arguments);
       }
 
@@ -2352,20 +2441,20 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
   }, {
     key: "showLoseSequenceTimeIsUp",
     value: function () {
-      var _showLoseSequenceTimeIsUp = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee12() {
-        return regeneratorRuntime.wrap(function _callee12$(_context12) {
+      var _showLoseSequenceTimeIsUp = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee13() {
+        return regeneratorRuntime.wrap(function _callee13$(_context13) {
           while (1) {
-            switch (_context12.prev = _context12.next) {
+            switch (_context13.prev = _context13.next) {
               case 0:
-                _context12.next = 2;
+                _context13.next = 2;
                 return this.showGameOverSequence(IMAGINARY.i18n.t('time-is-up'), IMAGINARY.i18n.t('game-over'));
 
               case 2:
               case "end":
-                return _context12.stop();
+                return _context13.stop();
             }
           }
-        }, _callee12, this);
+        }, _callee13, this);
       }));
 
       function showLoseSequenceTimeIsUp() {
@@ -2377,20 +2466,20 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
   }, {
     key: "showLoseSequenceNoProbesLeft",
     value: function () {
-      var _showLoseSequenceNoProbesLeft = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee13() {
-        return regeneratorRuntime.wrap(function _callee13$(_context13) {
+      var _showLoseSequenceNoProbesLeft = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee14() {
+        return regeneratorRuntime.wrap(function _callee14$(_context14) {
           while (1) {
-            switch (_context13.prev = _context13.next) {
+            switch (_context14.prev = _context14.next) {
               case 0:
-                _context13.next = 2;
+                _context14.next = 2;
                 return this.showGameOverSequence(IMAGINARY.i18n.t('no-probes-left'), IMAGINARY.i18n.t('game-over'));
 
               case 2:
               case "end":
-                return _context13.stop();
+                return _context14.stop();
             }
           }
-        }, _callee13, this);
+        }, _callee14, this);
       }));
 
       function showLoseSequenceNoProbesLeft() {
@@ -2402,7 +2491,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
   }, {
     key: "showGameOverSequence",
     value: function () {
-      var _showGameOverSequence = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee14(firstMessage, secondMessage) {
+      var _showGameOverSequence = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee15(firstMessage, secondMessage) {
         var secondMessageCallback,
             cssClasses,
             draw,
@@ -2415,13 +2504,13 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
             left,
             top,
             $announcementAnchor,
-            _args14 = arguments;
-        return regeneratorRuntime.wrap(function _callee14$(_context14) {
+            _args15 = arguments;
+        return regeneratorRuntime.wrap(function _callee15$(_context15) {
           while (1) {
-            switch (_context14.prev = _context14.next) {
+            switch (_context15.prev = _context15.next) {
               case 0:
-                secondMessageCallback = _args14.length > 2 && _args14[2] !== undefined ? _args14[2] : Function.prototype;
-                cssClasses = _args14.length > 3 && _args14[3] !== undefined ? _args14[3] : [];
+                secondMessageCallback = _args15.length > 2 && _args15[2] !== undefined ? _args15[2] : Function.prototype;
+                cssClasses = _args15.length > 3 && _args15[3] !== undefined ? _args15[3] : [];
                 draw = this.game.draw;
 
                 delay = function delay(ms) {
@@ -2434,16 +2523,16 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 $firstMessageDiv = $('<div>').text(firstMessage);
                 $secondMessageDiv = $('<div>').text(secondMessage).css('visibility', 'hidden');
                 $restartDiv = $('<div class="blinking">').text(restartMessage).css('visibility', 'hidden');
-                $endingSequenceDiv = $('<div class="ending-sequences-text" />').addClass(cssClasses).append([$firstMessageDiv, $secondMessageDiv, $('<br>'), $restartDiv]);
+                $endingSequenceDiv = $('<div class="announcement-sequences-text" />').addClass(cssClasses).append([$firstMessageDiv, $secondMessageDiv, $('<br>'), $restartDiv]);
                 left = 100 * this.treasureLocation.x;
                 top = 100 * (WATER_DISTANCE + TERRAIN_DISTANCE) / draw.height();
-                $announcementAnchor = $('<div class="ending-sequences-text-anchor" />').css({
+                $announcementAnchor = $('<div class="announcement-sequences-text-anchor" />').css({
                   left: "".concat(left, "%"),
                   top: "".concat(top, "%"),
                   width: "0px",
                   height: "0px"
                 });
-                _context14.next = 14;
+                _context15.next = 14;
                 return delay(ENDING_SEQUENCE_FST_DELAY);
 
               case 14:
@@ -2454,13 +2543,13 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 (0, _core.createPopper)($announcementAnchor.get(0), $endingSequenceDiv.get(0), {
                   placement: 'top'
                 });
-                _context14.next = 18;
+                _context15.next = 18;
                 return delay(ENDING_SEQUENCE_SND_DELAY);
 
               case 18:
                 $secondMessageDiv.css("visibility", "visible");
                 secondMessageCallback();
-                _context14.next = 22;
+                _context15.next = 22;
                 return delay(ENDING_SEQUENCE_RESTART_DELAY);
 
               case 22:
@@ -2468,13 +2557,13 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
 
               case 23:
               case "end":
-                return _context14.stop();
+                return _context15.stop();
             }
           }
-        }, _callee14, this);
+        }, _callee15, this);
       }));
 
-      function showGameOverSequence(_x3, _x4) {
+      function showGameOverSequence(_x5, _x6) {
         return _showGameOverSequence.apply(this, arguments);
       }
 

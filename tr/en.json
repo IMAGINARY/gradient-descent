@@ -22,6 +22,8 @@
   },
   "remaining-time": "Time:",
   "remaining-probes": "Probes:",
+  "objective": "Find the treasure at the deepest point of the ocean!",
+  "go": "Go!",
   "win-announcement-begin": "Player ",
   "win-announcement-end": " found the treasure:",
   "time-is-up": "Time is up!",
