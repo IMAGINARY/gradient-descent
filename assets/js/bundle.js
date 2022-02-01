@@ -3643,7 +3643,7 @@ function getCustomConfigUrl() {
     return null;
   } else {
     var customConfigName = urlSearchParams.get('config');
-    var whitelistRegex = /^[A-Za-z0\-_.]+$/;
+    var whitelistRegex = /^[A-Za-z0-9\-_.]+$/;
 
     if (whitelistRegex.test(customConfigName)) {
       return new URL(customConfigName, window.location.href);

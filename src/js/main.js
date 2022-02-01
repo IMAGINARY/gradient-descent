@@ -61,7 +61,7 @@ function getCustomConfigUrl() {
     return null;
   } else {
     const customConfigName = urlSearchParams.get('config');
-    const whitelistRegex = /^[A-Za-z0\-_.]+$/;
+    const whitelistRegex = /^[A-Za-z0-9\-_.]+$/;
     if (whitelistRegex.test(customConfigName)) {
       return new URL(customConfigName, window.location.href);
     } else {
