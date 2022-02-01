@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [1.5.1]
+
+### Fixed
+
+- Loading of config files with digits in file name
+
+## [1.5.0]
+
+### Added
+
+- Game start sequence
+
 ## [1.4.1]
 
 ### Added
@@ -82,7 +94,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Initial game
 
-[unreleased]: https://github.com/IMAGINARY/gradient-descent/compare/v1.4.1...HEAD
+[unreleased]: https://github.com/IMAGINARY/gradient-descent/compare/v1.5.1...HEAD
+
+[1.5.1]: https://github.com/IMAGINARY/gradient-descent/compare/v1.5.1...v1.5.0
+
+[1.5.0]: https://github.com/IMAGINARY/gradient-descent/compare/v1.5.0...v1.4.1
 
 [1.4.1]: https://github.com/IMAGINARY/gradient-descent/compare/v1.4.1...v1.4.0
 
