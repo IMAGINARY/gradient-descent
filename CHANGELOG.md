@@ -6,6 +6,12 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [1.5.2]
+
+### Fixed
+
+- Location of the treasure being visible to the attentive player
+
 ## [1.5.1]
 
 ### Fixed
@@ -94,7 +100,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Initial game
 
-[unreleased]: https://github.com/IMAGINARY/gradient-descent/compare/v1.5.1...HEAD
+[unreleased]: https://github.com/IMAGINARY/gradient-descent/compare/v1.5.2...HEAD
+
+[1.5.2]: https://github.com/IMAGINARY/gradient-descent/compare/v1.5.2...v1.5.1
 
 [1.5.1]: https://github.com/IMAGINARY/gradient-descent/compare/v1.5.1...v1.5.0
 

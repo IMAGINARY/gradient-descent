@@ -47,8 +47,6 @@ $player-colors: $color-player-0, $color-player-1, $color-player-2, $color-player
 
 .ground-cover {
   @extend .cover;
-  stroke: $color-bg;
-  stroke-width: 10px;
 }
 
 .treasure {
