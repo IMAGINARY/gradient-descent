@@ -1,0 +1,40 @@
+{
+  "press-to-start": "Duw op een knop om te starten",
+  "press-to-restart": "Duw op een knop om opnieuw te beginnen",
+  "choose-num-players": "Kies het aantal spelers",
+  "choose-bot-type": {
+    "difficulty": "Kies de moeilijkheidsgraad van de computer",
+    "strategy": "Kies de strategie van de computer"
+  },
+  "bot-types": {
+    "difficulty": {
+      "none": "Geen",
+      "random": "Makkelijk",
+      "gradient-descent": "Medium",
+      "tangent-intersection": "Moeilijk"
+    },
+    "strategy": {
+      "none": "Geen",
+      "random": "Willekeurig",
+      "gradient-descent": "Gradient descent",
+      "tangent-intersection": "Raaklijnenmethode"
+    }
+  },
+  "remaining-time": "Tijd:",
+  "remaining-probes": "Pogingen:",
+  "objective": "Vind de schat op het diepste punt van de oceaan!",
+  "go": "Start!",
+  "win-announcement-begin": "Speler ",
+  "win-announcement-end": " vond de schat:",
+  "time-is-up": "De tijd is om!",
+  "no-probes-left": "Geen resterende pogingen!",
+  "game-over": "Game over!",
+  "treasures": [
+    "Fermat’s Verloren Bewijs",
+    "Het laatste cijfer van Pi",
+    "De laatste priemtweeling",
+    "Een perpetuum mobile",
+    "Instructies voor de kwadratuur van de cirkel",
+    "Pythagoras’ gitaarplectrum"
+  ]
+}
