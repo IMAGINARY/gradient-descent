@@ -164,7 +164,7 @@ npx reload -d .. -w ../index.html -p [free port]
 ## Credits
 
 Developed by Christian Stussak and Eric Londaits, based on a concept by Aaron Montag, IMAGINARY
-gGmbH.
+gGmbH. Dutch translation by Jarne Renders.
 
 ## License
 
