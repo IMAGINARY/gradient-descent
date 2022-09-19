@@ -1,6 +1,7 @@
 /* globals SVG */
 import "@wessberg/pointer-events";
 
+import localize from "./i18n";
 import PlayMode from './game-mode-play';
 import TitleMode from './game-mode-title';
 import PlayerNumberMode from './game-mode-numplayers';
@@ -114,6 +115,18 @@ export default class GradientDescentGame {
       this.transition('play', 'done', 'title');
       await this.setMode('title');
     }
+
+    window.addEventListener('keypress', async (event) => {
+      if (event.code === 'KeyL') {
+        const langs = ['de', 'en', 'nl'];
+        const currentLangIdx = langs.indexOf(IMAGINARY.i18n.getLang());
+        const nextLangIdx = (currentLangIdx + 1) % langs.length;
+        const nextLang = langs[nextLangIdx];
+        await IMAGINARY.i18n.setLang(nextLang);
+        localize(this.container);
+        console.log(`Language switched: ${nextLang}`);
+      }
+    })
   }
 
   /**

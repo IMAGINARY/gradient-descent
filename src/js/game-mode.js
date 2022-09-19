@@ -73,6 +73,13 @@ export default class GameMode {
   }
 
   /**
+   * Called when the mode is active and the language changes.
+   */
+  handleLanguageChange() {
+    
+  }
+
+  /**
    * Called once per frame so the mode can draw based on the game's state
    *
    * @param {Number} delta

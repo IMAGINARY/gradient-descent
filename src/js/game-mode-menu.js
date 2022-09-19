@@ -1,5 +1,6 @@
 /* globals IMAGINARY */
 import GameMode from './game-mode';
+import {localeInit} from "./i18n";
 
 export default class MenuMode extends GameMode {
 
@@ -10,21 +11,29 @@ export default class MenuMode extends GameMode {
   async handleEnterMode() {
     const $overlay = $(this.game.overlay);
 
-    const menuItems = this.getMenuItems();
+    const menuItemsSpecs = this.getMenuItems();
 
     this.selectedIndex = this.getDefaultItemIndex();
-    $('<div class="text text-center menu-title" />')
-      .text(this.getMenuTitle())
-      .appendTo($overlay);
+    const $menuTitle = $('<div class="text text-center menu-title" />')
+        .appendTo($overlay);
+    localeInit($menuTitle, ...this.getMenuTitleKeys());
     const $selector = $('<div class="menu-selector" />')
-      .addClass(`menu-selector-with-${menuItems.length}`)
-      .appendTo($overlay);
-    for (let i = 0; i < menuItems.length; ++i) {
-      $('<div class="item" />')
-        .addClass(`item-${i}`)
-        .toggleClass('selected', this.selectedIndex === i)
-        .text(menuItems[i])
-        .appendTo($selector);
+        .addClass(`menu-selector-with-${menuItemsSpecs.length}`)
+        .appendTo($overlay);
+    for (let i = 0; i < menuItemsSpecs.length; ++i) {
+      const menuItemSpec = menuItemsSpecs[i];
+      const $menuItem = $('<div class="item" />')
+          .addClass(`item-${i}`)
+          .toggleClass('selected', this.selectedIndex === i)
+          .appendTo($selector);
+
+      if (typeof menuItemSpec === 'string') {
+        $menuItem.text(menuItemSpec);
+      } else if (Array.isArray(menuItemSpec)) {
+        localeInit($menuItem, ...menuItemSpec);
+      } else {
+        console.error(`Menu item ${i} must be of type (string|string[])[].`);
+      }
     }
     this.$selectorItems = $selector.children();
   }
@@ -54,15 +63,15 @@ export default class MenuMode extends GameMode {
   }
 
   /**
-   * Get the menu title.
+   * Get the menu title i18n key.
    *
    * Overwrite this method in a subclass to provide the menu title.
-   * I will be called whenever this game mode is entered to also reflect possible language changes.
+   * I will be called whenever this game mode is entered.
    *
-   * @returns {string}
+   * @returns {string[]}
    */
-  getMenuTitle() {
-    return "Menu"
+  getMenuTitleKeys() {
+    return ["menu"];
   }
 
   /**
@@ -71,7 +80,8 @@ export default class MenuMode extends GameMode {
    * Overwrite this method in a subclass to provide the list of menu items.
    * I will be called whenever this game mode is entered to also reflect possible language changes.
    *
-   *  @returns {string[]}
+   *  @returns {(string|string[])[]} Either an array of strings to use as labels or and an array of arrays of strings
+   *                                 that will be used as keys into the i18n database.
    */
   getMenuItems() {
     return ['One', 'Two'];

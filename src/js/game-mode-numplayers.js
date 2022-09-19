@@ -9,8 +9,8 @@ export default class PlayerNumberMode extends MenuMode {
       (_, id) => String(id + 1));
   }
 
-  getMenuTitle() {
-    return IMAGINARY.i18n.t('choose-num-players');
+  getMenuTitleKeys() {
+    return ['choose-num-players'];
   }
 
   getMenuItems() {
