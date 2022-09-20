@@ -5,6 +5,7 @@ const keyMap = {
   'ArrowRight': { id: 0, prop: 'right' },
   'ArrowDown': { id: 0, prop: 'action' },
   'Space': { id: 0, prop: 'action' },
+  'KeyL': { id: 0, prop: 'language' },
   'KeyA': { id: 1, prop: 'left' },
   'KeyD': { id: 1, prop: 'right' },
   'KeyS': { id: 1, prop: 'action' },
