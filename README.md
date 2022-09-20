@@ -163,6 +163,15 @@ cd src
 npx reload -d .. -w ../index.html -p [free port]
 ```
 
+### Internationalization
+
+To add a new translation, the following steps are necessary:
+
+- Figure out the language code for the language you want to add, e.g. `eo` for Esperanto.
+- Copy a locale file from `tr` for a language you are familiar with and rename its basename to match the new language code, e.g. copy `tr/en.json` to `tr/eo.json`.
+- Translate all the texts in the new locale file. Preserve whitespace.
+- Add the new language code and its endonym to `tr.json`.
+
 ## Credits
 
 Developed by Christian Stussak and Eric Londaits, based on a concept by Aaron Montag, IMAGINARY
