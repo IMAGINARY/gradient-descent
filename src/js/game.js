@@ -118,10 +118,10 @@ export default class GradientDescentGame {
 
     window.addEventListener('keypress', async (event) => {
       if (event.code === 'KeyL') {
-        const langs = ['de', 'en', 'nl'];
-        const currentLangIdx = langs.indexOf(IMAGINARY.i18n.getLang());
-        const nextLangIdx = (currentLangIdx + 1) % langs.length;
-        const nextLang = langs[nextLangIdx];
+        const languages = this.config.languages;
+        const currentLangIdx = languages.indexOf(IMAGINARY.i18n.getLang());
+        const nextLangIdx = (currentLangIdx + 1) % languages.length;
+        const nextLang = languages[nextLangIdx];
         await IMAGINARY.i18n.setLang(nextLang);
         localize(this.container);
         console.log(`Language switched: ${nextLang}`);

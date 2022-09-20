@@ -11,6 +11,7 @@ A config file is loaded when opening the application. It supports the following 
 
 - **defaultLanguage** (string, default: `"en"`): Default language to use. Can be overriden by the
   `lang` query string.
+- **languages** (array of strings, default: all languages present in `tr.json`): Selection and order of language codes for i18n.
 - **useGamepads** (boolean, default: `true`): Enables gamepad use.
 - **useScreenControls** (boolean, default: `true`): Shows on-screen controllers.
 - **useKeyboardControls** (boolean, default: `true`): Control the game via keyboard (player 1: <kbd>
