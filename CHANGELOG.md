@@ -10,7 +10,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ### Added
 
-- In-game locale switching
+- In-game locale switching (on-screen button, `L` key, `Select` gamepad button)
+- `languages` config option
+- `showLanguageButton` config option
 
 ## [1.5.3]
 
