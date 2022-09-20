@@ -806,9 +806,11 @@ var GamepadControls = /*#__PURE__*/function (_Controls) {
       Array.from(navigator.getGamepads()).filter(function (gp) {
         return gp !== null && gp.index < _this.states.length;
       }).forEach(function (gp) {
-        _this.modifyState(gp.index, "left", gp.axes[0] < -0.5);
+        var _gp$buttons$14$presse, _gp$buttons$, _gp$buttons$15$presse, _gp$buttons$2;
 
-        _this.modifyState(gp.index, "right", gp.axes[0] > 0.5);
+        _this.modifyState(gp.index, "left", gp.axes[0] < -0.5 || ((_gp$buttons$14$presse = (_gp$buttons$ = gp.buttons[14]) === null || _gp$buttons$ === void 0 ? void 0 : _gp$buttons$.pressed) !== null && _gp$buttons$14$presse !== void 0 ? _gp$buttons$14$presse : false));
+
+        _this.modifyState(gp.index, "right", gp.axes[0] > 0.5 || ((_gp$buttons$15$presse = (_gp$buttons$2 = gp.buttons[15]) === null || _gp$buttons$2 === void 0 ? void 0 : _gp$buttons$2.pressed) !== null && _gp$buttons$15$presse !== void 0 ? _gp$buttons$15$presse : false));
 
         _this.modifyState(gp.index, "action", gp.buttons[1].pressed || gp.buttons[2].pressed);
 

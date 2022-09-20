@@ -13,6 +13,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - In-game locale switching (on-screen button, `L` key, `Select` gamepad button)
 - `languages` config option
 - `showLanguageButton` config option
+- Support for D-Pad on gamepads
 
 ## [1.5.3]
 
