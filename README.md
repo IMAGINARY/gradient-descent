@@ -3,7 +3,7 @@
 A game of learning the concepts behind gradient descent by exploring the depths looking for
 treasure.
 
-Developed for the I AM AI exhibiton by IMAGINARY.
+Developed for the I AM AI exhibition by IMAGINARY.
 
 ## Configuration
 
@@ -69,7 +69,7 @@ const createMap = (distance, length) => Array.from(
 game.setMap(createMap(parabola, 100));
 ```
 
-Passing `null` as map will revert back to auto-generating a new map for every round of the game.
+Passing `null` as map will revert to auto-generating a new map for every round of the game.
 
 Whenever another game round is started, the current map will be output to the developer console of
 the browser. This allows to store the current (possibly auto-generated) map elsewhere and re-use it
