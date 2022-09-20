@@ -15,6 +15,10 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - `showLanguageButton` config option
 - Support for D-Pad on gamepads
 
+### Fixed
+
+- Out-of-bounds errors on gamepads and joysticks with too few buttons
+
 ## [1.5.3]
 
 ### Added
