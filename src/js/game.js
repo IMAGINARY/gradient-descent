@@ -10,6 +10,7 @@ import ScreenControls from './controls/screen';
 import KeyboardControls from "./controls/keyboard";
 import FullScreenToggle from './full-screen-toggle';
 import BotTypeMode from './game-mode-bottype';
+import LanguageCycleButton from "./language-cycle-button";
 
 /**
  * The main application
@@ -78,6 +79,16 @@ export default class GradientDescentGame {
       this.controls.gamepad = new GamepadControls(this.config.maxPlayers);
     }
 
+    this.languageButton = new LanguageCycleButton(this.container, this.config.languages);
+    minAspectRatioContainer.appendChild(this.languageButton.element);
+    window.addEventListener('keypress', async (event) => {
+      if (event.code === 'KeyL') await this.languageButton.handleLanguageChange();
+    })
+
+    if (!this.config.languageButton) {
+      this.languageButton.element.style.visibility = 'hidden';
+    }
+
     if (this.config.fullScreenButton) {
       this.fullScreenToggle = new FullScreenToggle();
       minAspectRatioContainer.appendChild(this.fullScreenToggle.element);
@@ -115,18 +126,6 @@ export default class GradientDescentGame {
       this.transition('play', 'done', 'title');
       await this.setMode('title');
     }
-
-    window.addEventListener('keypress', async (event) => {
-      if (event.code === 'KeyL') {
-        const languages = this.config.languages;
-        const currentLangIdx = languages.indexOf(IMAGINARY.i18n.getLang());
-        const nextLangIdx = (currentLangIdx + 1) % languages.length;
-        const nextLang = languages[nextLangIdx];
-        await IMAGINARY.i18n.setLang(nextLang);
-        localize(this.container);
-        console.log(`Language switched: ${nextLang}`);
-      }
-    })
   }
 
   /**

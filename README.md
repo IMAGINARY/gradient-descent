@@ -35,6 +35,7 @@ A config file is loaded when opening the application. It supports the following 
 - **continuousGame** (boolean, default: `false`): Skip the title screen and time limit,
   auto-restart.
 - **fullScreenButton** (boolean, default: `true`): Show a button to toggle full-screen mode.
+- **languageButton** (boolean, default: `true`): Show a button to cycle through the languages defined via `languages`.
 - **debugControls** (boolean, default: `false`): Shows debugging data for controls.
 
 By default, the config file `config.json` is used. However, this file name can be overwritten by

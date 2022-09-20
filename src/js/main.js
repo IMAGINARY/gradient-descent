@@ -31,6 +31,7 @@ async function getDefaultConfig() {
     showSeaFloor: false,
     maxDepthTilt: 4,
     fullScreenButton: true,
+    languageButton: true,
     debugControls: false,
     map: null,
   };
