@@ -1,4 +1,5 @@
 /* globals IMAGINARY */
+import {localeInit} from "./i18n";
 import GameMode from './game-mode';
 import WavyAnimation from './wavy-animation';
 
@@ -12,7 +13,7 @@ export default class TitleMode extends GameMode {
     const { draw } = this.game;
     const pressToStart = document.createElement('div');
     pressToStart.classList.add('title-press-to-start');
-    pressToStart.textContent = IMAGINARY.i18n.t('press-to-start');
+    localeInit(pressToStart,'press-to-start');
     this.game.overlay.append(pressToStart);
 
     const colorBegin = '#00368a';

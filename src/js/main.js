@@ -1,23 +1,44 @@
 /* globals IMAGINARY */
 import GradientDescentGame from './game';
 
-const defaultConfig = {
-  defaultLanguage: 'en',
-  useGamepads: true,
-  useScreenControls: true,
-  useKeyboardControls: true,
-  botType: null,
-  botTypeLabels: 'difficulty',
-  maxPlayers: 2,
-  maxTime: Number.POSITIVE_INFINITY,
-  maxProbes: Number.POSITIVE_INFINITY,
-  continuousGame: false,
-  showSeaFloor: false,
-  maxDepthTilt: 4,
-  fullScreenButton: true,
-  debugControls: false,
-  map: null,
-};
+async function fetchJson(uri) {
+  const response = await fetch(uri, {
+    cache: 'no-store',
+  });
+  if (response.status >= 200 && response.status < 300) {
+    try {
+      return await response.json();
+    } catch (e) {
+      throw new Error(`Error parsing JSON file: ${e.message}`);
+    }
+  }
+  throw new Error(`Server returned status ${response.status} (${response.statusText}) loading JSON file.`);
+}
+
+async function getDefaultConfig() {
+  const defaultConfig = {
+    defaultLanguage: 'en',
+    languages: undefined, // fill in from tr.json
+    useGamepads: true,
+    useScreenControls: true,
+    useKeyboardControls: true,
+    botType: null,
+    botTypeLabels: 'difficulty',
+    maxPlayers: 2,
+    maxTime: Number.POSITIVE_INFINITY,
+    maxProbes: Number.POSITIVE_INFINITY,
+    continuousGame: false,
+    showSeaFloor: false,
+    maxDepthTilt: 4,
+    fullScreenButton: true,
+    languageButton: true,
+    debugControls: false,
+    map: null,
+  };
+  const tr = await fetchJson(new URL('tr.json', window.location.href));
+  defaultConfig.languages = Object.keys(tr).sort();
+  return defaultConfig;
+}
 
 /**
  * Loads the config file from an external JSON file
@@ -55,7 +76,7 @@ async function loadConfig(uri) {
  * @returns {URL|null} User-supplied config URL or {null} if not supplied.
  * @throws {Error} If the user-supplied config file name doesn't match the regex.
  */
-function getCustomConfigUrl() {
+function getConfigCustomUrl() {
   const urlSearchParams = new URLSearchParams(window.location.search);
   if (!urlSearchParams.has('config')) {
     return null;
@@ -75,10 +96,16 @@ function getCustomConfigUrl() {
  */
 (async function main() {
   try {
-    const defaultConfigUrl = new URL('./config.json', window.location.href);
-    const costumConfigUrl = getCustomConfigUrl();
-    const configUrl = costumConfigUrl ? costumConfigUrl : defaultConfigUrl;
-    const config = Object.assign({}, defaultConfig, await loadConfig(configUrl.href));
+    const configDefaultUrl = new URL('./config.json', window.location.href);
+    const defaultConfigPromise = getDefaultConfig();
+    const configCustomUrl = getConfigCustomUrl();
+    const configUrl = configCustomUrl ?? configDefaultUrl;
+    const configPromise = loadConfig(configUrl.href);
+    const [defaultConfig, loadedConfig] = await Promise.all([defaultConfigPromise, configPromise]);
+    const config = Object.assign({}, defaultConfig, loadedConfig);
+    console.log("Default configuration:", defaultConfig);
+    console.log("Loaded configuration:", loadedConfig);
+    console.log("Merged configuration:", config);
 
     await IMAGINARY.i18n.init({
       queryStringVariable: 'lang',

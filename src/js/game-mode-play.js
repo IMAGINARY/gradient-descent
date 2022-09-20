@@ -8,6 +8,7 @@ import BotStrategyBase from './bot-strategies/base';
 import BotStrategyRandom from './bot-strategies/random';
 import BotStrategyTangentIntersection from './bot-strategies/tangent-intersection';
 import BotStrategyGradientDescent from './bot-strategies/gradient-descent';
+import {localeInit} from "./i18n";
 
 const WATER_HEIGHT_SCALE = 10;
 const NUM_WATER_POINTS = 300;
@@ -79,14 +80,14 @@ export default class PlayMode extends GameMode {
     const $gameStats = $('<div class="game-stats"/>').appendTo(this.$overlay);
 
     const $remainingTimeContainer = $('<div class="remaining-time"/>')
-      .text(IMAGINARY.i18n.t('remaining-time'))
       .appendTo($gameStats);
+    localeInit($('<span>').appendTo($remainingTimeContainer), 'remaining-time');
     if (config.maxTime === Number.POSITIVE_INFINITY)
       $remainingTimeContainer.hide()
 
     const $remainingProbesContainer = $('<div class="remaining-probes"/>')
-      .text(IMAGINARY.i18n.t('remaining-probes'))
       .appendTo($gameStats);
+    localeInit($('<span>').appendTo($remainingProbesContainer), 'remaining-probes');
     this.$remainingTime = $('<span class="counter"/>')
       .appendTo($remainingTimeContainer);
     this.$remainingProbes = $('<span />').appendTo($remainingProbesContainer);
@@ -291,8 +292,8 @@ export default class PlayMode extends GameMode {
 
     this.discardInputs = true;
     this.showGameStartSequence(
-        IMAGINARY.i18n.t('objective'),
-        IMAGINARY.i18n.t('go'),
+        localeInit($('<span>'), 'objective'),
+        localeInit($('<span>'), 'go'),
         () => this.discardInputs = false
     );
   }
@@ -534,16 +535,16 @@ export default class PlayMode extends GameMode {
     }
   }
 
-  async showGameStartSequence(firstMessage,
-                             secondMessage,
+  async showGameStartSequence(firstMessageElem,
+                             secondMessageElem,
                              secondMessageCallback = Function.prototype,
                              cssClasses = []) {
     const { draw } = this.game;
 
     const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-    const $firstMessageDiv = $('<div>').text(firstMessage);
-    const $secondMessageDiv = $('<div>').text(secondMessage)
+    const $firstMessageDiv = $('<div>').append(firstMessageElem);
+    const $secondMessageDiv = $('<div>').append(secondMessageElem)
         .css('visibility', 'hidden');
 
     const $startSequenceDiv = $('<div class="announcement-sequences-text" />')
@@ -565,7 +566,7 @@ export default class PlayMode extends GameMode {
     // popper.js places the ending sequence text in a popup-like fashion above the announcement
     // anchor and makes sure that is does not move off the screen if the anchor is to close to a
     // screen edge.
-    createPopper(
+    createAutoUpdatingPopper(
         $announcementAnchor.get(0),
         $startSequenceDiv.get(0),
         {
@@ -582,11 +583,13 @@ export default class PlayMode extends GameMode {
   }
 
   async showWinSequence(winner) {
-    const winAnnouncement = IMAGINARY.i18n.t('win-announcement-begin')
-      + (winner.id + 1)
-      + IMAGINARY.i18n.t('win-announcement-end');
-    const randomElement = arr => arr[Math.floor(Math.random() * (arr.length - 1))];
-    const treasure = randomElement(IMAGINARY.i18n.t('treasures'));
+    const $winAnnouncement = $('<span>').append(
+        localeInit($('<span>'), 'win-announcement-begin'),
+        $('<span>').text(winner.id + 1),
+        localeInit($('<span>'), 'win-announcement-end'),
+    );
+    const randomIdx = arr => Math.floor(Math.random() * (arr.length - 1));
+    const $treasure = localeInit($('<span>'), 'treasures', randomIdx(IMAGINARY.i18n.t('treasures')));
 
     const openTreaureChest = () => {
       this.treasureOpened.show();
@@ -594,8 +597,8 @@ export default class PlayMode extends GameMode {
     }
 
     await this.showGameOverSequence(
-      winAnnouncement,
-      treasure,
+      $winAnnouncement,
+      $treasure,
       openTreaureChest,
       [winner.cssClass]
     );
@@ -603,33 +606,32 @@ export default class PlayMode extends GameMode {
 
   async showLoseSequenceTimeIsUp() {
     await this.showGameOverSequence(
-      IMAGINARY.i18n.t('time-is-up'),
-      IMAGINARY.i18n.t('game-over'),
+        localeInit($('<span>'), 'time-is-up'),
+        localeInit($('<span>'), 'game-over'),
     );
   }
 
   async showLoseSequenceNoProbesLeft() {
     await this.showGameOverSequence(
-      IMAGINARY.i18n.t('no-probes-left'),
-      IMAGINARY.i18n.t('game-over'),
+        localeInit($('<span>'), 'no-probes-left'),
+        localeInit($('<span>'), 'game-over'),
     );
   }
 
-  async showGameOverSequence(firstMessage,
-                             secondMessage,
+  async showGameOverSequence(firstMessageElem,
+                             secondMessageElem,
                              secondMessageCallback = Function.prototype,
                              cssClasses = []) {
     const { draw } = this.game;
 
     const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-    const restartMessage = IMAGINARY.i18n.t('press-to-restart');
-
-    const $firstMessageDiv = $('<div>').text(firstMessage);
-    const $secondMessageDiv = $('<div>').text(secondMessage)
+    const $firstMessageDiv = $('<div>').append(firstMessageElem);
+    const $secondMessageDiv = $('<div>').append(secondMessageElem)
       .css('visibility', 'hidden');
-    const $restartDiv = $('<div class="blinking">').text(restartMessage)
+    const $restartDiv = $('<div class="blinking">')
       .css('visibility', 'hidden');
+    localeInit($restartDiv, 'press-to-restart');
 
     const $endingSequenceDiv = $('<div class="announcement-sequences-text" />')
       .addClass(cssClasses)
@@ -651,7 +653,7 @@ export default class PlayMode extends GameMode {
     // popper.js places the ending sequence text in a popup-like fashion above the announcement
     // anchor and makes sure that is does not move off the screen if the anchor is to close to a
     // screen edge.
-    createPopper(
+    createAutoUpdatingPopper(
       $announcementAnchor.get(0),
       $endingSequenceDiv.get(0),
       {
@@ -673,4 +675,11 @@ function actionPressed(input, lastInput) {
 
 function pad(num, places, char) {
   return String(num).padStart(places, char)
+}
+
+function createAutoUpdatingPopper(reference, popper, options) {
+  const popperInstance = createPopper(reference, popper, options);
+  const observer = new MutationObserver(() => popperInstance.update());
+  observer.observe(popper, {subtree: true, childList: true, characterData: true});
+  return popperInstance;
 }

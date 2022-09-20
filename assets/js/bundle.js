@@ -668,7 +668,8 @@ var Controls = /*#__PURE__*/function () {
       return {
         left: false,
         right: false,
-        action: false
+        action: false,
+        language: false
       };
     });
     this.statesModified = false;
@@ -697,7 +698,8 @@ var Controls = /*#__PURE__*/function () {
      * @return {[{
      *   left: Boolean,
      *   right: Boolean,
-     *   action: Boolean
+     *   action: Boolean,
+     *   language: Boolean,
      * }]}
      */
 
@@ -809,6 +811,8 @@ var GamepadControls = /*#__PURE__*/function (_Controls) {
         _this.modifyState(gp.index, "right", gp.axes[0] > 0.5);
 
         _this.modifyState(gp.index, "action", gp.buttons[1].pressed || gp.buttons[2].pressed);
+
+        _this.modifyState(gp.index, "language", gp.buttons[8].pressed);
       });
     }
     /**
@@ -820,7 +824,8 @@ var GamepadControls = /*#__PURE__*/function (_Controls) {
      * @return {[{
      *   left: Boolean,
      *   right: Boolean,
-     *   action: Boolean
+     *   action: Boolean,
+     *   language: Boolean,
      * }]}
      */
 
@@ -883,6 +888,10 @@ var keyMap = {
   'Space': {
     id: 0,
     prop: 'action'
+  },
+  'KeyL': {
+    id: 0,
+    prop: 'language'
   },
   'KeyA': {
     id: 1,
@@ -1223,17 +1232,16 @@ var BotTypeMode = /*#__PURE__*/function (_MenuMode) {
   }
 
   _createClass(BotTypeMode, [{
-    key: "getMenuTitle",
-    value: function getMenuTitle() {
-      return IMAGINARY.i18n.t('choose-bot-type')[this.game.config.botTypeLabels];
+    key: "getMenuTitleKeys",
+    value: function getMenuTitleKeys() {
+      return ['choose-bot-type', this.game.config.botTypeLabels];
     }
   }, {
     key: "getMenuItems",
     value: function getMenuItems() {
-      var botTypeStrings = IMAGINARY.i18n.t('bot-types')[this.game.config.botTypeLabels];
-      console.log(botTypeStrings);
+      var keysPrefix = ['bot-types', this.game.config.botTypeLabels];
       return BOT_TYPE_ORDER.map(function (key) {
-        return botTypeStrings[key];
+        return [].concat(keysPrefix, [key]);
       });
     }
   }, {
@@ -1266,9 +1274,23 @@ exports["default"] = void 0;
 
 var _gameMode = _interopRequireDefault(require("./game-mode"));
 
+var _i18n = require("./i18n");
+
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
 function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
 
 function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
 
@@ -1309,24 +1331,36 @@ var MenuMode = /*#__PURE__*/function (_GameMode) {
     key: "handleEnterMode",
     value: function () {
       var _handleEnterMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
-        var $overlay, menuItems, $selector, i;
+        var $overlay, menuItemsSpecs, $menuTitle, $selector, i, menuItemSpec, $menuItem;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
                 $overlay = $(this.game.overlay);
-                menuItems = this.getMenuItems();
+                menuItemsSpecs = this.getMenuItems();
                 this.selectedIndex = this.getDefaultItemIndex();
-                $('<div class="text text-center menu-title" />').text(this.getMenuTitle()).appendTo($overlay);
-                $selector = $('<div class="menu-selector" />').addClass("menu-selector-with-".concat(menuItems.length)).appendTo($overlay);
+                $menuTitle = $('<div class="text text-center menu-title" />').appendTo($overlay);
 
-                for (i = 0; i < menuItems.length; ++i) {
-                  $('<div class="item" />').addClass("item-".concat(i)).toggleClass('selected', this.selectedIndex === i).text(menuItems[i]).appendTo($selector);
+                _i18n.localeInit.apply(void 0, [$menuTitle].concat(_toConsumableArray(this.getMenuTitleKeys())));
+
+                $selector = $('<div class="menu-selector" />').addClass("menu-selector-with-".concat(menuItemsSpecs.length)).appendTo($overlay);
+
+                for (i = 0; i < menuItemsSpecs.length; ++i) {
+                  menuItemSpec = menuItemsSpecs[i];
+                  $menuItem = $('<div class="item" />').addClass("item-".concat(i)).toggleClass('selected', this.selectedIndex === i).appendTo($selector);
+
+                  if (typeof menuItemSpec === 'string') {
+                    $menuItem.text(menuItemSpec);
+                  } else if (Array.isArray(menuItemSpec)) {
+                    _i18n.localeInit.apply(void 0, [$menuItem].concat(_toConsumableArray(menuItemSpec)));
+                  } else {
+                    console.error("Menu item ".concat(i, " must be of type (string|string[])[]."));
+                  }
                 }
 
                 this.$selectorItems = $selector.children();
 
-              case 7:
+              case 8:
               case "end":
                 return _context.stop();
             }
@@ -1389,18 +1423,18 @@ var MenuMode = /*#__PURE__*/function (_GameMode) {
       }
     }
     /**
-     * Get the menu title.
+     * Get the menu title i18n key.
      *
      * Overwrite this method in a subclass to provide the menu title.
-     * I will be called whenever this game mode is entered to also reflect possible language changes.
+     * I will be called whenever this game mode is entered.
      *
-     * @returns {string}
+     * @returns {string[]}
      */
 
   }, {
-    key: "getMenuTitle",
-    value: function getMenuTitle() {
-      return "Menu";
+    key: "getMenuTitleKeys",
+    value: function getMenuTitleKeys() {
+      return ["menu"];
     }
     /**
      * Get the menu items.
@@ -1408,7 +1442,8 @@ var MenuMode = /*#__PURE__*/function (_GameMode) {
      * Overwrite this method in a subclass to provide the list of menu items.
      * I will be called whenever this game mode is entered to also reflect possible language changes.
      *
-     *  @returns {string[]}
+     *  @returns {(string|string[])[]} Either an array of strings to use as labels or and an array of arrays of strings
+     *                                 that will be used as keys into the i18n database.
      */
 
   }, {
@@ -1437,7 +1472,7 @@ var MenuMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = MenuMode;
 
-},{"./game-mode":15}],12:[function(require,module,exports){
+},{"./game-mode":15,"./i18n":17}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1495,9 +1530,9 @@ var PlayerNumberMode = /*#__PURE__*/function (_MenuMode) {
   }
 
   _createClass(PlayerNumberMode, [{
-    key: "getMenuTitle",
-    value: function getMenuTitle() {
-      return IMAGINARY.i18n.t('choose-num-players');
+    key: "getMenuTitleKeys",
+    value: function getMenuTitleKeys() {
+      return ['choose-num-players'];
     }
   }, {
     key: "getMenuItems",
@@ -1548,6 +1583,8 @@ var _random = _interopRequireDefault(require("./bot-strategies/random"));
 var _tangentIntersection = _interopRequireDefault(require("./bot-strategies/tangent-intersection"));
 
 var _gradientDescent = _interopRequireDefault(require("./bot-strategies/gradient-descent"));
+
+var _i18n = require("./i18n");
 
 function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return null; var cache = new WeakMap(); _getRequireWildcardCache = function _getRequireWildcardCache() { return cache; }; return cache; }
 
@@ -1710,9 +1747,11 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 this.tangents = [];
                 this.$overlay = $('<div class="play" />').appendTo(this.game.overlay);
                 $gameStats = $('<div class="game-stats"/>').appendTo(this.$overlay);
-                $remainingTimeContainer = $('<div class="remaining-time"/>').text(IMAGINARY.i18n.t('remaining-time')).appendTo($gameStats);
+                $remainingTimeContainer = $('<div class="remaining-time"/>').appendTo($gameStats);
+                (0, _i18n.localeInit)($('<span>').appendTo($remainingTimeContainer), 'remaining-time');
                 if (config.maxTime === Number.POSITIVE_INFINITY) $remainingTimeContainer.hide();
-                $remainingProbesContainer = $('<div class="remaining-probes"/>').text(IMAGINARY.i18n.t('remaining-probes')).appendTo($gameStats);
+                $remainingProbesContainer = $('<div class="remaining-probes"/>').appendTo($gameStats);
+                (0, _i18n.localeInit)($('<span>').appendTo($remainingProbesContainer), 'remaining-probes');
                 this.$remainingTime = $('<span class="counter"/>').appendTo($remainingTimeContainer);
                 this.$remainingProbes = $('<span />').appendTo($remainingProbesContainer);
                 if (config.maxProbes === Number.POSITIVE_INFINITY) $remainingProbesContainer.hide();
@@ -1912,11 +1951,11 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 this.groundGroup.back();
                 this.tangentGroup = modeGroup.group().translate(0, TERRAIN_DISTANCE);
                 this.discardInputs = true;
-                this.showGameStartSequence(IMAGINARY.i18n.t('objective'), IMAGINARY.i18n.t('go'), function () {
+                this.showGameStartSequence((0, _i18n.localeInit)($('<span>'), 'objective'), (0, _i18n.localeInit)($('<span>'), 'go'), function () {
                   return _this2.discardInputs = false;
                 });
 
-              case 43:
+              case 45:
               case "end":
                 return _context3.stop();
             }
@@ -2324,7 +2363,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
   }, {
     key: "showGameStartSequence",
     value: function () {
-      var _showGameStartSequence = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee11(firstMessage, secondMessage) {
+      var _showGameStartSequence = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee11(firstMessageElem, secondMessageElem) {
         var secondMessageCallback,
             cssClasses,
             draw,
@@ -2349,8 +2388,8 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                   });
                 };
 
-                $firstMessageDiv = $('<div>').text(firstMessage);
-                $secondMessageDiv = $('<div>').text(secondMessage).css('visibility', 'hidden');
+                $firstMessageDiv = $('<div>').append(firstMessageElem);
+                $secondMessageDiv = $('<div>').append(secondMessageElem).css('visibility', 'hidden');
                 $startSequenceDiv = $('<div class="announcement-sequences-text" />').addClass(cssClasses).append([$firstMessageDiv, $('<br>'), $secondMessageDiv]);
                 top = 100 * (WATER_DISTANCE + TERRAIN_DISTANCE) / draw.height();
                 $announcementAnchor = $('<div class="announcement-sequences-text-anchor" />').css({
@@ -2367,7 +2406,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 // anchor and makes sure that is does not move off the screen if the anchor is to close to a
                 // screen edge.
 
-                (0, _core.createPopper)($announcementAnchor.get(0), $startSequenceDiv.get(0), {
+                createAutoUpdatingPopper($announcementAnchor.get(0), $startSequenceDiv.get(0), {
                   placement: 'top'
                 });
                 _context11.next = 15;
@@ -2402,18 +2441,18 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       var _showWinSequence = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee12(winner) {
         var _this7 = this;
 
-        var winAnnouncement, randomElement, treasure, openTreaureChest;
+        var $winAnnouncement, randomIdx, $treasure, openTreaureChest;
         return regeneratorRuntime.wrap(function _callee12$(_context12) {
           while (1) {
             switch (_context12.prev = _context12.next) {
               case 0:
-                winAnnouncement = IMAGINARY.i18n.t('win-announcement-begin') + (winner.id + 1) + IMAGINARY.i18n.t('win-announcement-end');
+                $winAnnouncement = $('<span>').append((0, _i18n.localeInit)($('<span>'), 'win-announcement-begin'), $('<span>').text(winner.id + 1), (0, _i18n.localeInit)($('<span>'), 'win-announcement-end'));
 
-                randomElement = function randomElement(arr) {
-                  return arr[Math.floor(Math.random() * (arr.length - 1))];
+                randomIdx = function randomIdx(arr) {
+                  return Math.floor(Math.random() * (arr.length - 1));
                 };
 
-                treasure = randomElement(IMAGINARY.i18n.t('treasures'));
+                $treasure = (0, _i18n.localeInit)($('<span>'), 'treasures', randomIdx(IMAGINARY.i18n.t('treasures')));
 
                 openTreaureChest = function openTreaureChest() {
                   _this7.treasureOpened.show();
@@ -2422,7 +2461,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 };
 
                 _context12.next = 6;
-                return this.showGameOverSequence(winAnnouncement, treasure, openTreaureChest, [winner.cssClass]);
+                return this.showGameOverSequence($winAnnouncement, $treasure, openTreaureChest, [winner.cssClass]);
 
               case 6:
               case "end":
@@ -2447,7 +2486,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
             switch (_context13.prev = _context13.next) {
               case 0:
                 _context13.next = 2;
-                return this.showGameOverSequence(IMAGINARY.i18n.t('time-is-up'), IMAGINARY.i18n.t('game-over'));
+                return this.showGameOverSequence((0, _i18n.localeInit)($('<span>'), 'time-is-up'), (0, _i18n.localeInit)($('<span>'), 'game-over'));
 
               case 2:
               case "end":
@@ -2472,7 +2511,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
             switch (_context14.prev = _context14.next) {
               case 0:
                 _context14.next = 2;
-                return this.showGameOverSequence(IMAGINARY.i18n.t('no-probes-left'), IMAGINARY.i18n.t('game-over'));
+                return this.showGameOverSequence((0, _i18n.localeInit)($('<span>'), 'no-probes-left'), (0, _i18n.localeInit)($('<span>'), 'game-over'));
 
               case 2:
               case "end":
@@ -2491,12 +2530,11 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
   }, {
     key: "showGameOverSequence",
     value: function () {
-      var _showGameOverSequence = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee15(firstMessage, secondMessage) {
+      var _showGameOverSequence = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee15(firstMessageElem, secondMessageElem) {
         var secondMessageCallback,
             cssClasses,
             draw,
             delay,
-            restartMessage,
             $firstMessageDiv,
             $secondMessageDiv,
             $restartDiv,
@@ -2519,10 +2557,10 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                   });
                 };
 
-                restartMessage = IMAGINARY.i18n.t('press-to-restart');
-                $firstMessageDiv = $('<div>').text(firstMessage);
-                $secondMessageDiv = $('<div>').text(secondMessage).css('visibility', 'hidden');
-                $restartDiv = $('<div class="blinking">').text(restartMessage).css('visibility', 'hidden');
+                $firstMessageDiv = $('<div>').append(firstMessageElem);
+                $secondMessageDiv = $('<div>').append(secondMessageElem).css('visibility', 'hidden');
+                $restartDiv = $('<div class="blinking">').css('visibility', 'hidden');
+                (0, _i18n.localeInit)($restartDiv, 'press-to-restart');
                 $endingSequenceDiv = $('<div class="announcement-sequences-text" />').addClass(cssClasses).append([$firstMessageDiv, $secondMessageDiv, $('<br>'), $restartDiv]);
                 left = 100 * this.treasureLocation.x;
                 top = 100 * (WATER_DISTANCE + TERRAIN_DISTANCE) / draw.height();
@@ -2540,7 +2578,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 // anchor and makes sure that is does not move off the screen if the anchor is to close to a
                 // screen edge.
 
-                (0, _core.createPopper)($announcementAnchor.get(0), $endingSequenceDiv.get(0), {
+                createAutoUpdatingPopper($announcementAnchor.get(0), $endingSequenceDiv.get(0), {
                   placement: 'top'
                 });
                 _context15.next = 18;
@@ -2620,13 +2658,28 @@ function pad(num, places, _char) {
   return String(num).padStart(places, _char);
 }
 
-},{"./bot-strategies/base":1,"./bot-strategies/gradient-descent":2,"./bot-strategies/random":3,"./bot-strategies/tangent-intersection":4,"./game-mode":15,"./terrain":18,"./waves":19,"@popperjs/core":21,"events":27}],14:[function(require,module,exports){
+function createAutoUpdatingPopper(reference, popper, options) {
+  var popperInstance = (0, _core.createPopper)(reference, popper, options);
+  var observer = new MutationObserver(function () {
+    return popperInstance.update();
+  });
+  observer.observe(popper, {
+    subtree: true,
+    childList: true,
+    characterData: true
+  });
+  return popperInstance;
+}
+
+},{"./bot-strategies/base":1,"./bot-strategies/gradient-descent":2,"./bot-strategies/random":3,"./bot-strategies/tangent-intersection":4,"./game-mode":15,"./i18n":17,"./terrain":20,"./waves":21,"@popperjs/core":23,"events":29}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
 exports["default"] = void 0;
+
+var _i18n = require("./i18n");
 
 var _gameMode = _interopRequireDefault(require("./game-mode"));
 
@@ -2712,7 +2765,7 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
                 draw = this.game.draw;
                 pressToStart = document.createElement('div');
                 pressToStart.classList.add('title-press-to-start');
-                pressToStart.textContent = IMAGINARY.i18n.t('press-to-start');
+                (0, _i18n.localeInit)(pressToStart, 'press-to-start');
                 this.game.overlay.append(pressToStart);
                 colorBegin = '#00368a';
                 colorEnd = '#34c6ff';
@@ -2797,7 +2850,7 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = TitleMode;
 
-},{"./game-mode":15,"./wavy-animation":20}],15:[function(require,module,exports){
+},{"./game-mode":15,"./i18n":17,"./wavy-animation":22}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2946,6 +2999,13 @@ var GameMode = /*#__PURE__*/function () {
     key: "handleInputs",
     value: function handleInputs(inputs, lastInputs, delta, ts) {}
     /**
+     * Called when the mode is active and the language changes.
+     */
+
+  }, {
+    key: "handleLanguageChange",
+    value: function handleLanguageChange() {}
+    /**
      * Called once per frame so the mode can draw based on the game's state
      *
      * @param {Number} delta
@@ -2977,7 +3037,7 @@ var GameMode = /*#__PURE__*/function () {
 
 exports["default"] = GameMode;
 
-},{"events":27}],16:[function(require,module,exports){
+},{"events":29}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2986,6 +3046,8 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = void 0;
 
 require("@wessberg/pointer-events");
+
+var _i18n = _interopRequireDefault(require("./i18n"));
 
 var _gameModePlay = _interopRequireDefault(require("./game-mode-play"));
 
@@ -3002,6 +3064,8 @@ var _keyboard = _interopRequireDefault(require("./controls/keyboard"));
 var _fullScreenToggle = _interopRequireDefault(require("./full-screen-toggle"));
 
 var _gameModeBottype = _interopRequireDefault(require("./game-mode-bottype"));
+
+var _languageCycleButton = _interopRequireDefault(require("./language-cycle-button"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -3082,6 +3146,13 @@ var GradientDescentGame = /*#__PURE__*/function () {
                   this.controls.gamepad = new _gamepad["default"](this.config.maxPlayers);
                 }
 
+                this.languageButton = new _languageCycleButton["default"](this.container, this.config.languages);
+                minAspectRatioContainer.appendChild(this.languageButton.element);
+
+                if (!this.config.languageButton) {
+                  this.languageButton.element.style.visibility = 'hidden';
+                }
+
                 if (this.config.fullScreenButton) {
                   this.fullScreenToggle = new _fullScreenToggle["default"]();
                   minAspectRatioContainer.appendChild(this.fullScreenToggle.element);
@@ -3098,36 +3169,36 @@ var GradientDescentGame = /*#__PURE__*/function () {
                   minAspectRatioContainer.appendChild(this.debugControlsPane);
                 }
 
-                _context.next = 20;
+                _context.next = 23;
                 return this.registerMode('title', new _gameModeTitle["default"](this));
 
-              case 20:
-                _context.next = 22;
+              case 23:
+                _context.next = 25;
                 return this.registerMode('bottype', new _gameModeBottype["default"](this));
 
-              case 22:
-                _context.next = 24;
+              case 25:
+                _context.next = 27;
                 return this.registerMode('numplayers', new _gameModeNumplayers["default"](this));
 
-              case 24:
-                _context.next = 26;
+              case 27:
+                _context.next = 29;
                 return this.registerMode('play', new _gameModePlay["default"](this));
 
-              case 26:
+              case 29:
                 if (!this.config.continuousGame) {
-                  _context.next = 32;
+                  _context.next = 35;
                   break;
                 }
 
                 this.transition('play', 'done', 'play');
-                _context.next = 30;
+                _context.next = 33;
                 return this.setMode('play');
 
-              case 30:
-                _context.next = 42;
+              case 33:
+                _context.next = 45;
                 break;
 
-              case 32:
+              case 35:
                 showBotType = this.config.botType === null;
                 showNumPlayers = this.config.maxPlayers > 1;
                 afterNumPlayers = showBotType ? 'bottype' : 'play';
@@ -3136,10 +3207,10 @@ var GradientDescentGame = /*#__PURE__*/function () {
                 this.transition('numplayers', 'done', afterNumPlayers);
                 this.transition('bottype', 'done', 'play');
                 this.transition('play', 'done', 'title');
-                _context.next = 42;
+                _context.next = 45;
                 return this.setMode('title');
 
-              case 42:
+              case 45:
               case "end":
                 return _context.stop();
             }
@@ -3236,7 +3307,8 @@ var GradientDescentGame = /*#__PURE__*/function () {
       return Array(this.config.maxPlayers).fill(null).map(function () {
         return {
           direction: 0,
-          action: false
+          action: false,
+          language: false
         };
       });
     }
@@ -3260,7 +3332,8 @@ var GradientDescentGame = /*#__PURE__*/function () {
       var inputReducer = function inputReducer(accInput, curState) {
         return {
           direction: curState.right ? 1 : curState.left ? -1 : accInput.direction,
-          action: curState.action || accInput.action
+          action: curState.action || accInput.action,
+          language: curState.language || accInput.language
         };
       };
 
@@ -3276,6 +3349,16 @@ var GradientDescentGame = /*#__PURE__*/function () {
         }).join("\xA0\xA0\xA0\xA0"); // four &nbsp;
       }
     }
+  }, {
+    key: "handleGlobalInputs",
+    value: function handleGlobalInputs() {
+      var _this = this;
+
+      var switchLanguage = this.inputsLast.reduce(function (acc, cur, i) {
+        return acc || cur.language === false && _this.inputs[i].language === true;
+      }, false);
+      if (switchLanguage) this.languageButton.handleLanguageChange().then();
+    }
     /**
      * Game loop
      */
@@ -3283,7 +3366,7 @@ var GradientDescentGame = /*#__PURE__*/function () {
   }, {
     key: "run",
     value: function run() {
-      var _this = this;
+      var _this2 = this;
 
       window.cancelAnimationFrame(this.animationFrameRequestId);
 
@@ -3293,19 +3376,21 @@ var GradientDescentGame = /*#__PURE__*/function () {
         var MAX_DELTA = 125;
 
         this.gameLoop = function (ts) {
-          if (!_this.isPaused) {
-            _this.readInputs();
+          if (!_this2.isPaused) {
+            _this2.readInputs();
+
+            _this2.handleGlobalInputs();
 
             lag += Math.max(0, ts - lag - lastTs - MAX_DELTA);
             ts -= lag;
             var delta = ts - lastTs;
 
-            _this.currentMode.handleInputs(_this.inputs, _this.inputsLast, delta, ts);
+            _this2.currentMode.handleInputs(_this2.inputs, _this2.inputsLast, delta, ts);
 
-            _this.currentMode.draw(delta, ts);
+            _this2.currentMode.draw(delta, ts);
 
             lastTs = ts;
-            _this.animationFrameRequestId = window.requestAnimationFrame(_this.gameLoop);
+            _this2.animationFrameRequestId = window.requestAnimationFrame(_this2.gameLoop);
           }
         };
       }
@@ -3435,7 +3520,7 @@ var GradientDescentGame = /*#__PURE__*/function () {
   }, {
     key: "transition",
     value: function transition(modeId, event) {
-      var _this2 = this;
+      var _this3 = this;
 
       var nextModeId = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : null;
       var callback = arguments.length > 3 && arguments[3] !== undefined ? arguments[3] : null;
@@ -3449,12 +3534,12 @@ var GradientDescentGame = /*#__PURE__*/function () {
       }
 
       this.modes[modeId].events.on(event, function () {
-        if (_this2.currentMode !== _this2.modes[modeId]) {
+        if (_this3.currentMode !== _this3.modes[modeId]) {
           throw new Error("Mode ".concat(modeId, " triggered the event ").concat(event, " while not active. Something was not cleaned up?"));
         }
 
         if (nextModeId !== null) {
-          _this2.setMode(nextModeId);
+          _this3.setMode(nextModeId);
         }
 
         if (callback && typeof callback === 'function') {
@@ -3531,10 +3616,97 @@ var GradientDescentGame = /*#__PURE__*/function () {
 
 exports["default"] = GradientDescentGame;
 
-},{"./controls/gamepad":6,"./controls/keyboard":7,"./controls/screen":8,"./full-screen-toggle":9,"./game-mode-bottype":10,"./game-mode-numplayers":12,"./game-mode-play":13,"./game-mode-title":14,"@wessberg/pointer-events":22}],17:[function(require,module,exports){
+},{"./controls/gamepad":6,"./controls/keyboard":7,"./controls/screen":8,"./full-screen-toggle":9,"./game-mode-bottype":10,"./game-mode-numplayers":12,"./game-mode-play":13,"./game-mode-title":14,"./i18n":17,"./language-cycle-button":18,"@wessberg/pointer-events":24}],17:[function(require,module,exports){
 "use strict";
 
-var _game = _interopRequireDefault(require("./game"));
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports.localize = exports["default"] = localize;
+exports.localeInit = localeInit;
+exports.localizeFlat = localizeFlat;
+exports.I18N_KEY_ATTRIBUTE = exports.I18N_KEY_DATA_ATTRIBUTE = void 0;
+
+function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
+
+function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _iterableToArray(iter) { if (typeof Symbol !== "undefined" && Symbol.iterator in Object(iter)) return Array.from(iter); }
+
+function _arrayWithoutHoles(arr) { if (Array.isArray(arr)) return _arrayLikeToArray(arr); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+var I18N_KEY_DATA_ATTRIBUTE = 'i18n-key';
+exports.I18N_KEY_DATA_ATTRIBUTE = I18N_KEY_DATA_ATTRIBUTE;
+var I18N_KEY_ATTRIBUTE = "data-".concat(I18N_KEY_DATA_ATTRIBUTE);
+exports.I18N_KEY_ATTRIBUTE = I18N_KEY_ATTRIBUTE;
+var I18N_KEY_SELECTOR = "*[".concat(I18N_KEY_ATTRIBUTE, "]");
+
+function localeInit(elem) {
+  for (var _len = arguments.length, keys = new Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    keys[_key - 1] = arguments[_key];
+  }
+
+  var encodedKeys = keys.map(encodeURIComponent);
+  var $elem = $(elem);
+  $elem.attr(I18N_KEY_ATTRIBUTE, encodedKeys.join(","));
+  localize(elem);
+  return elem;
+}
+
+function localize(elems) {
+  localizeFlat(elems);
+  var $i18nElemsDescendants = $(elems).find(I18N_KEY_SELECTOR);
+  localizeFlat($i18nElemsDescendants);
+  return elems;
+}
+
+function localizeFlat(elems) {
+  var $elems = $(elems);
+  var $i18nElems = $elems.filter(I18N_KEY_SELECTOR);
+  $i18nElems.each(function () {
+    var $i18nElem = $(this);
+    var encodedKeys = $i18nElem.data(I18N_KEY_DATA_ATTRIBUTE).split(",");
+    var keys = encodedKeys.map(decodeURIComponent);
+
+    if (keys.length > 0) {
+      var object = _defineProperty({}, keys[0], IMAGINARY.i18n.t(keys[0]));
+
+      var text = recursiveGet.apply(void 0, [object].concat(_toConsumableArray(keys)));
+      $i18nElem.text(text);
+    }
+  });
+  return elems;
+}
+
+function recursiveGet(object, key) {
+  var value = object[key];
+
+  for (var _len2 = arguments.length, otherKeys = new Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
+    otherKeys[_key2 - 2] = arguments[_key2];
+  }
+
+  if (otherKeys.length === 0) {
+    return value;
+  } else {
+    return recursiveGet.apply(void 0, [value].concat(otherKeys));
+  }
+}
+
+},{}],18:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _i18n = _interopRequireDefault(require("./i18n"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -3542,23 +3714,148 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-var defaultConfig = {
-  defaultLanguage: 'en',
-  useGamepads: true,
-  useScreenControls: true,
-  useKeyboardControls: true,
-  botType: null,
-  botTypeLabels: 'difficulty',
-  maxPlayers: 2,
-  maxTime: Number.POSITIVE_INFINITY,
-  maxProbes: Number.POSITIVE_INFINITY,
-  continuousGame: false,
-  showSeaFloor: false,
-  maxDepthTilt: 4,
-  fullScreenButton: true,
-  debugControls: false,
-  map: null
-};
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+var LanguageCycleButton = /*#__PURE__*/function () {
+  function LanguageCycleButton(elementToLocalize, languageCodes) {
+    var _this = this;
+
+    _classCallCheck(this, LanguageCycleButton);
+
+    this.elementToLocalize = elementToLocalize;
+    this.languageCodes = languageCodes;
+    this.languageButton = document.createElement("div");
+    this.languageButton.classList.add("language-button");
+    this.languageIcon = document.createElement("i");
+    this.languageIcon.classList.add("fas", "fa-sm", "fa-language");
+    this.languageButton.appendChild(this.languageIcon);
+
+    this.languageButton.onpointerup = function () {
+      return _this.handleLanguageChange();
+    };
+
+    this.element = this.languageButton;
+  }
+
+  _createClass(LanguageCycleButton, [{
+    key: "handleLanguageChange",
+    value: function () {
+      var _handleLanguageChange = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+        var currentLangIdx, nextLangIdx, nextLang;
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                currentLangIdx = this.languageCodes.indexOf(IMAGINARY.i18n.getLang());
+                nextLangIdx = (currentLangIdx + 1) % this.languageCodes.length;
+                nextLang = this.languageCodes[nextLangIdx];
+                _context.next = 5;
+                return IMAGINARY.i18n.setLang(nextLang);
+
+              case 5:
+                (0, _i18n["default"])(this.elementToLocalize);
+                console.log("Language switched: ".concat(nextLang));
+
+              case 7:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function handleLanguageChange() {
+        return _handleLanguageChange.apply(this, arguments);
+      }
+
+      return handleLanguageChange;
+    }()
+  }]);
+
+  return LanguageCycleButton;
+}();
+
+exports["default"] = LanguageCycleButton;
+
+},{"./i18n":17}],19:[function(require,module,exports){
+"use strict";
+
+var _game = _interopRequireDefault(require("./game"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _slicedToArray(arr, i) { return _arrayWithHoles(arr) || _iterableToArrayLimit(arr, i) || _unsupportedIterableToArray(arr, i) || _nonIterableRest(); }
+
+function _nonIterableRest() { throw new TypeError("Invalid attempt to destructure non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
+
+function _unsupportedIterableToArray(o, minLen) { if (!o) return; if (typeof o === "string") return _arrayLikeToArray(o, minLen); var n = Object.prototype.toString.call(o).slice(8, -1); if (n === "Object" && o.constructor) n = o.constructor.name; if (n === "Map" || n === "Set") return Array.from(o); if (n === "Arguments" || /^(?:Ui|I)nt(?:8|16|32)(?:Clamped)?Array$/.test(n)) return _arrayLikeToArray(o, minLen); }
+
+function _arrayLikeToArray(arr, len) { if (len == null || len > arr.length) len = arr.length; for (var i = 0, arr2 = new Array(len); i < len; i++) { arr2[i] = arr[i]; } return arr2; }
+
+function _iterableToArrayLimit(arr, i) { if (typeof Symbol === "undefined" || !(Symbol.iterator in Object(arr))) return; var _arr = []; var _n = true; var _d = false; var _e = undefined; try { for (var _i = arr[Symbol.iterator](), _s; !(_n = (_s = _i.next()).done); _n = true) { _arr.push(_s.value); if (i && _arr.length === i) break; } } catch (err) { _d = true; _e = err; } finally { try { if (!_n && _i["return"] != null) _i["return"](); } finally { if (_d) throw _e; } } return _arr; }
+
+function _arrayWithHoles(arr) { if (Array.isArray(arr)) return arr; }
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function fetchJson(_x) {
+  return _fetchJson.apply(this, arguments);
+}
+
+function _fetchJson() {
+  _fetchJson = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(uri) {
+    var response;
+    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+      while (1) {
+        switch (_context2.prev = _context2.next) {
+          case 0:
+            _context2.next = 2;
+            return fetch(uri, {
+              cache: 'no-store'
+            });
+
+          case 2:
+            response = _context2.sent;
+
+            if (!(response.status >= 200 && response.status < 300)) {
+              _context2.next = 13;
+              break;
+            }
+
+            _context2.prev = 4;
+            _context2.next = 7;
+            return response.json();
+
+          case 7:
+            return _context2.abrupt("return", _context2.sent);
+
+          case 10:
+            _context2.prev = 10;
+            _context2.t0 = _context2["catch"](4);
+            throw new Error("Error parsing JSON file: ".concat(_context2.t0.message));
+
+          case 13:
+            throw new Error("Server returned status ".concat(response.status, " (").concat(response.statusText, ") loading JSON file."));
+
+          case 14:
+          case "end":
+            return _context2.stop();
+        }
+      }
+    }, _callee2, null, [[4, 10]]);
+  }));
+  return _fetchJson.apply(this, arguments);
+}
+
+function getDefaultConfig() {
+  return _getDefaultConfig.apply(this, arguments);
+}
 /**
  * Loads the config file from an external JSON file
  *
@@ -3566,7 +3863,53 @@ var defaultConfig = {
  * @return {Promise<any>}
  */
 
-function loadConfig(_x) {
+
+function _getDefaultConfig() {
+  _getDefaultConfig = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
+    var defaultConfig, tr;
+    return regeneratorRuntime.wrap(function _callee3$(_context3) {
+      while (1) {
+        switch (_context3.prev = _context3.next) {
+          case 0:
+            defaultConfig = {
+              defaultLanguage: 'en',
+              languages: undefined,
+              // fill in from tr.json
+              useGamepads: true,
+              useScreenControls: true,
+              useKeyboardControls: true,
+              botType: null,
+              botTypeLabels: 'difficulty',
+              maxPlayers: 2,
+              maxTime: Number.POSITIVE_INFINITY,
+              maxProbes: Number.POSITIVE_INFINITY,
+              continuousGame: false,
+              showSeaFloor: false,
+              maxDepthTilt: 4,
+              fullScreenButton: true,
+              languageButton: true,
+              debugControls: false,
+              map: null
+            };
+            _context3.next = 3;
+            return fetchJson(new URL('tr.json', window.location.href));
+
+          case 3:
+            tr = _context3.sent;
+            defaultConfig.languages = Object.keys(tr).sort();
+            return _context3.abrupt("return", defaultConfig);
+
+          case 6:
+          case "end":
+            return _context3.stop();
+        }
+      }
+    }, _callee3);
+  }));
+  return _getDefaultConfig.apply(this, arguments);
+}
+
+function loadConfig(_x2) {
   return _loadConfig.apply(this, arguments);
 }
 /**
@@ -3581,31 +3924,31 @@ function loadConfig(_x) {
 
 
 function _loadConfig() {
-  _loadConfig = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(uri) {
+  _loadConfig = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4(uri) {
     var response, config, titleCase;
-    return regeneratorRuntime.wrap(function _callee2$(_context2) {
+    return regeneratorRuntime.wrap(function _callee4$(_context4) {
       while (1) {
-        switch (_context2.prev = _context2.next) {
+        switch (_context4.prev = _context4.next) {
           case 0:
-            _context2.next = 2;
+            _context4.next = 2;
             return fetch(uri, {
               cache: 'no-store'
             });
 
           case 2:
-            response = _context2.sent;
+            response = _context4.sent;
 
             if (!(response.status >= 200 && response.status < 300)) {
-              _context2.next = 17;
+              _context4.next = 17;
               break;
             }
 
-            _context2.prev = 4;
-            _context2.next = 7;
+            _context4.prev = 4;
+            _context4.next = 7;
             return response.json();
 
           case 7:
-            config = _context2.sent;
+            config = _context4.sent;
 
             // Take into account the INFINITY is a valid value for maxTime and maxProbes
             titleCase = function titleCase(s) {
@@ -3616,27 +3959,27 @@ function _loadConfig() {
 
             if (Number(titleCase(config.maxTime)) === Number.POSITIVE_INFINITY) config.maxTime = Number.POSITIVE_INFINITY;
             if (Number(titleCase(config.maxProbes)) === Number.POSITIVE_INFINITY) config.maxProbes = Number.POSITIVE_INFINITY;
-            return _context2.abrupt("return", config);
+            return _context4.abrupt("return", config);
 
           case 14:
-            _context2.prev = 14;
-            _context2.t0 = _context2["catch"](4);
-            throw new Error("Error parsing config file: ".concat(_context2.t0.message));
+            _context4.prev = 14;
+            _context4.t0 = _context4["catch"](4);
+            throw new Error("Error parsing config file: ".concat(_context4.t0.message));
 
           case 17:
             throw new Error("Server returned status ".concat(response.status, " (").concat(response.statusText, ") loading config file."));
 
           case 18:
           case "end":
-            return _context2.stop();
+            return _context4.stop();
         }
       }
-    }, _callee2, null, [[4, 14]]);
+    }, _callee4, null, [[4, 14]]);
   }));
   return _loadConfig.apply(this, arguments);
 }
 
-function getCustomConfigUrl() {
+function getConfigCustomUrl() {
   var urlSearchParams = new URLSearchParams(window.location.search);
 
   if (!urlSearchParams.has('config')) {
@@ -3659,54 +4002,60 @@ function getCustomConfigUrl() {
 
 (function () {
   var _main = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
-    var defaultConfigUrl, costumConfigUrl, configUrl, config, game;
+    var configDefaultUrl, defaultConfigPromise, configCustomUrl, configUrl, configPromise, _yield$Promise$all, _yield$Promise$all2, defaultConfig, loadedConfig, config, game;
+
     return regeneratorRuntime.wrap(function _callee$(_context) {
       while (1) {
         switch (_context.prev = _context.next) {
           case 0:
             _context.prev = 0;
-            defaultConfigUrl = new URL('./config.json', window.location.href);
-            costumConfigUrl = getCustomConfigUrl();
-            configUrl = costumConfigUrl ? costumConfigUrl : defaultConfigUrl;
-            _context.t0 = Object;
-            _context.t1 = {};
-            _context.t2 = defaultConfig;
-            _context.next = 9;
-            return loadConfig(configUrl.href);
+            configDefaultUrl = new URL('./config.json', window.location.href);
+            defaultConfigPromise = getDefaultConfig();
+            configCustomUrl = getConfigCustomUrl();
+            configUrl = configCustomUrl !== null && configCustomUrl !== void 0 ? configCustomUrl : configDefaultUrl;
+            configPromise = loadConfig(configUrl.href);
+            _context.next = 8;
+            return Promise.all([defaultConfigPromise, configPromise]);
 
-          case 9:
-            _context.t3 = _context.sent;
-            config = _context.t0.assign.call(_context.t0, _context.t1, _context.t2, _context.t3);
-            _context.next = 13;
+          case 8:
+            _yield$Promise$all = _context.sent;
+            _yield$Promise$all2 = _slicedToArray(_yield$Promise$all, 2);
+            defaultConfig = _yield$Promise$all2[0];
+            loadedConfig = _yield$Promise$all2[1];
+            config = Object.assign({}, defaultConfig, loadedConfig);
+            console.log("Default configuration:", defaultConfig);
+            console.log("Loaded configuration:", loadedConfig);
+            console.log("Merged configuration:", config);
+            _context.next = 18;
             return IMAGINARY.i18n.init({
               queryStringVariable: 'lang',
               translationsDirectory: 'tr',
               defaultLanguage: config.defaultLanguage || 'en'
             });
 
-          case 13:
+          case 18:
             // eslint-disable-next-line no-unused-vars
             game = new _game["default"](document.querySelector('.main'), config);
             window.game = game;
-            _context.next = 17;
+            _context.next = 22;
             return game.init();
 
-          case 17:
-            _context.next = 22;
+          case 22:
+            _context.next = 27;
             break;
 
-          case 19:
-            _context.prev = 19;
-            _context.t4 = _context["catch"](0);
+          case 24:
+            _context.prev = 24;
+            _context.t0 = _context["catch"](0);
             // eslint-disable-next-line no-console
-            console.error(_context.t4);
+            console.error(_context.t0);
 
-          case 22:
+          case 27:
           case "end":
             return _context.stop();
         }
       }
-    }, _callee, null, [[0, 19]]);
+    }, _callee, null, [[0, 24]]);
   }));
 
   function main() {
@@ -3716,7 +4065,7 @@ function getCustomConfigUrl() {
   return main;
 })()();
 
-},{"./game":16}],18:[function(require,module,exports){
+},{"./game":16}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3876,7 +4225,7 @@ function terrain(numSamples, length) {
   });
 }
 
-},{"assert":23}],19:[function(require,module,exports){
+},{"assert":25}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3947,7 +4296,7 @@ function animatedSVGPolyline(svgContainer, numPoints, numSteps, xScale, yScale, 
   return waves;
 }
 
-},{}],20:[function(require,module,exports){
+},{}],22:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4036,7 +4385,7 @@ function WavyAnimation(shape) {
   };
 }
 
-},{}],21:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 (function (process){(function (){
 /**
  * @popperjs/core v2.5.4 - MIT License
@@ -5907,7 +6256,7 @@ exports.preventOverflow = preventOverflow$1;
 
 }).call(this)}).call(this,require('_process'))
 
-},{"_process":29}],22:[function(require,module,exports){
+},{"_process":31}],24:[function(require,module,exports){
 (function () {
 	'use strict';
 
@@ -7764,7 +8113,7 @@ exports.preventOverflow = preventOverflow$1;
 }());
 
 
-},{}],23:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 (function (global){(function (){
 'use strict';
 
@@ -8275,7 +8624,7 @@ var objectKeys = Object.keys || function (obj) {
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"object-assign":28,"util/":26}],24:[function(require,module,exports){
+},{"object-assign":30,"util/":28}],26:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -8300,14 +8649,14 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],25:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],26:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 (function (process,global){(function (){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -8898,7 +9247,7 @@ function hasOwnProperty(obj, prop) {
 
 }).call(this)}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./support/isBuffer":25,"_process":29,"inherits":24}],27:[function(require,module,exports){
+},{"./support/isBuffer":27,"_process":31,"inherits":26}],29:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -9423,7 +9772,7 @@ function functionBindPolyfill(context) {
   };
 }
 
-},{}],28:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 /*
 object-assign
 (c) Sindre Sorhus
@@ -9515,7 +9864,7 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 	return to;
 };
 
-},{}],29:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -9701,5 +10050,5 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[17])
+},{}]},{},[19])
 

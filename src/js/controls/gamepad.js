@@ -24,6 +24,7 @@ export default class GamepadControls extends Controls {
         this.modifyState(gp.index, "left", gp.axes[0] < -0.5);
         this.modifyState(gp.index, "right", gp.axes[0] > 0.5);
         this.modifyState(gp.index, "action", gp.buttons[1].pressed || gp.buttons[2].pressed);
+        this.modifyState(gp.index, "language", gp.buttons[8].pressed);
       });
   }
 
@@ -36,7 +37,8 @@ export default class GamepadControls extends Controls {
    * @return {[{
    *   left: Boolean,
    *   right: Boolean,
-   *   action: Boolean
+   *   action: Boolean,
+   *   language: Boolean,
    * }]}
    */
   getStates() {

@@ -285,6 +285,22 @@ body {
   .overlay .game-stats * .counter {
     margin-left: 1ex; }
 
+.language-button {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 1ex 1ex 1ex 1ex;
+  padding: 0ex 2ex 2ex 0ex;
+  color: #ffec02;
+  opacity: 0.6; }
+  .language-button:hover {
+    opacity: 0.8; }
+  .language-button:active {
+    opacity: 1.0; }
+  .language-button * {
+    margin-top: -0.1ex;
+    font-size: 188%; }
+
 .fullscreen-button {
   position: absolute;
   top: 0;
@@ -301,4 +317,4 @@ body {
     margin-top: -0.1ex;
     font-size: 188%; }
 
-/*# sourceMappingURL=default-2e8b5bf4e2.css.map */
+/*# sourceMappingURL=default-bbeb274cc4.css.map */

@@ -1,6 +1,7 @@
 /* globals SVG */
 import "@wessberg/pointer-events";
 
+import localize from "./i18n";
 import PlayMode from './game-mode-play';
 import TitleMode from './game-mode-title';
 import PlayerNumberMode from './game-mode-numplayers';
@@ -9,6 +10,7 @@ import ScreenControls from './controls/screen';
 import KeyboardControls from "./controls/keyboard";
 import FullScreenToggle from './full-screen-toggle';
 import BotTypeMode from './game-mode-bottype';
+import LanguageCycleButton from "./language-cycle-button";
 
 /**
  * The main application
@@ -75,6 +77,13 @@ export default class GradientDescentGame {
     }
     if (this.config.useGamepads) {
       this.controls.gamepad = new GamepadControls(this.config.maxPlayers);
+    }
+
+    this.languageButton = new LanguageCycleButton(this.container, this.config.languages);
+    minAspectRatioContainer.appendChild(this.languageButton.element);
+
+    if (!this.config.languageButton) {
+      this.languageButton.element.style.visibility = 'hidden';
     }
 
     if (this.config.fullScreenButton) {
@@ -149,7 +158,7 @@ export default class GradientDescentGame {
   createInputs() {
     return Array(this.config.maxPlayers)
       .fill(null)
-      .map(() => ({ direction: 0, action: false }));
+      .map(() => ({ direction: 0, action: false, language: false }));
   }
 
   /**
@@ -166,6 +175,7 @@ export default class GradientDescentGame {
     const inputReducer = (accInput, curState) => ({
       direction: curState.right ? 1 : (curState.left ? -1 : accInput.direction),
       action: curState.action || accInput.action,
+      language: curState.language || accInput.language
     });
     this.inputs = this.createInputs().map(
       (input, i) => states.map(s => s[i]).reduce(inputReducer, input)
@@ -176,6 +186,15 @@ export default class GradientDescentGame {
         `C${i}: d=${ctrl.direction} a=${ctrl.action ? 'T' : 'F'}`
       )).join('\u00a0\u00a0\u00a0\u00a0'); // four &nbsp;
     }
+  }
+
+  handleGlobalInputs() {
+    const switchLanguage = this.inputsLast.reduce(
+      (acc, cur, i) => acc || (cur.language === false && this.inputs[i].language === true),
+      false
+    )
+    if (switchLanguage)
+      this.languageButton.handleLanguageChange().then();
   }
 
   /**
@@ -190,6 +209,7 @@ export default class GradientDescentGame {
       this.gameLoop = (ts) => {
         if (!this.isPaused) {
           this.readInputs();
+          this.handleGlobalInputs();
           lag += Math.max(0, (ts - lag) - lastTs - MAX_DELTA);
           ts -= lag;
           const delta = ts - lastTs;

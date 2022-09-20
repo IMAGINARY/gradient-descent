@@ -16,6 +16,7 @@ export default class Controls {
         left: false,
         right: false,
         action: false,
+        language: false,
       }));
     this.statesModified = false;
   }
@@ -41,7 +42,8 @@ export default class Controls {
    * @return {[{
    *   left: Boolean,
    *   right: Boolean,
-   *   action: Boolean
+   *   action: Boolean,
+   *   language: Boolean,
    * }]}
    */
   getStates() {
