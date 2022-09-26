@@ -1,0 +1,40 @@
+{
+  "press-to-start": "Press a button to start",
+  "press-to-restart": "Press a button to restart",
+  "choose-num-players": "Choose number of players",
+  "choose-bot-type": {
+    "difficulty": "Choose the difficulty level of the bot",
+    "strategy": "Choose the bot type"
+  },
+  "bot-types": {
+    "difficulty": {
+      "none": "None",
+      "random": "Easy",
+      "gradient-descent": "Medium",
+      "tangent-intersection": "Hard"
+    },
+    "strategy": {
+      "none": "None",
+      "random": "Random",
+      "gradient-descent": "Gradient descent",
+      "tangent-intersection": "Adjacent tangents"
+    }
+  },
+  "remaining-time": "Time:",
+  "remaining-probes": "Probes:",
+  "objective": "Find the treasure at the deepest point of the ocean!",
+  "go": "Go!",
+  "win-announcement-begin": "Player ",
+  "win-announcement-end": " found the treasure:",
+  "time-is-up": "Time is up!",
+  "no-probes-left": "No probes left!",
+  "game-over": "Game over!",
+  "treasures": [
+    "Fermat’s Lost Proof",
+    "The last digit of Pi",
+    "The last pair of twin primes",
+    "A perpetual motion machine",
+    "Instructions for squaring the circle",
+    "Pythagoras’ guitar pick"
+  ]
+}
