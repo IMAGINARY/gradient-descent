@@ -1,40 +1,40 @@
 {
-  "press-to-start": "Press a button to start",
-  "press-to-restart": "Press a button to restart",
-  "choose-num-players": "Choose number of players",
+  "press-to-start": "Appuyez sur une touche pour commencer",
+  "press-to-restart": "Appuyez sur une touche pour recommencer",
+  "choose-num-players": "Choisissez le nombre de joueurs",
   "choose-bot-type": {
-    "difficulty": "Choose the difficulty level of the bot",
-    "strategy": "Choose the bot type"
+    "difficulty": "Choisissez le niveau de difficulté du bot",
+    "strategy": "Choisissez le type de bot"
   },
   "bot-types": {
     "difficulty": {
-      "none": "None",
-      "random": "Easy",
-      "gradient-descent": "Medium",
-      "tangent-intersection": "Hard"
+      "none": "Aucun bot",
+      "random": "Facile",
+      "gradient-descent": "Moyen",
+      "tangent-intersection": "Difficile"
     },
     "strategy": {
-      "none": "None",
-      "random": "Random",
-      "gradient-descent": "Gradient descent",
-      "tangent-intersection": "Adjacent tangents"
+      "none": "Aucune",
+      "random": "Aléatoire",
+      "gradient-descent": "Descente de gradient",
+      "tangent-intersection": "Tangentes adjacentes"
     }
   },
-  "remaining-time": "Time:",
-  "remaining-probes": "Probes:",
-  "objective": "Find the treasure at the deepest point of the ocean!",
-  "go": "Go!",
-  "win-announcement-begin": "Player ",
-  "win-announcement-end": " found the treasure:",
-  "time-is-up": "Time is up!",
-  "no-probes-left": "No probes left!",
-  "game-over": "Game over!",
+  "remaining-time": "Temps :",
+  "remaining-probes": "Sondes :",
+  "objective": "Trouvez le trésor au point le plus profond de l'océan !",
+  "go": "Allez !",
+  "win-announcement-begin": "Le joueur ",
+  "win-announcement-end": " a trouvé le trésor :",
+  "time-is-up": "Le temps est écoulé !",
+  "no-probes-left": "Vouz n'avez plus de sondes !",
+  "game-over": "Le jeu est terminé !",
   "treasures": [
-    "Fermat’s Lost Proof",
-    "The last digit of Pi",
-    "The last pair of twin primes",
-    "A perpetual motion machine",
-    "Instructions for squaring the circle",
-    "Pythagoras’ guitar pick"
+    "La preuve perdue de Fermat",
+    "Le dernier chiffre de Pi",
+    "Le dernier couple de nombres premiers jumeaux",
+    "Une machine à mouvement perpétuel",
+    "Des instructions pour quarrer le cercle",
+    "Le médiator de guitare de Pythagore"
   ]
 }

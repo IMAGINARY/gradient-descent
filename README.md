@@ -175,7 +175,7 @@ To add a new translation, the following steps are necessary:
 ## Credits
 
 Developed by Christian Stussak and Eric Londaits, based on a concept by Aaron Montag, IMAGINARY
-gGmbH. Dutch translation by Jarne Renders.
+gGmbH. Dutch translation by Jarne Renders. French translation by Barbara Knapiak.
 
 ## License
 
