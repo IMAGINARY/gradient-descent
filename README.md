@@ -171,11 +171,19 @@ To add a new translation, the following steps are necessary:
 - Copy a locale file from `tr` for a language you are familiar with and rename its basename to match the new language code, e.g. copy `tr/en.json` to `tr/eo.json`.
 - Translate all the texts in the new locale file. Preserve whitespace.
 - Add the new language code and its endonym to `tr.json`.
+- Add your name to the list of contributors below.
 
 ## Credits
 
 Developed by Christian Stussak and Eric Londaits, based on a concept by Aaron Montag, IMAGINARY
-gGmbH. Dutch translation by Jarne Renders. French translation by Barbara Knapiak.
+gGmbH.
+
+### Translations
+
+- Dutch: Jarne Renders
+- English: Christian Stussak, Eric Londaits
+- French: Barbara Knapiak, Daniel Ramos
+- German: Christian Stussak, Andreas Daniel Matt
 
 ## License
 
