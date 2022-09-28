@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [1.7.0]
+
 ### Added
 
 - French translation
@@ -123,7 +125,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Initial game
 
-[unreleased]: https://github.com/IMAGINARY/gradient-descent/compare/v1.6.0...HEAD
+[unreleased]: https://github.com/IMAGINARY/gradient-descent/compare/v1.7.0...HEAD
+
+[1.7.0]: https://github.com/IMAGINARY/gradient-descent/compare/v1.7.0...v1.6.0
 
 [1.6.0]: https://github.com/IMAGINARY/gradient-descent/compare/v1.6.0...v1.5.2
 
