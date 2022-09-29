@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [1.7.1]
+
+### Modified
+
+- Updated the Gradient Vector font to v1.1.0, which includes support for French characters.
+- Added extra space between the lines of the end game message because the current version of the 
+  font has less space between the lines than the previous version.
+
 ## [1.7.0]
 
 ### Added
