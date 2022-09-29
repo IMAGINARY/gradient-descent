@@ -2390,8 +2390,8 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                   });
                 };
 
-                $firstMessageDiv = $('<div>').append(firstMessageElem);
-                $secondMessageDiv = $('<div>').append(secondMessageElem).css('visibility', 'hidden');
+                $firstMessageDiv = $('<div class="line">').append(firstMessageElem);
+                $secondMessageDiv = $('<div class="line">').append(secondMessageElem).css('visibility', 'hidden');
                 $startSequenceDiv = $('<div class="announcement-sequences-text" />').addClass(cssClasses).append([$firstMessageDiv, $('<br>'), $secondMessageDiv]);
                 top = 100 * (WATER_DISTANCE + TERRAIN_DISTANCE) / draw.height();
                 $announcementAnchor = $('<div class="announcement-sequences-text-anchor" />').css({
@@ -2559,8 +2559,8 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                   });
                 };
 
-                $firstMessageDiv = $('<div>').append(firstMessageElem);
-                $secondMessageDiv = $('<div>').append(secondMessageElem).css('visibility', 'hidden');
+                $firstMessageDiv = $('<div class="line">').append(firstMessageElem);
+                $secondMessageDiv = $('<div class="line">').append(secondMessageElem).css('visibility', 'hidden');
                 $restartDiv = $('<div class="blinking">').css('visibility', 'hidden');
                 (0, _i18n.localeInit)($restartDiv, 'press-to-restart');
                 $endingSequenceDiv = $('<div class="announcement-sequences-text" />').addClass(cssClasses).append([$firstMessageDiv, $secondMessageDiv, $('<br>'), $restartDiv]);

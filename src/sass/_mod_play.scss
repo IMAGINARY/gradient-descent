@@ -58,6 +58,10 @@ $player-colors: $color-player-0, $color-player-1, $color-player-2, $color-player
     text-align: center;
     text-transform: uppercase;
     padding-bottom: 0.25ex;
+
+    .line {
+      margin-bottom: 0.4ex;
+    }
   }
 
   .announcement-sequences-text-anchor {

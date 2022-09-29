@@ -268,6 +268,8 @@ body {
   text-align: center;
   text-transform: uppercase;
   padding-bottom: 0.25ex; }
+  .overlay .announcement-sequences-text .line {
+    margin-bottom: 0.4ex; }
 
 .overlay .announcement-sequences-text-anchor {
   position: absolute; }
@@ -317,4 +319,4 @@ body {
     margin-top: -0.1ex;
     font-size: 188%; }
 
-/*# sourceMappingURL=default-bbeb274cc4.css.map */
+/*# sourceMappingURL=default-10a55b0700.css.map */

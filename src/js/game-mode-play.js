@@ -543,8 +543,8 @@ export default class PlayMode extends GameMode {
 
     const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-    const $firstMessageDiv = $('<div>').append(firstMessageElem);
-    const $secondMessageDiv = $('<div>').append(secondMessageElem)
+    const $firstMessageDiv = $('<div class="line">').append(firstMessageElem);
+    const $secondMessageDiv = $('<div class="line">').append(secondMessageElem)
         .css('visibility', 'hidden');
 
     const $startSequenceDiv = $('<div class="announcement-sequences-text" />')
@@ -626,8 +626,8 @@ export default class PlayMode extends GameMode {
 
     const delay = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-    const $firstMessageDiv = $('<div>').append(firstMessageElem);
-    const $secondMessageDiv = $('<div>').append(secondMessageElem)
+    const $firstMessageDiv = $('<div class="line">').append(firstMessageElem);
+    const $secondMessageDiv = $('<div class="line">').append(secondMessageElem)
       .css('visibility', 'hidden');
     const $restartDiv = $('<div class="blinking">')
       .css('visibility', 'hidden');
