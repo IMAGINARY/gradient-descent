@@ -6,56 +6,56 @@ const sounds = {
     `${PREFIX}/silence.mp3`,
   ],
   gameLogoAppears: [
-    `${PREFIX}/silence.webm`,
-    `${PREFIX}/silence.mp3`,
+    `${PREFIX}/gameLogoAppears.webm`,
+    `${PREFIX}/gameLogoAppears.mp3`,
   ],
   changeItem: [
-    `${PREFIX}/silence.webm`,
-    `${PREFIX}/silence.mp3`,
+    `${PREFIX}/changeItem.webm`,
+    `${PREFIX}/changeItem.mp3`,
   ],
   selectItem: [
-    `${PREFIX}/silence.webm`,
-    `${PREFIX}/silence.mp3`,
+    `${PREFIX}/selectItem.webm`,
+    `${PREFIX}/selectItem.mp3`,
   ],
   clockTick: [
-    `${PREFIX}/silence.webm`,
-    `${PREFIX}/silence.mp3`,
+    `${PREFIX}/clockTick.webm`,
+    `${PREFIX}/clockTick.mp3`,
   ],
   boatMove: [
-    `${PREFIX}/silence.webm`,
-    `${PREFIX}/silence.mp3`,
+    `${PREFIX}/boatMove.webm`,
+    `${PREFIX}/boatMove.mp3`,
   ],
   probeDown: [
-    `${PREFIX}/silence.webm`,
-    `${PREFIX}/silence.mp3`,
+    `${PREFIX}/probeDown.webm`,
+    `${PREFIX}/probeDown.mp3`,
   ],
   probeUp: [
-    `${PREFIX}/silence.webm`,
-    `${PREFIX}/silence.mp3`,
+    `${PREFIX}/probeUp.webm`,
+    `${PREFIX}/probeUp.mp3`,
   ],
   probeHit: [
-    `${PREFIX}/silence.webm`,
-    `${PREFIX}/silence.mp3`,
+    `${PREFIX}/probeHit.webm`,
+    `${PREFIX}/probeHit.mp3`,
   ],
   probeMiss: [
-    `${PREFIX}/silence.webm`,
-    `${PREFIX}/silence.mp3`,
+    `${PREFIX}/probeMiss.webm`,
+    `${PREFIX}/probeMiss.mp3`,
   ],
   revealSeaFloor: [
-    `${PREFIX}/silence.webm`,
-    `${PREFIX}/silence.mp3`,
+    `${PREFIX}/revealSeaFloor.webm`,
+    `${PREFIX}/revealSeaFloor.mp3`,
   ],
   treasureOpen: [
-    `${PREFIX}/silence.webm`,
-    `${PREFIX}/silence.mp3`,
+    `${PREFIX}/treasureOpen.webm`,
+    `${PREFIX}/treasureOpen.mp3`,
   ],
   gameOverWin: [
-    `${PREFIX}/silence.webm`,
-    `${PREFIX}/silence.mp3`,
+    `${PREFIX}/gameOverWin.webm`,
+    `${PREFIX}/gameOverWin.mp3`,
   ],
   gameOverLose: [
-    `${PREFIX}/silence.webm`,
-    `${PREFIX}/silence.mp3`,
+    `${PREFIX}/gameOverLose.webm`,
+    `${PREFIX}/gameOverLose.mp3`,
   ]
 };
 

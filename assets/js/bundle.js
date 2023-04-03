@@ -8,19 +8,19 @@ exports.musics = exports.sounds = void 0;
 var PREFIX = './assets/audio';
 var sounds = {
   silence: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
-  gameLogoAppears: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
-  changeItem: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
-  selectItem: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
-  clockTick: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
-  boatMove: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
-  probeDown: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
-  probeUp: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
-  probeHit: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
-  probeMiss: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
-  revealSeaFloor: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
-  treasureOpen: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
-  gameOverWin: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")],
-  gameOverLose: ["".concat(PREFIX, "/silence.webm"), "".concat(PREFIX, "/silence.mp3")]
+  gameLogoAppears: ["".concat(PREFIX, "/gameLogoAppears.webm"), "".concat(PREFIX, "/gameLogoAppears.mp3")],
+  changeItem: ["".concat(PREFIX, "/changeItem.webm"), "".concat(PREFIX, "/changeItem.mp3")],
+  selectItem: ["".concat(PREFIX, "/selectItem.webm"), "".concat(PREFIX, "/selectItem.mp3")],
+  clockTick: ["".concat(PREFIX, "/clockTick.webm"), "".concat(PREFIX, "/clockTick.mp3")],
+  boatMove: ["".concat(PREFIX, "/boatMove.webm"), "".concat(PREFIX, "/boatMove.mp3")],
+  probeDown: ["".concat(PREFIX, "/probeDown.webm"), "".concat(PREFIX, "/probeDown.mp3")],
+  probeUp: ["".concat(PREFIX, "/probeUp.webm"), "".concat(PREFIX, "/probeUp.mp3")],
+  probeHit: ["".concat(PREFIX, "/probeHit.webm"), "".concat(PREFIX, "/probeHit.mp3")],
+  probeMiss: ["".concat(PREFIX, "/probeMiss.webm"), "".concat(PREFIX, "/probeMiss.mp3")],
+  revealSeaFloor: ["".concat(PREFIX, "/revealSeaFloor.webm"), "".concat(PREFIX, "/revealSeaFloor.mp3")],
+  treasureOpen: ["".concat(PREFIX, "/treasureOpen.webm"), "".concat(PREFIX, "/treasureOpen.mp3")],
+  gameOverWin: ["".concat(PREFIX, "/gameOverWin.webm"), "".concat(PREFIX, "/gameOverWin.mp3")],
+  gameOverLose: ["".concat(PREFIX, "/gameOverLose.webm"), "".concat(PREFIX, "/gameOverLose.mp3")]
 };
 exports.sounds = sounds;
 var musics = {
