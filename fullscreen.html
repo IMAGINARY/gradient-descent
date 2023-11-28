@@ -29,7 +29,16 @@
   </script>
 </head>
 <body>
-<iframe id="game" src="index.html"></iframe>
+<iframe id="game"></iframe>
 <div id="overlay"></div>
+<script>
+  const baseUrl = new URL(window.location.href);
+  const iframeUrl = new URL("index.html",baseUrl);
+  iframeUrl.search = baseUrl.search;
+  iframeUrl.hash = baseUrl.hash;
+
+  const iframe = document.querySelector('#game');
+  iframe.src = iframeUrl.href;
+</script>
 </body>
 </html>
