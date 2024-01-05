@@ -119,38 +119,45 @@ yarn
 After the dependencies have been installed successfully, you can compile as needed:
 
 - **sass (stylesheets)**
-    ```
-    gulp styles
-    ```
+
+  ```
+  gulp styles
+  ```
 
 - **scripts (ES6)**
-    ```
-    gulp scripts
-    ```
+
+  ```
+  gulp scripts
+  ```
 
 - **dependencies (ES6)**
-    ```
-    gulp dependencies
-    ```
+
+  ```
+  gulp dependencies
+  ```
 
 - **pug (HTML pages)**
-    ```
-    gulp html
-    ```
+
+  ```
+  gulp html
+  ```
 
 - **all**
-    ```
-    yarn run build
-    ```
+
+  ```
+  yarn run build
+  ```
+
   respectively
-    ```
-    gulp build
-    ```
+
+  ```
+  gulp build
+  ```
 
 - **watch for changes and recompile as needed**
-    ```
-    gulp build
-    ```
+  ```
+  gulp build
+  ```
 
 Note that `gulp html` needs to be run after `gulp styles`, `gulp scripts` and `gulp dependencies`
 since the html files need to be updated in order to point to the updated build artifacts.
@@ -184,6 +191,7 @@ gGmbH.
 - English: Christian Stussak, Eric Londaits
 - French: Barbara Knapiak, Daniel Ramos
 - German: Christian Stussak, Andreas Daniel Matt
+- Spanish: Daniel Ramos
 
 ## License
 
