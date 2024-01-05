@@ -1,0 +1,40 @@
+{
+  "press-to-start": "Pulsa un botón para empezar",
+  "press-to-restart": "Pulsa un botón para reiniciar",
+  "choose-num-players": "Elige el número de jugadores",
+  "choose-bot-type": {
+    "difficulty": "Elige el nivel de dificultad del bot",
+    "strategy": "Elige el tipo de bot"
+  },
+  "bot-types": {
+    "difficulty": {
+      "none": "Ninguno",
+      "random": "Fácil",
+      "gradient-descent": "Medio",
+      "tangent-intersection": "Difícil"
+    },
+    "strategy": {
+      "none": "Ninguno",
+      "random": "Aleatorio",
+      "gradient-descent": "Descenso gradiente",
+      "tangent-intersection": "Tangentes adyacentes"
+    }
+  },
+  "remaining-time": "Tiempo:",
+  "remaining-probes": "Sondas:",
+  "objective": "¡Encuentra el tesoro en el punto más profundo del océano!",
+  "go": "Vamos!",
+  "win-announcement-begin": "El jugador ",
+  "win-announcement-end": " ha encontrado el tesoro:",
+  "time-is-up": "¡Se acabó el tiempo!",
+  "no-probes-left": "¡No quedan sondas!",
+  "game-over": "¡Fin del juego!",
+  "treasures": [
+    "La demostración perdida de Fermat",
+    "El último dígito de Pi",
+    "El último par de primos gemelos",
+    "Una máquina de movimiento perpetuo",
+    "Instrucciones para la cuadratura del círculo",
+    "La púa de guitarra de Pitágoras"
+  ]
+}
