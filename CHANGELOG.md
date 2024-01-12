@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [1.7.2]
+
+### Modified
+
+- Added the Spanish translation.
+- Forward query string and hash to iframe in the fullscreen.html page.
+
 ## [1.7.1]
 
 ### Modified
