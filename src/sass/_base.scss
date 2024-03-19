@@ -1,7 +1,9 @@
+@use "sass:math";
+
 $width: 1920;
 $height: 1080;
-$aspect-ratio-wh: $width / $height;
-$aspect-ratio-hw: $height / $width;
+$aspect-ratio-wh: math.div($width, $height);
+$aspect-ratio-hw: math.div($height, $width);
 
 :root {
   color-scheme: light dark;
