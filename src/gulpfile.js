@@ -137,9 +137,9 @@ function scripts() {
 
 function watch() {
   gulp.watch(paths.html.watchSrc, html);
-  gulp.watch(paths.styles.watchSrc, styles);
-  gulp.watch(paths.scripts.watchSrc, scripts);
-  gulp.watch(paths.dependencies.watchSrc, dependencies);
+  gulp.watch(paths.styles.watchSrc, gulp.series(styles, html));
+  gulp.watch(paths.scripts.watchSrc, gulp.series(scripts, html));
+  gulp.watch(paths.dependencies.watchSrc, gulp.series(dependencies, html));
 }
 
 const build = gulp.series(gulp.parallel(styles, scripts, dependencies), html);
