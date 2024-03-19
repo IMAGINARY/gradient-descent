@@ -13,6 +13,14 @@ export default class BotTypeMode extends MenuMode {
     return BOT_TYPE_ORDER.map(key => [...keysPrefix, key]);
   }
 
+  getMenuItemTips() {
+    if (this.game.config.showBotTypeTips) {
+      const keysPrefix = ['bot-types', this.game.config.botTypeLabels];
+      return BOT_TYPE_ORDER.map(key => [...keysPrefix, `${key}-tip`]);
+    }
+    return null;
+  }
+
   getDefaultItemIndex() {
     const index = BOT_TYPE_ORDER.indexOf(this.game.botType);
     return index !== -1 ? index : 0;

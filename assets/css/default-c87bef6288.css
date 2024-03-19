@@ -262,6 +262,13 @@ body {
   border-top: 0.09ex solid;
 }
 
+.menu-tip {
+  max-width: 75%;
+  margin: 6% auto 0;
+  line-height: 1;
+  color: #8b811e;
+}
+
 .play {
   color: lightgray;
   stroke-width: 3;
@@ -404,4 +411,4 @@ body {
   margin-top: -0.1ex;
   font-size: 188%;
 }
-/*# sourceMappingURL=default-266bb33bfa.css.map */
+/*# sourceMappingURL=default-c87bef6288.css.map */

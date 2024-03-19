@@ -1247,6 +1247,18 @@ var BotTypeMode = /*#__PURE__*/function (_MenuMode) {
       });
     }
   }, {
+    key: "getMenuItemTips",
+    value: function getMenuItemTips() {
+      if (this.game.config.showBotTypeTips) {
+        var keysPrefix = ['bot-types', this.game.config.botTypeLabels];
+        return BOT_TYPE_ORDER.map(function (key) {
+          return [].concat(keysPrefix, ["".concat(key, "-tip")]);
+        });
+      }
+
+      return null;
+    }
+  }, {
     key: "getDefaultItemIndex",
     value: function getDefaultItemIndex() {
       var index = BOT_TYPE_ORDER.indexOf(this.game.botType);
@@ -1333,19 +1345,20 @@ var MenuMode = /*#__PURE__*/function (_GameMode) {
     key: "handleEnterMode",
     value: function () {
       var _handleEnterMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
-        var $overlay, menuItemsSpecs, $menuTitle, $selector, i, menuItemSpec, $menuItem;
+        var $overlay, menuItemsSpecs, menuItemTipsSpecs, $menuTitle, $selector, i, menuItemSpec, $menuItem;
         return regeneratorRuntime.wrap(function _callee$(_context) {
           while (1) {
             switch (_context.prev = _context.next) {
               case 0:
                 $overlay = $(this.game.overlay);
                 menuItemsSpecs = this.getMenuItems();
+                menuItemTipsSpecs = this.getMenuItemTips();
                 this.selectedIndex = this.getDefaultItemIndex();
                 $menuTitle = $('<div class="text text-center menu-title" />').appendTo($overlay);
 
                 _i18n.localeInit.apply(void 0, [$menuTitle].concat(_toConsumableArray(this.getMenuTitleKeys())));
 
-                $selector = $('<div class="menu-selector" />').addClass("menu-selector-with-".concat(menuItemsSpecs.length)).appendTo($overlay);
+                $selector = $('<div class="menu-selector" />').addClass("menu-selector-with-".concat(menuItemsSpecs.length)).appendTo($overlay); // Build menu items
 
                 for (i = 0; i < menuItemsSpecs.length; ++i) {
                   menuItemSpec = menuItemsSpecs[i];
@@ -1362,7 +1375,12 @@ var MenuMode = /*#__PURE__*/function (_GameMode) {
 
                 this.$selectorItems = $selector.children();
 
-              case 8:
+                if (menuItemTipsSpecs) {
+                  this.$menuTip = $('<div class="text text-center menu-tip" />').appendTo($overlay);
+                  this.updateMenuTip();
+                }
+
+              case 10:
               case "end":
                 return _context.stop();
             }
@@ -1376,6 +1394,19 @@ var MenuMode = /*#__PURE__*/function (_GameMode) {
 
       return handleEnterMode;
     }()
+  }, {
+    key: "updateMenuTip",
+    value: function updateMenuTip() {
+      if (this.$menuTip) {
+        var tipsSpec = this.getMenuItemTips();
+
+        if (typeof tipsSpec === 'string') {
+          this.$menuTip.text(tipsSpec[this.selectedIndex]);
+        } else if (Array.isArray(tipsSpec)) {
+          _i18n.localeInit.apply(void 0, [this.$menuTip].concat(_toConsumableArray(tipsSpec[this.selectedIndex])));
+        }
+      }
+    }
   }, {
     key: "handleExitMode",
     value: function () {
@@ -1415,6 +1446,7 @@ var MenuMode = /*#__PURE__*/function (_GameMode) {
           this.$selectorItems.eq(this.selectedIndex).removeClass('selected');
           this.selectedIndex = clampIndex(this.selectedIndex + input.direction);
           this.$selectorItems.eq(this.selectedIndex).addClass('selected');
+          this.updateMenuTip();
         }
 
         if (input.action && !lastInput.action) {
@@ -1452,6 +1484,25 @@ var MenuMode = /*#__PURE__*/function (_GameMode) {
     key: "getMenuItems",
     value: function getMenuItems() {
       return ['One', 'Two'];
+    }
+    /**
+     * Get the menu item tips.
+     *
+     * Menu items tips are longer descriptions about each menu item that are shown when the user
+     * moves through them.
+     *
+     * Overwrite this method in a subclass to provide the list of menu item tips.
+     * I will be called whenever this game mode is entered to also reflect possible language changes.
+     *
+     * @returns {null|(string|string[])[]}
+     *  Either an array of strings to use as labels or and an array of arrays of strings
+     *  that will be used as keys into the i18n database. Can be null if no tips are available.
+     */
+
+  }, {
+    key: "getMenuItemTips",
+    value: function getMenuItemTips() {
+      return null;
     }
     /**
      * Get the index of the default menu item. This can be used to preselect menu items in subclasses.
@@ -3673,13 +3724,13 @@ function localizeFlat(elems) {
   var $i18nElems = $elems.filter(I18N_KEY_SELECTOR);
   $i18nElems.each(function () {
     var $i18nElem = $(this);
-    var encodedKeys = $i18nElem.data(I18N_KEY_DATA_ATTRIBUTE).split(",");
+    var encodedKeys = $i18nElem.attr(I18N_KEY_ATTRIBUTE).split(",");
     var keys = encodedKeys.map(decodeURIComponent);
 
     if (keys.length > 0) {
       var object = _defineProperty({}, keys[0], IMAGINARY.i18n.t(keys[0]));
 
-      var text = recursiveGet.apply(void 0, [object].concat(_toConsumableArray(keys)));
+      var text = recursiveGet.apply(void 0, [object].concat(_toConsumableArray(keys))) || '';
       $i18nElem.text(text);
     }
   });
@@ -3882,6 +3933,7 @@ function _getDefaultConfig() {
               useKeyboardControls: true,
               botType: null,
               botTypeLabels: 'difficulty',
+              showBotTypeTips: false,
               maxPlayers: 2,
               maxTime: Number.POSITIVE_INFINITY,
               maxProbes: Number.POSITIVE_INFINITY,

@@ -12,6 +12,7 @@ export default class MenuMode extends GameMode {
     const $overlay = $(this.game.overlay);
 
     const menuItemsSpecs = this.getMenuItems();
+    const menuItemTipsSpecs = this.getMenuItemTips();
 
     this.selectedIndex = this.getDefaultItemIndex();
     const $menuTitle = $('<div class="text text-center menu-title" />')
@@ -20,6 +21,7 @@ export default class MenuMode extends GameMode {
     const $selector = $('<div class="menu-selector" />')
         .addClass(`menu-selector-with-${menuItemsSpecs.length}`)
         .appendTo($overlay);
+    // Build menu items
     for (let i = 0; i < menuItemsSpecs.length; ++i) {
       const menuItemSpec = menuItemsSpecs[i];
       const $menuItem = $('<div class="item" />')
@@ -36,6 +38,22 @@ export default class MenuMode extends GameMode {
       }
     }
     this.$selectorItems = $selector.children();
+    if (menuItemTipsSpecs) {
+      this.$menuTip = $('<div class="text text-center menu-tip" />')
+        .appendTo($overlay);
+      this.updateMenuTip();
+    }
+  }
+
+  updateMenuTip() {
+    if (this.$menuTip) {
+      const tipsSpec = this.getMenuItemTips();
+      if (typeof tipsSpec === 'string') {
+        this.$menuTip.text(tipsSpec[this.selectedIndex]);
+      } else if (Array.isArray(tipsSpec)) {
+        localeInit(this.$menuTip, ...tipsSpec[this.selectedIndex]);
+      }
+    }
   }
 
   async handleExitMode() {
@@ -52,6 +70,7 @@ export default class MenuMode extends GameMode {
         this.$selectorItems.eq(this.selectedIndex).removeClass('selected');
         this.selectedIndex = clampIndex(this.selectedIndex + input.direction);
         this.$selectorItems.eq(this.selectedIndex).addClass('selected');
+        this.updateMenuTip();
       }
 
       if (input.action && !lastInput.action) {
@@ -85,6 +104,23 @@ export default class MenuMode extends GameMode {
    */
   getMenuItems() {
     return ['One', 'Two'];
+  }
+
+  /**
+   * Get the menu item tips.
+   *
+   * Menu items tips are longer descriptions about each menu item that are shown when the user
+   * moves through them.
+   *
+   * Overwrite this method in a subclass to provide the list of menu item tips.
+   * I will be called whenever this game mode is entered to also reflect possible language changes.
+   *
+   * @returns {null|(string|string[])[]}
+   *  Either an array of strings to use as labels or and an array of arrays of strings
+   *  that will be used as keys into the i18n database. Can be null if no tips are available.
+   */
+  getMenuItemTips() {
+    return null;
   }
 
   /**

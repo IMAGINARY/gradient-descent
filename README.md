@@ -22,6 +22,9 @@ A config file is loaded when opening the application. It supports the following 
 - **botTypeLabels** (`"difficulty"` or `"strategy"`, default: `"difficulty"`): Set the type of
   labels used to describe the bot type (`"difficulty"`: difficulty level, `"strategy"`: name of the
   bot strategy)
+- **showBotTypeTips** (boolean, default: `false`): Show longer descriptions for bot types.
+  Tips are optional, and can be set in the translation files with the keys
+  `bot-types.difficulty.<type>-tip` o `bot-types.strategy.<type>-tip`.
 - **maxPlayers** (integer, default: 2): Maximum number of players (between 1 and 4).
 - **maxTime** (integer or string `"Infinity"`, default: `"Infinity"`): Maximum number seconds until
   the game is over.

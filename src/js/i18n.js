@@ -22,11 +22,11 @@ function localizeFlat(elems) {
     const $i18nElems = $elems.filter(I18N_KEY_SELECTOR);
     $i18nElems.each(function () {
         const $i18nElem = $(this);
-        const encodedKeys = $i18nElem.data(I18N_KEY_DATA_ATTRIBUTE).split(",");
+        const encodedKeys = $i18nElem.attr(I18N_KEY_ATTRIBUTE).split(",");
         const keys = encodedKeys.map(decodeURIComponent);
         if (keys.length > 0) {
             const object = {[keys[0]]: IMAGINARY.i18n.t(keys[0])};
-            const text = recursiveGet(object, ...keys);
+            const text = recursiveGet(object, ...keys) || '';
             $i18nElem.text(text);
         }
     })

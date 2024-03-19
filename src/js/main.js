@@ -24,6 +24,7 @@ async function getDefaultConfig() {
     useKeyboardControls: true,
     botType: null,
     botTypeLabels: 'difficulty',
+    showBotTypeTips: false,
     maxPlayers: 2,
     maxTime: Number.POSITIVE_INFINITY,
     maxProbes: Number.POSITIVE_INFINITY,
