@@ -87,4 +87,18 @@ $player-colors: $color-player-0, $color-player-1, $color-player-2, $color-player
       margin-left: 1ex;
     }
   }
+
+  .demo-explanation {
+    position: absolute;
+    text-align: center;
+    text-transform: uppercase;
+    padding-bottom: 0.25ex;
+    margin: auto;
+    max-width: 75%;
+    left: 12.5%;
+
+    .line {
+      margin-bottom: 0.4ex;
+    }
+  }
 }

@@ -5,6 +5,7 @@ import localize from "./i18n";
 import PlayMode from './game-mode-play';
 import TitleMode from './game-mode-title';
 import PlayerNumberMode from './game-mode-numplayers';
+import DemoMode from './game-mode-demo';
 import GamepadControls from "./controls/gamepad";
 import ScreenControls from './controls/screen';
 import KeyboardControls from "./controls/keyboard";
@@ -106,8 +107,13 @@ export default class GradientDescentGame {
     await this.registerMode('bottype', new BotTypeMode(this));
     await this.registerMode('numplayers', new PlayerNumberMode(this));
     await this.registerMode('play', new PlayMode(this));
+    await this.registerMode('demo', new DemoMode(this));
 
-    if (this.config.continuousGame) {
+    if (this.config.flagDemoMode) {
+      this.transition('demo', 'done', 'demo');
+      this.transition('demo', 'timeout', 'demo');
+      await this.setMode('demo');
+    } else if (this.config.continuousGame) {
       this.transition('play', 'done', 'play');
       await this.setMode('play');
     } else {
@@ -216,7 +222,7 @@ export default class GradientDescentGame {
           this.currentMode.handleInputs(this.inputs, this.inputsLast, delta, ts);
           this.currentMode.draw(delta, ts);
           lastTs = ts;
-          
+
           this.animationFrameRequestId = window.requestAnimationFrame(this.gameLoop);
         }
       };

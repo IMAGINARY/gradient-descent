@@ -1278,7 +1278,271 @@ var BotTypeMode = /*#__PURE__*/function (_MenuMode) {
 
 exports["default"] = BotTypeMode;
 
-},{"./game-mode-menu":11}],11:[function(require,module,exports){
+},{"./game-mode-menu":12}],11:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _gameModePlay = _interopRequireDefault(require("./game-mode-play"));
+
+var _i18n = require("./i18n");
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "function" && typeof Symbol.iterator === "symbol") { _typeof = function _typeof(obj) { return typeof obj; }; } else { _typeof = function _typeof(obj) { return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj; }; } return _typeof(obj); }
+
+function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try { var info = gen[key](arg); var value = info.value; } catch (error) { reject(error); return; } if (info.done) { resolve(value); } else { Promise.resolve(value).then(_next, _throw); } }
+
+function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
+
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+function _get(target, property, receiver) { if (typeof Reflect !== "undefined" && Reflect.get) { _get = Reflect.get; } else { _get = function _get(target, property, receiver) { var base = _superPropBase(target, property); if (!base) return; var desc = Object.getOwnPropertyDescriptor(base, property); if (desc.get) { return desc.get.call(receiver); } return desc.value; }; } return _get(target, property, receiver || target); }
+
+function _superPropBase(object, property) { while (!Object.prototype.hasOwnProperty.call(object, property)) { object = _getPrototypeOf(object); if (object === null) break; } return object; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function"); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, writable: true, configurable: true } }); if (superClass) _setPrototypeOf(subClass, superClass); }
+
+function _setPrototypeOf(o, p) { _setPrototypeOf = Object.setPrototypeOf || function _setPrototypeOf(o, p) { o.__proto__ = p; return o; }; return _setPrototypeOf(o, p); }
+
+function _createSuper(Derived) { var hasNativeReflectConstruct = _isNativeReflectConstruct(); return function _createSuperInternal() { var Super = _getPrototypeOf(Derived), result; if (hasNativeReflectConstruct) { var NewTarget = _getPrototypeOf(this).constructor; result = Reflect.construct(Super, arguments, NewTarget); } else { result = Super.apply(this, arguments); } return _possibleConstructorReturn(this, result); }; }
+
+function _possibleConstructorReturn(self, call) { if (call && (_typeof(call) === "object" || typeof call === "function")) { return call; } return _assertThisInitialized(self); }
+
+function _assertThisInitialized(self) { if (self === void 0) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return self; }
+
+function _isNativeReflectConstruct() { if (typeof Reflect === "undefined" || !Reflect.construct) return false; if (Reflect.construct.sham) return false; if (typeof Proxy === "function") return true; try { Date.prototype.toString.call(Reflect.construct(Date, [], function () {})); return true; } catch (e) { return false; } }
+
+function _getPrototypeOf(o) { _getPrototypeOf = Object.setPrototypeOf ? Object.getPrototypeOf : function _getPrototypeOf(o) { return o.__proto__ || Object.getPrototypeOf(o); }; return _getPrototypeOf(o); }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
+// todo: The constants below were copied from game-mode-play.js
+//  but they really should be exported by the PlayMode class
+var WATER_DISTANCE = 260;
+var TERRAIN_DISTANCE = 300;
+
+var DemoGame = /*#__PURE__*/function () {
+  function DemoGame(propOverrides) {
+    _classCallCheck(this, DemoGame);
+
+    this.propOverrides = propOverrides;
+  }
+
+  _createClass(DemoGame, [{
+    key: "get",
+    value: function get(target, prop, receiver) {
+      if (this.propOverrides[prop] !== undefined) {
+        return this.propOverrides[prop];
+      }
+
+      return Reflect.get.apply(Reflect, arguments);
+    }
+  }]);
+
+  return DemoGame;
+}();
+
+var DemoMode = /*#__PURE__*/function (_PlayMode) {
+  _inherits(DemoMode, _PlayMode);
+
+  var _super = _createSuper(DemoMode);
+
+  function DemoMode(game, options) {
+    var _this;
+
+    _classCallCheck(this, DemoMode);
+
+    var config = _objectSpread(_objectSpread({}, game.config), {
+      maxProbes: Infinity,
+      maxTime: Infinity
+    });
+
+    var demoGame = new Proxy(game, new DemoGame({
+      config: config,
+      numPlayers: 0,
+      botType: 'tangent-intersection'
+    }));
+    _this = _super.call(this, demoGame);
+    _this.options = _objectSpread(_objectSpread({}, DemoMode.defaultOptions), options);
+    return _this;
+  }
+
+  _createClass(DemoMode, [{
+    key: "handleEnterMode",
+    value: function () {
+      var _handleEnterMode = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
+        return regeneratorRuntime.wrap(function _callee$(_context) {
+          while (1) {
+            switch (_context.prev = _context.next) {
+              case 0:
+                _context.next = 2;
+                return _get(_getPrototypeOf(DemoMode.prototype), "handleEnterMode", this).call(this);
+
+              case 2:
+                this.remainingTime = this.options.duration;
+                this.showDemoText();
+
+              case 4:
+              case "end":
+                return _context.stop();
+            }
+          }
+        }, _callee, this);
+      }));
+
+      function handleEnterMode() {
+        return _handleEnterMode.apply(this, arguments);
+      }
+
+      return handleEnterMode;
+    }()
+  }, {
+    key: "handleInputs",
+    value: function handleInputs(inputs, lastInputs, delta, ts) {
+      var numPlayers = this.game.numPlayers;
+
+      if (inputs.find(function (ctrl, i) {
+        return ctrl.action && !lastInputs[i].action;
+      })) {
+        this.demoOver();
+        this.triggerEvent('done');
+        return;
+      } // Update remaining time
+
+
+      var newRemainingTime = Math.max(0, this.remainingTime - delta);
+
+      if (this.remainingTime !== newRemainingTime) {
+        this.remainingTime = newRemainingTime;
+      }
+
+      if (this.remainingTime === 0) {
+        this.demoOver();
+        this.triggerEvent('timeout');
+        return;
+      } // Discard inputs that don't belong to an active player
+
+
+      inputs = inputs.slice(0, numPlayers);
+      lastInputs = lastInputs.slice(0, numPlayers);
+
+      if (this.bot !== null) {
+        var _PlayMode$buildBotInp = _gameModePlay["default"].buildBotInput(this.bot),
+            input = _PlayMode$buildBotInp.input,
+            lastInput = _PlayMode$buildBotInp.lastInput;
+
+        inputs.push(input);
+        lastInputs.push(lastInput);
+      } // Regular move & probe logic
+
+
+      this.processInputs(inputs, lastInputs, delta, ts);
+    }
+  }, {
+    key: "gameOver",
+    value: function () {
+      var _gameOver = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee2(endingSequenceCallback) {
+        return regeneratorRuntime.wrap(function _callee2$(_context2) {
+          while (1) {
+            switch (_context2.prev = _context2.next) {
+              case 0:
+              case "end":
+                return _context2.stop();
+            }
+          }
+        }, _callee2);
+      }));
+
+      function gameOver(_x) {
+        return _gameOver.apply(this, arguments);
+      }
+
+      return gameOver;
+    }()
+  }, {
+    key: "demoOver",
+    value: function () {
+      var _demoOver = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee3() {
+        return regeneratorRuntime.wrap(function _callee3$(_context3) {
+          while (1) {
+            switch (_context3.prev = _context3.next) {
+              case 0:
+                _context3.next = 2;
+                return Promise.all(this.players.map(function (p) {
+                  return p.probingDone();
+                }));
+
+              case 2:
+              case "end":
+                return _context3.stop();
+            }
+          }
+        }, _callee3, this);
+      }));
+
+      function demoOver() {
+        return _demoOver.apply(this, arguments);
+      }
+
+      return demoOver;
+    }()
+  }, {
+    key: "showGameStartSequence",
+    value: function () {
+      var _showGameStartSequence = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee4() {
+        return regeneratorRuntime.wrap(function _callee4$(_context4) {
+          while (1) {
+            switch (_context4.prev = _context4.next) {
+              case 0:
+                return _context4.abrupt("return", null);
+
+              case 1:
+              case "end":
+                return _context4.stop();
+            }
+          }
+        }, _callee4);
+      }));
+
+      function showGameStartSequence() {
+        return _showGameStartSequence.apply(this, arguments);
+      }
+
+      return showGameStartSequence;
+    }()
+  }, {
+    key: "showDemoText",
+    value: function showDemoText() {
+      var draw = this.game.draw;
+      var top = 100 * (WATER_DISTANCE * 1.3) / draw.height();
+      this.$demoExplanationContainer = $('<div>').addClass('demo-explanation').css('top', "".concat(top, "%")).appendTo(this.$overlay);
+      (0, _i18n.localeInit)(this.$demoExplanationContainer, 'demo-explanation');
+      this.$pressToStart = $('<div>').addClass('title-press-to-start').appendTo(this.$overlay);
+      (0, _i18n.localeInit)(this.$pressToStart, 'press-to-start');
+    }
+  }]);
+
+  return DemoMode;
+}(_gameModePlay["default"]);
+
+exports["default"] = DemoMode;
+DemoMode.defaultOptions = {
+  duration: 15 * 1000
+};
+
+},{"./game-mode-play":14,"./i18n":18}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1525,7 +1789,7 @@ var MenuMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = MenuMode;
 
-},{"./game-mode":15,"./i18n":17}],12:[function(require,module,exports){
+},{"./game-mode":16,"./i18n":18}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1611,7 +1875,7 @@ var PlayerNumberMode = /*#__PURE__*/function (_MenuMode) {
 
 exports["default"] = PlayerNumberMode;
 
-},{"./game-mode-menu":11}],13:[function(require,module,exports){
+},{"./game-mode-menu":12}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2139,12 +2403,19 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
       } // Regular move & probe logic
 
 
+      this.processInputs(inputs, lastInputs, delta, ts);
+    }
+  }, {
+    key: "processInputs",
+    value: function processInputs(inputs, lastInputs, delta, ts) {
+      var _this6 = this;
+
       inputs.forEach(function (input, playerIndex) {
         var lastInput = lastInputs[playerIndex];
         var action = actionPressed(input, lastInput);
-        var player = _this5.players[playerIndex];
+        var player = _this6.players[playerIndex];
 
-        if (!player.probing && !_this5.isGameOver) {
+        if (player && !player.probing && !_this6.isGameOver) {
           player.lastX = player.x;
           player.x += SPEED_FACTOR * (delta * input.direction);
           player.x = Math.min(Math.max(TERRAIN_MARGIN_WIDTH, player.x), 1.0 - TERRAIN_MARGIN_WIDTH); // TODO: Limit bot position to bot.targetX
@@ -2154,34 +2425,35 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
           if (action && player.remainingProbes > 0) {
             // Switch to probe mode
             // Lower the probe, wait and raise it again
-            var terrainHeight = _this5.terrainHeight(player.x);
+            var terrainHeight = _this6.terrainHeight(player.x);
 
             var _player$doProbe = player.doProbe(terrainHeight),
                 down = _player$doProbe.down,
-                up = _player$doProbe.up;
+                up = _player$doProbe.up; // Todo: If the game ends, this tangent is still added. It should be cancellable.
+
 
             down.then(function () {
-              return _this5.addTangent(player);
+              return _this6.addTangent(player);
             });
-            var treasureFound = Math.abs(player.x - _this5.treasureLocation.x) <= TREASURE_SIZE / 2;
+            var treasureFound = Math.abs(player.x - _this6.treasureLocation.x) <= TREASURE_SIZE / 2;
             down.then( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee8() {
               return regeneratorRuntime.wrap(function _callee8$(_context8) {
                 while (1) {
                   switch (_context8.prev = _context8.next) {
                     case 0:
-                      if (!(treasureFound && !_this5.isGameOver)) {
+                      if (!(treasureFound && !_this6.isGameOver)) {
                         _context8.next = 4;
                         break;
                       }
 
                       console.log("Treasure found - GAME OVER!");
                       _context8.next = 4;
-                      return _this5.gameOver( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7() {
+                      return _this6.gameOver( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7() {
                         return regeneratorRuntime.wrap(function _callee7$(_context7) {
                           while (1) {
                             switch (_context7.prev = _context7.next) {
                               case 0:
-                                return _context7.abrupt("return", _this5.showWinSequence(player));
+                                return _context7.abrupt("return", _this6.showWinSequence(player));
 
                               case 1:
                               case "end":
@@ -2209,16 +2481,14 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
   }, {
     key: "draw",
     value: function draw(delta, ts) {
-      var _this6 = this;
+      var _this7 = this;
 
-      var _this$game3 = this.game,
-          draw = _this$game3.draw,
-          numPlayers = _this$game3.numPlayers; // Move boats
+      var draw = this.game.draw; // Move boats
       // Draw bottom
       // etc...
 
       var padRemainingTime = function padRemainingTime(num) {
-        return pad(num, String(_this6.game.config.maxTime).length, ' ');
+        return pad(num, String(_this7.game.config.maxTime).length, ' ');
       };
 
       var remainingTimeText = padRemainingTime(Math.ceil(this.remainingTime / 1000.0));
@@ -2492,7 +2762,7 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
     key: "showWinSequence",
     value: function () {
       var _showWinSequence = _asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee12(winner) {
-        var _this7 = this;
+        var _this8 = this;
 
         var $winAnnouncement, randomIdx, $treasure, openTreaureChest;
         return regeneratorRuntime.wrap(function _callee12$(_context12) {
@@ -2508,9 +2778,9 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 $treasure = (0, _i18n.localeInit)($('<span>'), 'treasures', randomIdx(IMAGINARY.i18n.t('treasures')));
 
                 openTreaureChest = function openTreaureChest() {
-                  _this7.treasureOpened.show();
+                  _this8.treasureOpened.show();
 
-                  _this7.treasureClosed.hide();
+                  _this8.treasureClosed.hide();
                 };
 
                 _context12.next = 6;
@@ -2724,7 +2994,7 @@ function createAutoUpdatingPopper(reference, popper, options) {
   return popperInstance;
 }
 
-},{"./bot-strategies/base":1,"./bot-strategies/gradient-descent":2,"./bot-strategies/random":3,"./bot-strategies/tangent-intersection":4,"./game-mode":15,"./i18n":17,"./terrain":20,"./waves":21,"@popperjs/core":23,"events":29}],14:[function(require,module,exports){
+},{"./bot-strategies/base":1,"./bot-strategies/gradient-descent":2,"./bot-strategies/random":3,"./bot-strategies/tangent-intersection":4,"./game-mode":16,"./i18n":18,"./terrain":21,"./waves":22,"@popperjs/core":24,"events":30}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -2903,7 +3173,7 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = TitleMode;
 
-},{"./game-mode":15,"./i18n":17,"./wavy-animation":22}],15:[function(require,module,exports){
+},{"./game-mode":16,"./i18n":18,"./wavy-animation":23}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3090,7 +3360,7 @@ var GameMode = /*#__PURE__*/function () {
 
 exports["default"] = GameMode;
 
-},{"events":29}],16:[function(require,module,exports){
+},{"events":30}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3107,6 +3377,8 @@ var _gameModePlay = _interopRequireDefault(require("./game-mode-play"));
 var _gameModeTitle = _interopRequireDefault(require("./game-mode-title"));
 
 var _gameModeNumplayers = _interopRequireDefault(require("./game-mode-numplayers"));
+
+var _gameModeDemo = _interopRequireDefault(require("./game-mode-demo"));
 
 var _gamepad = _interopRequireDefault(require("./controls/gamepad"));
 
@@ -3238,20 +3510,39 @@ var GradientDescentGame = /*#__PURE__*/function () {
                 return this.registerMode('play', new _gameModePlay["default"](this));
 
               case 29:
+                _context.next = 31;
+                return this.registerMode('demo', new _gameModeDemo["default"](this));
+
+              case 31:
+                if (!this.config.flagDemoMode) {
+                  _context.next = 38;
+                  break;
+                }
+
+                this.transition('demo', 'done', 'demo');
+                this.transition('demo', 'timeout', 'demo');
+                _context.next = 36;
+                return this.setMode('demo');
+
+              case 36:
+                _context.next = 54;
+                break;
+
+              case 38:
                 if (!this.config.continuousGame) {
-                  _context.next = 35;
+                  _context.next = 44;
                   break;
                 }
 
                 this.transition('play', 'done', 'play');
-                _context.next = 33;
+                _context.next = 42;
                 return this.setMode('play');
 
-              case 33:
-                _context.next = 45;
+              case 42:
+                _context.next = 54;
                 break;
 
-              case 35:
+              case 44:
                 showBotType = this.config.botType === null;
                 showNumPlayers = this.config.maxPlayers > 1;
                 afterNumPlayers = showBotType ? 'bottype' : 'play';
@@ -3260,10 +3551,10 @@ var GradientDescentGame = /*#__PURE__*/function () {
                 this.transition('numplayers', 'done', afterNumPlayers);
                 this.transition('bottype', 'done', 'play');
                 this.transition('play', 'done', 'title');
-                _context.next = 45;
+                _context.next = 54;
                 return this.setMode('title');
 
-              case 45:
+              case 54:
               case "end":
                 return _context.stop();
             }
@@ -3669,7 +3960,7 @@ var GradientDescentGame = /*#__PURE__*/function () {
 
 exports["default"] = GradientDescentGame;
 
-},{"./controls/gamepad":6,"./controls/keyboard":7,"./controls/screen":8,"./full-screen-toggle":9,"./game-mode-bottype":10,"./game-mode-numplayers":12,"./game-mode-play":13,"./game-mode-title":14,"./i18n":17,"./language-cycle-button":18,"@wessberg/pointer-events":24}],17:[function(require,module,exports){
+},{"./controls/gamepad":6,"./controls/keyboard":7,"./controls/screen":8,"./full-screen-toggle":9,"./game-mode-bottype":10,"./game-mode-demo":11,"./game-mode-numplayers":13,"./game-mode-play":14,"./game-mode-title":15,"./i18n":18,"./language-cycle-button":19,"@wessberg/pointer-events":25}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3751,7 +4042,7 @@ function recursiveGet(object, key) {
   }
 }
 
-},{}],18:[function(require,module,exports){
+},{}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3834,7 +4125,7 @@ var LanguageCycleButton = /*#__PURE__*/function () {
 
 exports["default"] = LanguageCycleButton;
 
-},{"./i18n":17}],19:[function(require,module,exports){
+},{"./i18n":18}],20:[function(require,module,exports){
 "use strict";
 
 var _game = _interopRequireDefault(require("./game"));
@@ -4119,7 +4410,7 @@ function getConfigCustomUrl() {
   return main;
 })()();
 
-},{"./game":16}],20:[function(require,module,exports){
+},{"./game":17}],21:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4279,7 +4570,7 @@ function terrain(numSamples, length) {
   });
 }
 
-},{"assert":25}],21:[function(require,module,exports){
+},{"assert":26}],22:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4350,7 +4641,7 @@ function animatedSVGPolyline(svgContainer, numPoints, numSteps, xScale, yScale, 
   return waves;
 }
 
-},{}],22:[function(require,module,exports){
+},{}],23:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4439,7 +4730,7 @@ function WavyAnimation(shape) {
   };
 }
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 (function (process){(function (){
 /**
  * @popperjs/core v2.5.4 - MIT License
@@ -6310,7 +6601,7 @@ exports.preventOverflow = preventOverflow$1;
 
 }).call(this)}).call(this,require('_process'))
 
-},{"_process":31}],24:[function(require,module,exports){
+},{"_process":32}],25:[function(require,module,exports){
 (function () {
 	'use strict';
 
@@ -8167,7 +8458,7 @@ exports.preventOverflow = preventOverflow$1;
 }());
 
 
-},{}],25:[function(require,module,exports){
+},{}],26:[function(require,module,exports){
 (function (global){(function (){
 'use strict';
 
@@ -8678,7 +8969,7 @@ var objectKeys = Object.keys || function (obj) {
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"object-assign":30,"util/":28}],26:[function(require,module,exports){
+},{"object-assign":31,"util/":29}],27:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -8703,14 +8994,14 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],27:[function(require,module,exports){
+},{}],28:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 (function (process,global){(function (){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -9301,7 +9592,7 @@ function hasOwnProperty(obj, prop) {
 
 }).call(this)}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./support/isBuffer":27,"_process":31,"inherits":26}],29:[function(require,module,exports){
+},{"./support/isBuffer":28,"_process":32,"inherits":27}],30:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -9826,7 +10117,7 @@ function functionBindPolyfill(context) {
   };
 }
 
-},{}],30:[function(require,module,exports){
+},{}],31:[function(require,module,exports){
 /*
 object-assign
 (c) Sindre Sorhus
@@ -9918,7 +10209,7 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 	return to;
 };
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -10104,5 +10395,5 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[19])
+},{}]},{},[20])
 

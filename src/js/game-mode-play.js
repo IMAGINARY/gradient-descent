@@ -378,13 +378,17 @@ export default class PlayMode extends GameMode {
     }
 
     // Regular move & probe logic
+    this.processInputs(inputs, lastInputs, delta, ts);
+  }
+
+  processInputs(inputs, lastInputs, delta, ts) {
     inputs
       .forEach((input, playerIndex) => {
         const lastInput = lastInputs[playerIndex];
         const action = actionPressed(input, lastInput);
 
         const player = this.players[playerIndex];
-        if (!player.probing && !this.isGameOver) {
+        if (player && !player.probing && !this.isGameOver) {
           player.lastX = player.x;
           player.x += SPEED_FACTOR * (delta * input.direction);
           player.x = Math.min(Math.max(TERRAIN_MARGIN_WIDTH, player.x),
@@ -396,6 +400,7 @@ export default class PlayMode extends GameMode {
             // Lower the probe, wait and raise it again
             const terrainHeight = this.terrainHeight(player.x);
             const { down, up } = player.doProbe(terrainHeight);
+            // Todo: If the game ends, this tangent is still added. It should be cancellable.
             down.then(() => this.addTangent(player));
             const treasureFound = Math.abs(player.x - this.treasureLocation.x) <= TREASURE_SIZE
               / 2;
@@ -414,7 +419,7 @@ export default class PlayMode extends GameMode {
   }
 
   draw(delta, ts) {
-    const { draw, numPlayers } = this.game;
+    const { draw } = this.game;
     // Move boats
     // Draw bottom
     // etc...

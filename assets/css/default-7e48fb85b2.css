@@ -371,6 +371,18 @@ body {
 .overlay .game-stats * .counter {
   margin-left: 1ex;
 }
+.overlay .demo-explanation {
+  position: absolute;
+  text-align: center;
+  text-transform: uppercase;
+  padding-bottom: 0.25ex;
+  margin: auto;
+  max-width: 75%;
+  left: 12.5%;
+}
+.overlay .demo-explanation .line {
+  margin-bottom: 0.4ex;
+}
 
 .language-button {
   position: absolute;
@@ -411,4 +423,4 @@ body {
   margin-top: -0.1ex;
   font-size: 188%;
 }
-/*# sourceMappingURL=default-c87bef6288.css.map */
+/*# sourceMappingURL=default-7e48fb85b2.css.map */
