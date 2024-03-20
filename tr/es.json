@@ -10,14 +10,20 @@
     "difficulty": {
       "none": "Ninguno",
       "random": "Fácil",
+      "random-tip": "Busca al azar, sin estrategia",
       "gradient-descent": "Medio",
-      "tangent-intersection": "Difícil"
+      "gradient-descent-tip": "Sigue las pendientes de sus propias sondas hacia el fondo",
+      "tangent-intersection": "Difícil",
+      "tangent-intersection-tip": "Usa las sondas de todos los jugadores para decidir dónde buscar"
     },
     "strategy": {
       "none": "Ninguno",
       "random": "Aleatorio",
+      "random-tip": "Busca al azar, sin estrategia",
       "gradient-descent": "Descenso gradiente",
-      "tangent-intersection": "Tangentes adyacentes"
+      "gradient-descent-tip": "Sigue las pendientes de sus propias sondas hacia el fondo",
+      "tangent-intersection": "Tangentes adyacentes",
+      "tangent-intersection-tip": "Usa las sondas de todos los jugadores para decidir dónde buscar"
     }
   },
   "remaining-time": "Tiempo:",

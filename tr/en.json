@@ -10,14 +10,20 @@
     "difficulty": {
       "none": "None",
       "random": "Easy",
+      "random-tip": "Searches randomly without a strategy",
       "gradient-descent": "Medium",
-      "tangent-intersection": "Hard"
+      "gradient-descent-tip": "Follows the downward slope of its probes to the bottom",
+      "tangent-intersection": "Hard",
+      "tangent-intersection-tip": "Uses all players' probes to decide where to search"
     },
     "strategy": {
       "none": "None",
       "random": "Random",
+      "random-tip": "Searches randomly without a strategy",
       "gradient-descent": "Gradient descent",
-      "tangent-intersection": "Adjacent tangents"
+      "gradient-descent-tip": "Follows the downward slope of its probes to the bottom",
+      "tangent-intersection": "Adjacent tangents",
+      "tangent-intersection-tip": "Uses all players' probes to decide where to search"
     }
   },
   "remaining-time": "Time:",

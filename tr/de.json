@@ -10,14 +10,20 @@
     "difficulty": {
       "none": "Ohne",
       "random": "Leicht",
+      "random-tip": "Sucht zufällig ohne Strategie",
       "gradient-descent": "Mittel",
-      "tangent-intersection": "Schwer"
+      "gradient-descent-tip": "Folgt dem Gefälle seiner Sonden nach unten",
+      "tangent-intersection": "Schwer",
+      "tangent-intersection-tip": "Verwendet die Sonden aller Boote, um zu entscheiden, wo gesucht werden soll"
     },
     "strategy": {
       "none": "Ohne",
       "random": "Zufall",
+      "random-tip": "Sucht zufällig ohne Strategie",
       "gradient-descent": "Gradientenverfahren",
-      "tangent-intersection": "Benachbarte Tangenten"
+      "gradient-descent-tip": "Folgt dem Gefälle seiner Sonden nach unten",
+      "tangent-intersection": "Benachbarte Tangenten",
+      "tangent-intersection-tip": "Verwendet die Sonden aller Boote, um zu entscheiden, wo gesucht werden soll"
     }
   },
   "remaining-time": "Zeit:",
