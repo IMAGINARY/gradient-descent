@@ -1,5 +1,6 @@
 /* globals IMAGINARY */
 import GradientDescentGame from './game';
+import debugConsole from './debug-console';
 
 async function fetchJson(uri) {
   const response = await fetch(uri, {
@@ -34,6 +35,7 @@ async function getDefaultConfig() {
     fullScreenButton: true,
     languageButton: true,
     debugControls: false,
+    debugLog: false,
     map: null,
   };
   const tr = await fetchJson(new URL('tr.json', window.location.href));
@@ -104,9 +106,12 @@ function getConfigCustomUrl() {
     const configPromise = loadConfig(configUrl.href);
     const [defaultConfig, loadedConfig] = await Promise.all([defaultConfigPromise, configPromise]);
     const config = Object.assign({}, defaultConfig, loadedConfig);
-    console.log("Default configuration:", defaultConfig);
-    console.log("Loaded configuration:", loadedConfig);
-    console.log("Merged configuration:", config);
+    if (config.debugLog) {
+      debugConsole.setActive(true);
+    }
+    debugConsole.log("Default configuration:", defaultConfig);
+    debugConsole.log("Loaded configuration:", loadedConfig);
+    debugConsole.log("Merged configuration:", config);
 
     await IMAGINARY.i18n.init({
       queryStringVariable: 'lang',

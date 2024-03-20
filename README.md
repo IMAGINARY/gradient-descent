@@ -40,6 +40,7 @@ A config file is loaded when opening the application. It supports the following 
 - **fullScreenButton** (boolean, default: `true`): Show a button to toggle full-screen mode.
 - **languageButton** (boolean, default: `true`): Show a button to cycle through the languages defined via `languages`.
 - **debugControls** (boolean, default: `false`): Shows debugging data for controls.
+- **debugLog** (boolean, default: `false`): Shows debugging messages in the console.
 
 By default, the config file `config.json` is used. However, this file name can be overwritten by
 setting the `config` query string variable, e.g. `index.html?config=config.local.json`.

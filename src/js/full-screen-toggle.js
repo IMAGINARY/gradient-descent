@@ -1,3 +1,5 @@
+import debugConsole from './debug-console';
+
 export default class FullScreenToggle {
   constructor() {
     this.fullScreenButton = document.createElement('div');

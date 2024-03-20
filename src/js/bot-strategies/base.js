@@ -1,3 +1,5 @@
+import debugConsole from '../debug-console';
+
 export default class BotStrategyBase {
   /**
    * Construct a new bot strategy.
@@ -31,7 +33,7 @@ export default class BotStrategyBase {
   }
 
   getAdjacentTangentDistance(x, tangents) {
-    console.assert(
+    debugConsole.assert(
       this.lower <= x && x <= this.upper,
       `x=${x} out of range [${this.lower},${this.upper}]`
     );
@@ -47,17 +49,17 @@ export default class BotStrategyBase {
     const left = sortedPositions[Math.max(0, rightIndex - 1)];
     const right = sortedPositions[rightIndex];
 
-    console.log(sortedPositions, x, rightIndex);
+    debugConsole.log(sortedPositions, x, rightIndex);
 
     return right - left;
   }
 
   getOppositeTangentDistance(tangentX, x, tangents, lowerValue, lowerSlope, upperValue, upperSlope) {
-    console.assert(
+    debugConsole.assert(
       this.lower <= x && x <= this.upper,
       `x=${x} out of range [${this.lower},${this.upper}]`
     );
-    console.assert(
+    debugConsole.assert(
       this.lower <= tangentX && tangentX <= this.upper,
       `tangentX=${tangentX} out of range [${this.lower},${this.upper}]`
     );

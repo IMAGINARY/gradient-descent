@@ -6,6 +6,10 @@ Object.defineProperty(exports, "__esModule", {
 });
 exports["default"] = void 0;
 
+var _debugConsole = _interopRequireDefault(require("../debug-console"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
 function _toConsumableArray(arr) { return _arrayWithoutHoles(arr) || _iterableToArray(arr) || _unsupportedIterableToArray(arr) || _nonIterableSpread(); }
 
 function _nonIterableSpread() { throw new TypeError("Invalid attempt to spread non-iterable instance.\nIn order to be iterable, non-array objects must have a [Symbol.iterator]() method."); }
@@ -66,7 +70,8 @@ var BotStrategyBase = /*#__PURE__*/function () {
     value: function getAdjacentTangentDistance(x, tangents) {
       var _this = this;
 
-      console.assert(this.lower <= x && x <= this.upper, "x=".concat(x, " out of range [").concat(this.lower, ",").concat(this.upper, "]"));
+      _debugConsole["default"].assert(this.lower <= x && x <= this.upper, "x=".concat(x, " out of range [").concat(this.lower, ",").concat(this.upper, "]"));
+
       var positions = tangents.filter(function (t) {
         return _this.lower <= t.x && t.x < _this.upper;
       }).reduce(function (acc, cur) {
@@ -78,14 +83,18 @@ var BotStrategyBase = /*#__PURE__*/function () {
       });
       var left = sortedPositions[Math.max(0, rightIndex - 1)];
       var right = sortedPositions[rightIndex];
-      console.log(sortedPositions, x, rightIndex);
+
+      _debugConsole["default"].log(sortedPositions, x, rightIndex);
+
       return right - left;
     }
   }, {
     key: "getOppositeTangentDistance",
     value: function getOppositeTangentDistance(tangentX, x, tangents, lowerValue, lowerSlope, upperValue, upperSlope) {
-      console.assert(this.lower <= x && x <= this.upper, "x=".concat(x, " out of range [").concat(this.lower, ",").concat(this.upper, "]"));
-      console.assert(this.lower <= tangentX && tangentX <= this.upper, "tangentX=".concat(tangentX, " out of range [").concat(this.lower, ",").concat(this.upper, "]"));
+      _debugConsole["default"].assert(this.lower <= x && x <= this.upper, "x=".concat(x, " out of range [").concat(this.lower, ",").concat(this.upper, "]"));
+
+      _debugConsole["default"].assert(this.lower <= tangentX && tangentX <= this.upper, "tangentX=".concat(tangentX, " out of range [").concat(this.lower, ",").concat(this.upper, "]"));
+
       var lowerTangent = {
         x: this.lower,
         value: lowerValue,
@@ -169,7 +178,7 @@ var BotStrategyBase = /*#__PURE__*/function () {
 
 exports["default"] = BotStrategyBase;
 
-},{}],2:[function(require,module,exports){
+},{"../debug-console":9}],2:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -178,6 +187,8 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = void 0;
 
 var _base = _interopRequireDefault(require("./base"));
+
+var _debugConsole = _interopRequireDefault(require("../debug-console"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -263,7 +274,8 @@ var BotStrategyGradientDescent = /*#__PURE__*/function (_BotStrategyBase) {
             // Try to do a local step
             x = this.getNextProbeLocationLocal(lastTargetTangent, tangents);
           } catch (e) {
-            console.log('BotStrategyGradientDescent', e.message); // Local step failed -> do a global step
+            _debugConsole["default"].log('BotStrategyGradientDescent', e.message); // Local step failed -> do a global step
+
 
             x = this.getNextProbeLocationGlobal(tangents);
           }
@@ -277,7 +289,7 @@ var BotStrategyGradientDescent = /*#__PURE__*/function (_BotStrategyBase) {
   }, {
     key: "getNextProbeLocationLocal",
     value: function getNextProbeLocationLocal(currentTangent, tangents) {
-      console.log('BotStrategyGradientDescent', 'Local step with ', currentTangent);
+      _debugConsole["default"].log('BotStrategyGradientDescent', 'Local step with ', currentTangent);
 
       if (Math.abs(currentTangent.slope) < LOCAL_MIN_SLOPE) {
         throw new Error('Local minimum reached');
@@ -300,7 +312,8 @@ var BotStrategyGradientDescent = /*#__PURE__*/function (_BotStrategyBase) {
         var oppositeTangentDistance = Math.abs(this.gda.lastArmijoTangent.x - oppositeTangent.x);
         var localMinimumInBetween = this.gda.lastArmijoTangent.slope * oppositeTangent.slope < 0;
         var tooNarrow = oppositeTangentDistance < this.treasureWidth;
-        console.log("oppositeTangentDistance", oppositeTangentDistance, "tooNarrow", tooNarrow);
+
+        _debugConsole["default"].log("oppositeTangentDistance", oppositeTangentDistance, "tooNarrow", tooNarrow);
 
         if (x === this.gda.lastArmijoTangent.x || localMinimumInBetween && tooNarrow) {
           // No useful progress possible -> do global search step
@@ -316,7 +329,7 @@ var BotStrategyGradientDescent = /*#__PURE__*/function (_BotStrategyBase) {
     value: function getNextProbeLocationGlobal(tangents) {
       var _this3 = this;
 
-      console.log('BotStrategyGradientDescent', 'Global step');
+      _debugConsole["default"].log('BotStrategyGradientDescent', 'Global step');
 
       try {
         // Try to find a tangent that we didn't use so far and that's above all currently known local maxima
@@ -378,7 +391,9 @@ var GradientDescentArmijo = /*#__PURE__*/function () {
         return this.step(tangent);
       } else {
         var x = this.lastArmijoTangent.x + this.alpha * this.lastArmijoTangent.slope;
-        console.log('alpha', this.alpha, 't', tangent, 'x', x);
+
+        _debugConsole["default"].log('alpha', this.alpha, 't', tangent, 'x', x);
+
         this.alpha *= RHO;
         return x;
       }
@@ -388,7 +403,7 @@ var GradientDescentArmijo = /*#__PURE__*/function () {
   return GradientDescentArmijo;
 }();
 
-},{"./base":1}],3:[function(require,module,exports){
+},{"../debug-console":9,"./base":1}],3:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1126,6 +1141,61 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
+var DebugConsole = /*#__PURE__*/function () {
+  function DebugConsole() {
+    _classCallCheck(this, DebugConsole);
+
+    this.active = false;
+  }
+
+  _createClass(DebugConsole, [{
+    key: "setActive",
+    value: function setActive(state) {
+      this.active = state;
+    }
+  }, {
+    key: "log",
+    value: function log() {
+      if (this.active) {
+        var _console;
+
+        (_console = console).log.apply(_console, arguments);
+      }
+    }
+  }, {
+    key: "assert",
+    value: function assert() {
+      var _console2;
+
+      (_console2 = console).assert.apply(_console2, arguments);
+    }
+  }]);
+
+  return DebugConsole;
+}();
+
+var singleton = new DebugConsole();
+var _default = singleton;
+exports["default"] = _default;
+
+},{}],10:[function(require,module,exports){
+"use strict";
+
+Object.defineProperty(exports, "__esModule", {
+  value: true
+});
+exports["default"] = void 0;
+
+var _debugConsole = _interopRequireDefault(require("./debug-console"));
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
+
+function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
+
 var FullScreenToggle = /*#__PURE__*/function () {
   function FullScreenToggle() {
     var _this = this;
@@ -1182,7 +1252,7 @@ var FullScreenToggle = /*#__PURE__*/function () {
 
 exports["default"] = FullScreenToggle;
 
-},{}],10:[function(require,module,exports){
+},{"./debug-console":9}],11:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1278,7 +1348,7 @@ var BotTypeMode = /*#__PURE__*/function (_MenuMode) {
 
 exports["default"] = BotTypeMode;
 
-},{"./game-mode-menu":12}],11:[function(require,module,exports){
+},{"./game-mode-menu":13}],12:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1542,7 +1612,7 @@ DemoMode.defaultOptions = {
   duration: 15 * 1000
 };
 
-},{"./game-mode-play":14,"./i18n":18}],12:[function(require,module,exports){
+},{"./game-mode-play":15,"./i18n":19}],13:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1789,7 +1859,7 @@ var MenuMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = MenuMode;
 
-},{"./game-mode":16,"./i18n":18}],13:[function(require,module,exports){
+},{"./game-mode":17,"./i18n":19}],14:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1875,7 +1945,7 @@ var PlayerNumberMode = /*#__PURE__*/function (_MenuMode) {
 
 exports["default"] = PlayerNumberMode;
 
-},{"./game-mode-menu":12}],14:[function(require,module,exports){
+},{"./game-mode-menu":13}],15:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -1886,6 +1956,8 @@ exports["default"] = void 0;
 var _events = _interopRequireDefault(require("events"));
 
 var _core = require("@popperjs/core");
+
+var _debugConsole = _interopRequireDefault(require("./debug-console"));
 
 var _gameMode = _interopRequireDefault(require("./game-mode"));
 
@@ -2251,8 +2323,11 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 }).concat([[2 * draw.width(), 0], [2 * draw.width(), draw.height()], [-draw.width(), draw.height()], [-draw.width(), 0]]);
                 this.terrainHeights = terrainHeights;
                 this.treasureLocation = this.locateTreasure();
-                console.log("Map:", terrainHeights);
-                console.log("Treasure location:", this.treasureLocation);
+
+                _debugConsole["default"].log("Map:", terrainHeights);
+
+                _debugConsole["default"].log("Treasure location:", this.treasureLocation);
+
                 behindGroundGroup = this.groundGroup.group();
                 treasure = behindGroundGroup.group().addClass('treasure').transform({
                   translateX: this.treasureLocation.x * draw.width(),
@@ -2346,7 +2421,8 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
 
 
       if (this.remainingTime === 0) {
-        console.log("Time is up - GAME OVER!");
+        _debugConsole["default"].log("Time is up - GAME OVER!");
+
         this.gameOver( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee5() {
           return regeneratorRuntime.wrap(function _callee5$(_context5) {
             while (1) {
@@ -2370,7 +2446,8 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
         }, false);
 
         if (!anyoneProbing) {
-          console.log("No probes left - GAME OVER!");
+          _debugConsole["default"].log("No probes left - GAME OVER!");
+
           this.gameOver( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee6() {
             return regeneratorRuntime.wrap(function _callee6$(_context6) {
               while (1) {
@@ -2446,7 +2523,8 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                         break;
                       }
 
-                      console.log("Treasure found - GAME OVER!");
+                      _debugConsole["default"].log("Treasure found - GAME OVER!");
+
                       _context8.next = 4;
                       return _this6.gameOver( /*#__PURE__*/_asyncToGenerator( /*#__PURE__*/regeneratorRuntime.mark(function _callee7() {
                         return regeneratorRuntime.wrap(function _callee7$(_context7) {
@@ -2470,7 +2548,8 @@ var PlayMode = /*#__PURE__*/function (_GameMode) {
                 }
               }, _callee8);
             })));
-            console.log("Player ".concat(playerIndex, " is probing at:"), {
+
+            _debugConsole["default"].log("Player ".concat(playerIndex, " is probing at:"), {
               x: player.x,
               y: terrainHeight
             });
@@ -2994,7 +3073,7 @@ function createAutoUpdatingPopper(reference, popper, options) {
   return popperInstance;
 }
 
-},{"./bot-strategies/base":1,"./bot-strategies/gradient-descent":2,"./bot-strategies/random":3,"./bot-strategies/tangent-intersection":4,"./game-mode":16,"./i18n":18,"./terrain":21,"./waves":22,"@popperjs/core":24,"events":30}],15:[function(require,module,exports){
+},{"./bot-strategies/base":1,"./bot-strategies/gradient-descent":2,"./bot-strategies/random":3,"./bot-strategies/tangent-intersection":4,"./debug-console":9,"./game-mode":17,"./i18n":19,"./terrain":22,"./waves":23,"@popperjs/core":25,"events":31}],16:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3173,7 +3252,7 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
 
 exports["default"] = TitleMode;
 
-},{"./game-mode":16,"./i18n":18,"./wavy-animation":23}],16:[function(require,module,exports){
+},{"./game-mode":17,"./i18n":19,"./wavy-animation":24}],17:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3360,7 +3439,7 @@ var GameMode = /*#__PURE__*/function () {
 
 exports["default"] = GameMode;
 
-},{"events":30}],17:[function(require,module,exports){
+},{"events":31}],18:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -3960,7 +4039,7 @@ var GradientDescentGame = /*#__PURE__*/function () {
 
 exports["default"] = GradientDescentGame;
 
-},{"./controls/gamepad":6,"./controls/keyboard":7,"./controls/screen":8,"./full-screen-toggle":9,"./game-mode-bottype":10,"./game-mode-demo":11,"./game-mode-numplayers":13,"./game-mode-play":14,"./game-mode-title":15,"./i18n":18,"./language-cycle-button":19,"@wessberg/pointer-events":25}],18:[function(require,module,exports){
+},{"./controls/gamepad":6,"./controls/keyboard":7,"./controls/screen":8,"./full-screen-toggle":10,"./game-mode-bottype":11,"./game-mode-demo":12,"./game-mode-numplayers":14,"./game-mode-play":15,"./game-mode-title":16,"./i18n":19,"./language-cycle-button":20,"@wessberg/pointer-events":26}],19:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4042,7 +4121,7 @@ function recursiveGet(object, key) {
   }
 }
 
-},{}],19:[function(require,module,exports){
+},{}],20:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4051,6 +4130,8 @@ Object.defineProperty(exports, "__esModule", {
 exports["default"] = void 0;
 
 var _i18n = _interopRequireDefault(require("./i18n"));
+
+var _debugConsole = _interopRequireDefault(require("./debug-console"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -4102,7 +4183,8 @@ var LanguageCycleButton = /*#__PURE__*/function () {
 
               case 5:
                 (0, _i18n["default"])(this.elementToLocalize);
-                console.log("Language switched: ".concat(nextLang));
+
+                _debugConsole["default"].log("Language switched: ".concat(nextLang));
 
               case 7:
               case "end":
@@ -4125,10 +4207,12 @@ var LanguageCycleButton = /*#__PURE__*/function () {
 
 exports["default"] = LanguageCycleButton;
 
-},{"./i18n":18}],20:[function(require,module,exports){
+},{"./debug-console":9,"./i18n":19}],21:[function(require,module,exports){
 "use strict";
 
 var _game = _interopRequireDefault(require("./game"));
+
+var _debugConsole = _interopRequireDefault(require("./debug-console"));
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { "default": obj }; }
 
@@ -4234,6 +4318,7 @@ function _getDefaultConfig() {
               fullScreenButton: true,
               languageButton: true,
               debugControls: false,
+              debugLog: false,
               map: null
             };
             _context3.next = 3;
@@ -4368,39 +4453,47 @@ function getConfigCustomUrl() {
             defaultConfig = _yield$Promise$all2[0];
             loadedConfig = _yield$Promise$all2[1];
             config = Object.assign({}, defaultConfig, loadedConfig);
-            console.log("Default configuration:", defaultConfig);
-            console.log("Loaded configuration:", loadedConfig);
-            console.log("Merged configuration:", config);
-            _context.next = 18;
+
+            if (config.debugLog) {
+              _debugConsole["default"].setActive(true);
+            }
+
+            _debugConsole["default"].log("Default configuration:", defaultConfig);
+
+            _debugConsole["default"].log("Loaded configuration:", loadedConfig);
+
+            _debugConsole["default"].log("Merged configuration:", config);
+
+            _context.next = 19;
             return IMAGINARY.i18n.init({
               queryStringVariable: 'lang',
               translationsDirectory: 'tr',
               defaultLanguage: config.defaultLanguage || 'en'
             });
 
-          case 18:
+          case 19:
             // eslint-disable-next-line no-unused-vars
             game = new _game["default"](document.querySelector('.main'), config);
             window.game = game;
-            _context.next = 22;
+            _context.next = 23;
             return game.init();
 
-          case 22:
-            _context.next = 27;
+          case 23:
+            _context.next = 28;
             break;
 
-          case 24:
-            _context.prev = 24;
+          case 25:
+            _context.prev = 25;
             _context.t0 = _context["catch"](0);
             // eslint-disable-next-line no-console
             console.error(_context.t0);
 
-          case 27:
+          case 28:
           case "end":
             return _context.stop();
         }
       }
-    }, _callee, null, [[0, 24]]);
+    }, _callee, null, [[0, 25]]);
   }));
 
   function main() {
@@ -4410,7 +4503,7 @@ function getConfigCustomUrl() {
   return main;
 })()();
 
-},{"./game":17}],21:[function(require,module,exports){
+},{"./debug-console":9,"./game":18}],22:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4570,7 +4663,7 @@ function terrain(numSamples, length) {
   });
 }
 
-},{"assert":26}],22:[function(require,module,exports){
+},{"assert":27}],23:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4641,7 +4734,7 @@ function animatedSVGPolyline(svgContainer, numPoints, numSteps, xScale, yScale, 
   return waves;
 }
 
-},{}],23:[function(require,module,exports){
+},{}],24:[function(require,module,exports){
 "use strict";
 
 Object.defineProperty(exports, "__esModule", {
@@ -4730,7 +4823,7 @@ function WavyAnimation(shape) {
   };
 }
 
-},{}],24:[function(require,module,exports){
+},{}],25:[function(require,module,exports){
 (function (process){(function (){
 /**
  * @popperjs/core v2.5.4 - MIT License
@@ -6601,7 +6694,7 @@ exports.preventOverflow = preventOverflow$1;
 
 }).call(this)}).call(this,require('_process'))
 
-},{"_process":32}],25:[function(require,module,exports){
+},{"_process":33}],26:[function(require,module,exports){
 (function () {
 	'use strict';
 
@@ -8458,7 +8551,7 @@ exports.preventOverflow = preventOverflow$1;
 }());
 
 
-},{}],26:[function(require,module,exports){
+},{}],27:[function(require,module,exports){
 (function (global){(function (){
 'use strict';
 
@@ -8969,7 +9062,7 @@ var objectKeys = Object.keys || function (obj) {
 
 }).call(this)}).call(this,typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"object-assign":31,"util/":29}],27:[function(require,module,exports){
+},{"object-assign":32,"util/":30}],28:[function(require,module,exports){
 if (typeof Object.create === 'function') {
   // implementation from standard node.js 'util' module
   module.exports = function inherits(ctor, superCtor) {
@@ -8994,14 +9087,14 @@ if (typeof Object.create === 'function') {
   }
 }
 
-},{}],28:[function(require,module,exports){
+},{}],29:[function(require,module,exports){
 module.exports = function isBuffer(arg) {
   return arg && typeof arg === 'object'
     && typeof arg.copy === 'function'
     && typeof arg.fill === 'function'
     && typeof arg.readUInt8 === 'function';
 }
-},{}],29:[function(require,module,exports){
+},{}],30:[function(require,module,exports){
 (function (process,global){(function (){
 // Copyright Joyent, Inc. and other Node contributors.
 //
@@ -9592,7 +9685,7 @@ function hasOwnProperty(obj, prop) {
 
 }).call(this)}).call(this,require('_process'),typeof global !== "undefined" ? global : typeof self !== "undefined" ? self : typeof window !== "undefined" ? window : {})
 
-},{"./support/isBuffer":28,"_process":32,"inherits":27}],30:[function(require,module,exports){
+},{"./support/isBuffer":29,"_process":33,"inherits":28}],31:[function(require,module,exports){
 // Copyright Joyent, Inc. and other Node contributors.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a
@@ -10117,7 +10210,7 @@ function functionBindPolyfill(context) {
   };
 }
 
-},{}],31:[function(require,module,exports){
+},{}],32:[function(require,module,exports){
 /*
 object-assign
 (c) Sindre Sorhus
@@ -10209,7 +10302,7 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 	return to;
 };
 
-},{}],32:[function(require,module,exports){
+},{}],33:[function(require,module,exports){
 // shim for using process in browser
 var process = module.exports = {};
 
@@ -10395,5 +10488,5 @@ process.chdir = function (dir) {
 };
 process.umask = function() { return 0; };
 
-},{}]},{},[20])
+},{}]},{},[21])
 

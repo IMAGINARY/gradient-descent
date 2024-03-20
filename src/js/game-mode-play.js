@@ -1,6 +1,7 @@
 import EventEmitter from 'events';
 import { createPopper } from '@popperjs/core';
 
+import debugConsole from './debug-console';
 import GameMode from './game-mode';
 import terrain from './terrain';
 import * as waves from './waves';
@@ -257,8 +258,8 @@ export default class PlayMode extends GameMode {
     ]);
     this.terrainHeights = terrainHeights;
     this.treasureLocation = this.locateTreasure();
-    console.log("Map:", terrainHeights);
-    console.log("Treasure location:", this.treasureLocation);
+    debugConsole.log("Map:", terrainHeights);
+    debugConsole.log("Treasure location:", this.treasureLocation);
 
     const behindGroundGroup = this.groundGroup.group();
     const treasure = behindGroundGroup.group()
@@ -354,13 +355,13 @@ export default class PlayMode extends GameMode {
 
     // Check whether the game is lost
     if (this.remainingTime === 0) {
-      console.log("Time is up - GAME OVER!");
+      debugConsole.log("Time is up - GAME OVER!");
       this.gameOver(async () => this.showLoseSequenceTimeIsUp());
       return;
     } else if (this.players.reduce((a, c) => a + c.remainingProbes, 0) === 0) {
       const anyoneProbing = this.players.reduce((a, c) => a || c.probing, false);
       if (!anyoneProbing) {
-        console.log("No probes left - GAME OVER!");
+        debugConsole.log("No probes left - GAME OVER!");
         this.gameOver(async () => this.showLoseSequenceNoProbesLeft());
         return;
       }
@@ -406,12 +407,12 @@ export default class PlayMode extends GameMode {
               / 2;
             down.then(async () => {
               if (treasureFound && !this.isGameOver) {
-                console.log("Treasure found - GAME OVER!");
+                debugConsole.log("Treasure found - GAME OVER!");
                 await this.gameOver(async () => this.showWinSequence(player));
               }
             });
 
-            console.log(`Player ${playerIndex} is probing at:`,
+            debugConsole.log(`Player ${playerIndex} is probing at:`,
               { x: player.x, y: terrainHeight });
           }
         }

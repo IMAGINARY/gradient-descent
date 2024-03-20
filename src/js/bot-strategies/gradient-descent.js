@@ -1,4 +1,5 @@
 import BotStrategyBase from './base';
+import debugConsole from '../debug-console';
 
 const INITIAL_ALPHA = 1.0 / Math.pow(2, 7);
 const SIGMA = 0.5;
@@ -43,7 +44,7 @@ export default class BotStrategyGradientDescent extends BotStrategyBase {
           // Try to do a local step
           x = this.getNextProbeLocationLocal(lastTargetTangent, tangents);
         } catch (e) {
-          console.log('BotStrategyGradientDescent', e.message);
+          debugConsole.log('BotStrategyGradientDescent', e.message);
           // Local step failed -> do a global step
           x = this.getNextProbeLocationGlobal(tangents);
         }
@@ -56,7 +57,7 @@ export default class BotStrategyGradientDescent extends BotStrategyBase {
   }
 
   getNextProbeLocationLocal(currentTangent, tangents) {
-    console.log('BotStrategyGradientDescent', 'Local step with ', currentTangent);
+    debugConsole.log('BotStrategyGradientDescent', 'Local step with ', currentTangent);
 
     if (Math.abs(currentTangent.slope) < LOCAL_MIN_SLOPE) {
       throw new Error('Local minimum reached');
@@ -82,7 +83,7 @@ export default class BotStrategyGradientDescent extends BotStrategyBase {
       const oppositeTangentDistance = Math.abs(this.gda.lastArmijoTangent.x - oppositeTangent.x);
       const localMinimumInBetween = this.gda.lastArmijoTangent.slope * oppositeTangent.slope < 0;
       const tooNarrow = oppositeTangentDistance < this.treasureWidth;
-      console.log(
+      debugConsole.log(
         "oppositeTangentDistance", oppositeTangentDistance,
         "tooNarrow", tooNarrow
       );
@@ -97,7 +98,7 @@ export default class BotStrategyGradientDescent extends BotStrategyBase {
   }
 
   getNextProbeLocationGlobal(tangents) {
-    console.log('BotStrategyGradientDescent', 'Global step');
+    debugConsole.log('BotStrategyGradientDescent', 'Global step');
 
     try {
       // Try to find a tangent that we didn't use so far and that's above all currently known local maxima
@@ -147,7 +148,7 @@ class GradientDescentArmijo {
       return this.step(tangent);
     } else {
       const x = this.lastArmijoTangent.x + this.alpha * this.lastArmijoTangent.slope;
-      console.log('alpha', this.alpha, 't', tangent, 'x', x);
+      debugConsole.log('alpha', this.alpha, 't', tangent, 'x', x);
       this.alpha *= RHO;
       return x;
     }

@@ -1,4 +1,5 @@
 import localize from "./i18n";
+import debugConsole from './debug-console';
 
 export default class LanguageCycleButton {
   constructor(elementToLocalize, languageCodes) {
@@ -23,6 +24,6 @@ export default class LanguageCycleButton {
     const nextLang = this.languageCodes[nextLangIdx];
     await IMAGINARY.i18n.setLang(nextLang);
     localize(this.elementToLocalize);
-    console.log(`Language switched: ${nextLang}`);
+    debugConsole.log(`Language switched: ${nextLang}`);
   }
 }
