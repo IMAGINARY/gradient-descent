@@ -43,5 +43,15 @@
     "Instructions for squaring the circle",
     "Pythagoras’ guitar pick"
   ],
-  "demo-explanation": "There’s a treasure in the deepest part of the seabed. Drop probes from your ship in different places to find it."
+  "demo-explanation": [
+    [
+      "There’s a treasure in the deepest part of the seabed.",
+      "Drop probes from your ship in different places to find it."
+    ],
+    ["What’s your best strategy?"],
+    [
+      "Neural networks learn by using a similar strategy.",
+      "They follow their previous attempts, getting closer and closer to the best solution."
+    ]
+  ]
 }

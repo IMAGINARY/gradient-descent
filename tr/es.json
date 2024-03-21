@@ -43,5 +43,15 @@
     "Instrucciones para la cuadratura del círculo",
     "La púa de guitarra de Pitágoras"
   ],
-  "demo-explanation": "Hay un tesoro en el punto más profundo del océano. Suelta sondas desde tu barco en distintos puntos para encontrarlo."
+  "demo-explanation": [
+    [
+      "Hay un tesoro en el punto más profundo del océano.",
+      "Suelta sondas desde tu barco en distintos puntos para encontrarlo."
+    ],
+    ["¿Cuál es tu mejor estrategia?"],
+    [
+      "Las redes neuronales aprenden usando una estrategia similar.",
+      "Se guían por sus intentos previos, aproximándose más y más a la mejor solución."
+    ]
+  ]
 }

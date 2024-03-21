@@ -1,10 +1,11 @@
 import PlayMode from './game-mode-play';
 import { localeInit } from './i18n';
 
-// todo: The constants below were copied from game-mode-play.js
+const PAGE_COUNT = 3;
+const LINE_COUNT = 2;
+// todo: The constant below was copied from game-mode-play.js
 //  but they really should be exported by the PlayMode class
 const WATER_DISTANCE = 260;
-const TERRAIN_DISTANCE = 300;
 
 class DemoGame {
   constructor(propOverrides) {
@@ -32,6 +33,7 @@ export default class DemoMode extends PlayMode {
     }));
     super(demoGame);
     this.options = {...DemoMode.defaultOptions, ...options};
+    this.currPage = 0;
   }
 
   async handleEnterMode() {
@@ -58,6 +60,13 @@ export default class DemoMode extends PlayMode {
       this.demoOver();
       this.triggerEvent('timeout');
       return;
+    }
+    const timePerPage = this.options.duration / PAGE_COUNT;
+    const timeElapsed = this.options.duration - this.remainingTime;
+    const expectedPage = Math.floor(PAGE_COUNT - this.remainingTime / (this.options.duration / PAGE_COUNT));
+    // const expectedPage = Math.floor(timeElapsed / timePerPage);
+    if (expectedPage !== this.currPage) {
+      this.setPage(expectedPage);
     }
 
     // Discard inputs that don't belong to an active player
@@ -93,15 +102,45 @@ export default class DemoMode extends PlayMode {
       .addClass('demo-explanation')
       .css('top', `${top}%`)
       .appendTo(this.$overlay);
-    localeInit(this.$demoExplanationContainer, 'demo-explanation');
+
+    this.$demoExplanationPages = [];
+    // Todo: This below should be more flexible, but there are potential
+    //  problems with how i18n is currently handled.
+    for (let i = 0; i < PAGE_COUNT; i += 1) {
+      const $page = $('<div>')
+        .addClass('demo-explanation-page')
+        .appendTo(this.$demoExplanationContainer);
+      if (i === 0) {
+        $page.addClass(['active', 'first']);
+      }
+      this.$demoExplanationPages.push($page);
+      for (let j = 0; j < LINE_COUNT; j += 1) {
+        const $line = $('<div>').addClass('line').appendTo($page);
+        localeInit($line, 'demo-explanation', i, j);
+      }
+    }
 
     this.$pressToStart = $('<div>')
       .addClass('title-press-to-start')
       .appendTo(this.$overlay);
     localeInit(this.$pressToStart,'press-to-start');
   }
+
+  setPage(pageNumber) {
+    this.currPage = pageNumber;
+    this.$demoExplanationPages.forEach(($page, i) => {
+      if (i === pageNumber) {
+        $page.addClass('active');
+      } else {
+        if ($page.hasClass('active')) {
+          $page.removeClass('active');
+          $page.addClass('leave');
+        }
+      }
+    });
+  }
 }
 
 DemoMode.defaultOptions = {
-  duration: 15 * 1000,
+  duration: 18 * 1000,
 };

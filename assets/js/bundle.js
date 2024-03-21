@@ -1398,10 +1398,11 @@ function _defineProperties(target, props) { for (var i = 0; i < props.length; i+
 
 function _createClass(Constructor, protoProps, staticProps) { if (protoProps) _defineProperties(Constructor.prototype, protoProps); if (staticProps) _defineProperties(Constructor, staticProps); return Constructor; }
 
-// todo: The constants below were copied from game-mode-play.js
+var PAGE_COUNT = 3;
+var LINE_COUNT = 2; // todo: The constant below was copied from game-mode-play.js
 //  but they really should be exported by the PlayMode class
+
 var WATER_DISTANCE = 260;
-var TERRAIN_DISTANCE = 300;
 
 var DemoGame = /*#__PURE__*/function () {
   function DemoGame(propOverrides) {
@@ -1446,6 +1447,7 @@ var DemoMode = /*#__PURE__*/function (_PlayMode) {
     }));
     _this = _super.call(this, demoGame);
     _this.options = _objectSpread(_objectSpread({}, DemoMode.defaultOptions), options);
+    _this.currPage = 0;
     return _this;
   }
 
@@ -1502,6 +1504,14 @@ var DemoMode = /*#__PURE__*/function (_PlayMode) {
         this.demoOver();
         this.triggerEvent('timeout');
         return;
+      }
+
+      var timePerPage = this.options.duration / PAGE_COUNT;
+      var timeElapsed = this.options.duration - this.remainingTime;
+      var expectedPage = Math.floor(PAGE_COUNT - this.remainingTime / (this.options.duration / PAGE_COUNT)); // const expectedPage = Math.floor(timeElapsed / timePerPage);
+
+      if (expectedPage !== this.currPage) {
+        this.setPage(expectedPage);
       } // Discard inputs that don't belong to an active player
 
 
@@ -1598,9 +1608,41 @@ var DemoMode = /*#__PURE__*/function (_PlayMode) {
       var draw = this.game.draw;
       var top = 100 * (WATER_DISTANCE * 1.3) / draw.height();
       this.$demoExplanationContainer = $('<div>').addClass('demo-explanation').css('top', "".concat(top, "%")).appendTo(this.$overlay);
-      (0, _i18n.localeInit)(this.$demoExplanationContainer, 'demo-explanation');
+      this.$demoExplanationPages = []; // Todo: This below should be more flexible, but there are potential
+      //  problems with how i18n is currently handled.
+
+      for (var i = 0; i < PAGE_COUNT; i += 1) {
+        var $page = $('<div>').addClass('demo-explanation-page').appendTo(this.$demoExplanationContainer);
+
+        if (i === 0) {
+          $page.addClass(['active', 'first']);
+        }
+
+        this.$demoExplanationPages.push($page);
+
+        for (var j = 0; j < LINE_COUNT; j += 1) {
+          var $line = $('<div>').addClass('line').appendTo($page);
+          (0, _i18n.localeInit)($line, 'demo-explanation', i, j);
+        }
+      }
+
       this.$pressToStart = $('<div>').addClass('title-press-to-start').appendTo(this.$overlay);
       (0, _i18n.localeInit)(this.$pressToStart, 'press-to-start');
+    }
+  }, {
+    key: "setPage",
+    value: function setPage(pageNumber) {
+      this.currPage = pageNumber;
+      this.$demoExplanationPages.forEach(function ($page, i) {
+        if (i === pageNumber) {
+          $page.addClass('active');
+        } else {
+          if ($page.hasClass('active')) {
+            $page.removeClass('active');
+            $page.addClass('leave');
+          }
+        }
+      });
     }
   }]);
 
@@ -1609,7 +1651,7 @@ var DemoMode = /*#__PURE__*/function (_PlayMode) {
 
 exports["default"] = DemoMode;
 DemoMode.defaultOptions = {
-  duration: 15 * 1000
+  duration: 18 * 1000
 };
 
 },{"./game-mode-play":15,"./i18n":19}],13:[function(require,module,exports){

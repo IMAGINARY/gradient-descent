@@ -371,14 +371,50 @@ body {
 .overlay .game-stats * .counter {
   margin-left: 1ex;
 }
+@keyframes slideOut {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+@keyframes slideIn {
+  0% {
+    transform: translateX(100%);
+  }
+  100% {
+    transform: translateX(0);
+  }
+}
 .overlay .demo-explanation {
   position: absolute;
   text-align: center;
   text-transform: uppercase;
-  padding-bottom: 0.25ex;
-  margin: auto;
-  max-width: 75%;
-  left: 12.5%;
+  line-height: 1;
+  width: 75%;
+  height: 8ex;
+  padding: 0 12.5% 0.25ex 12.5%;
+}
+.overlay .demo-explanation .demo-explanation-page {
+  transform: translateX(100%);
+  width: 75%;
+  position: absolute;
+  top: 0;
+  left: 0;
+  padding: 0 12.5% 0.25ex 12.5%;
+  background-color: rgba(21, 21, 21, 0.5);
+}
+.overlay .demo-explanation .demo-explanation-page.active {
+  animation: slideIn 1s linear;
+  transform: translateX(0);
+}
+.overlay .demo-explanation .demo-explanation-page.first {
+  animation: none;
+}
+.overlay .demo-explanation .demo-explanation-page.leave {
+  animation: slideOut 1s linear;
+  transform: translateX(-100%);
 }
 .overlay .demo-explanation .line {
   margin-bottom: 0.4ex;
@@ -423,4 +459,4 @@ body {
   margin-top: -0.1ex;
   font-size: 188%;
 }
-/*# sourceMappingURL=default-7e48fb85b2.css.map */
+/*# sourceMappingURL=default-68545de719.css.map */

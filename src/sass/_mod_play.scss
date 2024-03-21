@@ -88,15 +88,58 @@ $player-colors: $color-player-0, $color-player-1, $color-player-2, $color-player
     }
   }
 
+  @keyframes slideOut {
+    0% {
+      transform: translateX(0);
+    }
+
+    100% {
+      transform: translateX(-100%);
+    }
+  }
+
+  @keyframes slideIn {
+    0% {
+      transform: translateX(100%);
+    }
+
+    100% {
+      transform: translateX(0);
+    }
+  }
+
   .demo-explanation {
     position: absolute;
     text-align: center;
     text-transform: uppercase;
-    padding-bottom: 0.25ex;
-    margin: auto;
-    max-width: 75%;
-    left: 12.5%;
+    line-height: 1;
+    width: 75%;
+    height: 8ex;
+    padding: 0 12.5% 0.25ex 12.5%;
 
+    .demo-explanation-page {
+      transform: translateX(100%);
+      width: 75%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      padding: 0 12.5% 0.25ex 12.5%;
+      background-color: rgb($color-black, 50%);
+
+      &.active {
+        animation: slideIn 1s linear;
+        transform: translateX(0);
+      }
+
+      &.first {
+        animation: none;
+      }
+
+      &.leave {
+        animation: slideOut 1s linear;
+        transform: translateX(-100%);
+      }
+    }
     .line {
       margin-bottom: 0.4ex;
     }
