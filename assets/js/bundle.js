@@ -1463,7 +1463,7 @@ var DemoMode = /*#__PURE__*/function (_PlayMode) {
                 return _get(_getPrototypeOf(DemoMode.prototype), "handleEnterMode", this).call(this);
 
               case 2:
-                this.remainingTime = this.options.duration;
+                this.elapsedTime = 0;
                 this.showDemoText();
 
               case 4:
@@ -1494,21 +1494,15 @@ var DemoMode = /*#__PURE__*/function (_PlayMode) {
       } // Update remaining time
 
 
-      var newRemainingTime = Math.max(0, this.remainingTime - delta);
+      this.elapsedTime = this.elapsedTime + delta;
 
-      if (this.remainingTime !== newRemainingTime) {
-        this.remainingTime = newRemainingTime;
-      }
-
-      if (this.remainingTime === 0) {
+      if (this.elapsedTime > this.options.duration) {
         this.demoOver();
         this.triggerEvent('timeout');
         return;
       }
 
-      var timePerPage = this.options.duration / PAGE_COUNT;
-      var timeElapsed = this.options.duration - this.remainingTime;
-      var expectedPage = Math.floor(PAGE_COUNT - this.remainingTime / (this.options.duration / PAGE_COUNT)); // const expectedPage = Math.floor(timeElapsed / timePerPage);
+      var expectedPage = Math.floor(this.elapsedTime / this.options.duration * PAGE_COUNT);
 
       if (expectedPage !== this.currPage) {
         this.setPage(expectedPage);
@@ -3137,6 +3131,12 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(Object(source), true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(Object(source)).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
 function _defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } }
@@ -3162,10 +3162,14 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
 
   var _super = _createSuper(TitleMode);
 
-  function TitleMode() {
+  function TitleMode(game, options) {
+    var _this;
+
     _classCallCheck(this, TitleMode);
 
-    return _super.apply(this, arguments);
+    _this = _super.call(this, game);
+    _this.options = _objectSpread(_objectSpread({}, TitleMode.defaultOptions), options);
+    return _this;
   }
 
   _createClass(TitleMode, [{
@@ -3230,8 +3234,9 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
                   duration: 3500
                 });
                 this.animCounter = 0;
+                this.elapsedTime = 0;
 
-              case 13:
+              case 14:
               case "end":
                 return _context2.stop();
             }
@@ -3281,6 +3286,12 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
       })) {
         this.triggerEvent('done');
       }
+
+      this.elapsedTime += delta;
+
+      if (this.elapsedTime > this.options.duration) {
+        this.triggerEvent('timeout');
+      }
     }
   }, {
     key: "draw",
@@ -3293,6 +3304,9 @@ var TitleMode = /*#__PURE__*/function (_GameMode) {
 }(_gameMode["default"]);
 
 exports["default"] = TitleMode;
+TitleMode.defaultOptions = {
+  duration: 8 * 1000
+};
 
 },{"./game-mode":17,"./i18n":19,"./wavy-animation":24}],17:[function(require,module,exports){
 "use strict";
@@ -3616,66 +3630,56 @@ var GradientDescentGame = /*#__PURE__*/function () {
                 }
 
                 _context.next = 23;
-                return this.registerMode('title', new _gameModeTitle["default"](this));
+                return this.registerMode('title', new _gameModeTitle["default"](this, {
+                  duration: this.config.showDemo ? _gameModeTitle["default"].defaultOptions.duration : Infinity
+                }));
 
               case 23:
                 _context.next = 25;
-                return this.registerMode('bottype', new _gameModeBottype["default"](this));
+                return this.registerMode('demo', new _gameModeDemo["default"](this));
 
               case 25:
                 _context.next = 27;
-                return this.registerMode('numplayers', new _gameModeNumplayers["default"](this));
+                return this.registerMode('bottype', new _gameModeBottype["default"](this));
 
               case 27:
                 _context.next = 29;
-                return this.registerMode('play', new _gameModePlay["default"](this));
+                return this.registerMode('numplayers', new _gameModeNumplayers["default"](this));
 
               case 29:
                 _context.next = 31;
-                return this.registerMode('demo', new _gameModeDemo["default"](this));
+                return this.registerMode('play', new _gameModePlay["default"](this));
 
               case 31:
-                if (!this.config.flagDemoMode) {
-                  _context.next = 38;
-                  break;
-                }
-
-                this.transition('demo', 'done', 'demo');
-                this.transition('demo', 'timeout', 'demo');
-                _context.next = 36;
-                return this.setMode('demo');
-
-              case 36:
-                _context.next = 54;
-                break;
-
-              case 38:
                 if (!this.config.continuousGame) {
-                  _context.next = 44;
+                  _context.next = 37;
                   break;
                 }
 
                 this.transition('play', 'done', 'play');
-                _context.next = 42;
+                _context.next = 35;
                 return this.setMode('play');
 
-              case 42:
-                _context.next = 54;
+              case 35:
+                _context.next = 50;
                 break;
 
-              case 44:
+              case 37:
                 showBotType = this.config.botType === null;
                 showNumPlayers = this.config.maxPlayers > 1;
                 afterNumPlayers = showBotType ? 'bottype' : 'play';
                 afterTitle = showNumPlayers ? 'numplayers' : afterNumPlayers;
                 this.transition('title', 'done', afterTitle);
+                this.transition('title', 'timeout', 'demo');
+                this.transition('demo', 'done', afterTitle);
+                this.transition('demo', 'timeout', 'title');
                 this.transition('numplayers', 'done', afterNumPlayers);
                 this.transition('bottype', 'done', 'play');
                 this.transition('play', 'done', 'title');
-                _context.next = 54;
+                _context.next = 50;
                 return this.setMode('title');
 
-              case 54:
+              case 50:
               case "end":
                 return _context.stop();
             }

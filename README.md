@@ -37,6 +37,7 @@ A config file is loaded when opening the application. It supports the following 
   supplied map. See [below](#setting-a-sea-floor-map) for details.
 - **continuousGame** (boolean, default: `false`): Skip the title screen and time limit,
   auto-restart.
+- **showDemo** (boolean, default: `false`): Alternate between the title screen and demo mode.
 - **fullScreenButton** (boolean, default: `true`): Show a button to toggle full-screen mode.
 - **languageButton** (boolean, default: `true`): Show a button to cycle through the languages defined via `languages`.
 - **debugControls** (boolean, default: `false`): Shows debugging data for controls.

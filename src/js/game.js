@@ -103,17 +103,15 @@ export default class GradientDescentGame {
       minAspectRatioContainer.appendChild(this.debugControlsPane);
     }
 
-    await this.registerMode('title', new TitleMode(this));
+    await this.registerMode('title', new TitleMode(this, {
+      duration: this.config.showDemo ? TitleMode.defaultOptions.duration : Infinity
+    }));
+    await this.registerMode('demo', new DemoMode(this));
     await this.registerMode('bottype', new BotTypeMode(this));
     await this.registerMode('numplayers', new PlayerNumberMode(this));
     await this.registerMode('play', new PlayMode(this));
-    await this.registerMode('demo', new DemoMode(this));
 
-    if (this.config.flagDemoMode) {
-      this.transition('demo', 'done', 'demo');
-      this.transition('demo', 'timeout', 'demo');
-      await this.setMode('demo');
-    } else if (this.config.continuousGame) {
+    if (this.config.continuousGame) {
       this.transition('play', 'done', 'play');
       await this.setMode('play');
     } else {
@@ -124,6 +122,9 @@ export default class GradientDescentGame {
       const afterTitle = showNumPlayers ? 'numplayers' : afterNumPlayers;
 
       this.transition('title', 'done', afterTitle);
+      this.transition('title', 'timeout', 'demo');
+      this.transition('demo', 'done', afterTitle);
+      this.transition('demo', 'timeout', 'title');
       this.transition('numplayers', 'done', afterNumPlayers);
       this.transition('bottype', 'done', 'play');
       this.transition('play', 'done', 'title');

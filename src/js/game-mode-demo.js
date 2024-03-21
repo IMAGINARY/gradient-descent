@@ -38,7 +38,7 @@ export default class DemoMode extends PlayMode {
 
   async handleEnterMode() {
     await super.handleEnterMode();
-    this.remainingTime = this.options.duration;
+    this.elapsedTime = 0;
     this.showDemoText();
   }
 
@@ -52,19 +52,14 @@ export default class DemoMode extends PlayMode {
     }
 
     // Update remaining time
-    const newRemainingTime = Math.max(0, this.remainingTime - delta);
-    if (this.remainingTime !== newRemainingTime) {
-      this.remainingTime = newRemainingTime;
-    }
-    if (this.remainingTime === 0) {
+    this.elapsedTime = this.elapsedTime + delta;
+    if (this.elapsedTime > this.options.duration) {
       this.demoOver();
       this.triggerEvent('timeout');
       return;
     }
-    const timePerPage = this.options.duration / PAGE_COUNT;
-    const timeElapsed = this.options.duration - this.remainingTime;
-    const expectedPage = Math.floor(PAGE_COUNT - this.remainingTime / (this.options.duration / PAGE_COUNT));
-    // const expectedPage = Math.floor(timeElapsed / timePerPage);
+
+    const expectedPage = Math.floor((this.elapsedTime / this.options.duration) * PAGE_COUNT);
     if (expectedPage !== this.currPage) {
       this.setPage(expectedPage);
     }

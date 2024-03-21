@@ -4,6 +4,11 @@ import GameMode from './game-mode';
 import WavyAnimation from './wavy-animation';
 
 export default class TitleMode extends GameMode {
+  constructor(game, options) {
+    super(game);
+    this.options = {...TitleMode.defaultOptions, ...options};
+  }
+
   async preLoadAssets() {
     this.logoSprite = await this.game.loadSVGSymbol('assets/img/descent-logo.svg');
     this.poly = this.logoSprite.findOne('#descent');
@@ -34,6 +39,7 @@ export default class TitleMode extends GameMode {
     this.wavyStep = WavyAnimation(this.logoSprite, { duration: 3500 });
 
     this.animCounter = 0;
+    this.elapsedTime = 0;
   }
 
   async handleExitMode() {
@@ -50,6 +56,11 @@ export default class TitleMode extends GameMode {
       .find((ctrl, i) => ctrl.action && !lastInputs[i].action)) {
       this.triggerEvent('done');
     }
+
+    this.elapsedTime += delta;
+    if (this.elapsedTime > this.options.duration) {
+      this.triggerEvent('timeout');
+    }
   }
 
   draw(delta, ts) {
@@ -57,3 +68,7 @@ export default class TitleMode extends GameMode {
     this.wavyStep(delta, ts);
   }
 }
+
+TitleMode.defaultOptions = {
+  duration: 8 * 1000,
+};
