@@ -6,6 +6,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [1.8.0]
+
+### Added
+
+- Added an optional demo mode that loops with the title screen. (Enable with `showDemo` config key.)
+- Added optional descriptions for the bot types. (Enable with `showBotTypeTips` config key.)
+- Hid console debug messages (activate with the `debugLog` config key).
+
+## Modified
+
+- Fixed the 'watch' gulp task.
+
 ## [1.7.2]
 
 ### Modified
