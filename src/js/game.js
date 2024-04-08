@@ -106,7 +106,7 @@ export default class GradientDescentGame {
     await this.registerMode('title', new TitleMode(this, {
       duration: this.config.showDemo ? TitleMode.defaultOptions.duration : Infinity
     }));
-    await this.registerMode('demo', new DemoMode(this));
+    await this.registerMode('demo', new DemoMode(this, { duration: this.config.demoDuration || DemoMode.defaultOptions.duration }));
     await this.registerMode('bottype', new BotTypeMode(this));
     await this.registerMode('numplayers', new PlayerNumberMode(this));
     await this.registerMode('play', new PlayMode(this));

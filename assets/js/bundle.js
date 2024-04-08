@@ -3636,7 +3636,9 @@ var GradientDescentGame = /*#__PURE__*/function () {
 
               case 23:
                 _context.next = 25;
-                return this.registerMode('demo', new _gameModeDemo["default"](this));
+                return this.registerMode('demo', new _gameModeDemo["default"](this, {
+                  duration: this.config.demoDuration || _gameModeDemo["default"].defaultOptions.duration
+                }));
 
               case 25:
                 _context.next = 27;
