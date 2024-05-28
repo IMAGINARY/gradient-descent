@@ -10,14 +10,20 @@
     "difficulty": {
       "none": "Aucun bot",
       "random": "Facile",
+      "random-tip": "Le bot cherche au hasard sans stratégie",
       "gradient-descent": "Moyen",
-      "tangent-intersection": "Difficile"
+      "gradient-descent-tip": "Le bot suit la pente descendante découverte par ses sondes jusqu'au fond",
+      "tangent-intersection": "Difficile",
+      "tangent-intersection-tip": "Le bot utilise l'information des sondes de tous les joueurs pour décider où chercher"
     },
     "strategy": {
       "none": "Aucune",
       "random": "Aléatoire",
+      "random-tip": "Le bot cherche au hasard sans stratégie",
       "gradient-descent": "Descente de gradient",
-      "tangent-intersection": "Tangentes adjacentes"
+      "gradient-descent-tip": "Le bot suit la pente descendante découverte par ses sondes jusqu'au fond",
+      "tangent-intersection": "Tangentes adjacentes",
+      "tangent-intersection-tip": "Le bot utilise l'information des sondes de tous les joueurs pour décider où chercher"
     }
   },
   "remaining-time": "Temps :",
@@ -36,5 +42,16 @@
     "Une machine à mouvement perpétuel",
     "Des instructions pour quarrer le cercle",
     "Le médiator de guitare de Pythagore"
+  ],
+  "demo-explanation": [
+    [
+      "Un trésor se cache dans la partie la plus profonde du fond marin",
+      "Jetez des sondes depuis votre navire à différents endroits pour le trouver."
+    ],
+    ["Quelle stratégie suivrez-vous ?"],
+    [
+      "Les réseaux neuronaux apprennent en utilisant une stratégie similaire.",
+      "Ils pursuivent à base de leurs essais précédents pour se rapprocher de plus en plus de la meilleure solution."
+    ]
   ]
 }
