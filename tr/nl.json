@@ -10,8 +10,11 @@
     "difficulty": {
       "none": "Geen",
       "random": "Makkelijk",
+      "random-tip": "Zoekt willekeurig zonder strategie",
       "gradient-descent": "Medium",
-      "tangent-intersection": "Moeilijk"
+      "gradient-descent-tip": "Volgt de neerwaartse helling van de sondes naar de bodem",
+      "tangent-intersection": "Moeilijk",
+      "tangent-intersection-tip": "Gebruikt de sondes van alle spelers om te beslissen waar te zoeken"
     },
     "strategy": {
       "none": "Geen",
@@ -35,6 +38,32 @@
     "De laatste priemtweeling",
     "Een perpetuum mobile",
     "Instructies voor de kwadratuur van de cirkel",
-    "Pythagoras’ gitaarplectrum"
+    "Pythagoras’ gitaarplectrum",
+    "Newton's appeltaart recept",
+    "De badeend van Archimedes",
+    "Hilbert's hotelkamersleutel",
+    "Zeno's boog (de pijl vliegt nog ergens rond)",
+    "Een Rubik hyperkubus",
+    "Het verschil tussen 0,999... en 1",
+    "Een verbeterde 0, die kan worden gedeeld door 0",
+    "Een boek met alle mogelijke Sudoku's",
+    "Een lidmaatschapskaart voor de Oneindige Bibliotheek",
+    "De zesde platonische lichaam",
+    "Een kwantummunt die aan beide kanten tegelijk landt",
+    "Een oneindige reeks Matroesjka poppen",
+    "Een mooiere verhouding dan de gulden snede",
+    "Schrödingers doos (kat niet inbegrepen)",
+    "Ada Lovelace's verloren coderingstutorial"
+  ],
+  "demo-explanation": [
+    [
+      "In het diepste gedeelte van de zeebodem ligt een schat.",
+      "Werp sondes vanaf je schip op verschillende plaatsen om hem te vinden."
+    ],
+    ["Wat is je beste strategie?"],
+    [
+      "Neurale netwerken leren door een vergelijkbare strategie te gebruiken.",
+      "Ze volgen hun eerdere pogingen en komen steeds dichter bij de beste oplossing."
+    ]
   ]
 }
