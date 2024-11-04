@@ -112,14 +112,13 @@ This web application is built using several compilable languages:
 To make any modifications re-compilation is necessary. You should install:
 
 - **node** and **npm**
-- **yarn**
 - **gulp** (install globally)
 
 Afterwards run the following in the command line to install dependencies:
 
 ```
 cd src
-yarn
+npm install
 ```
 
 After the dependencies have been installed successfully, you can compile as needed:
@@ -142,9 +141,9 @@ After the dependencies have been installed successfully, you can compile as need
     ```
 - **all**
     ```
-    yarn run build
+    npm run build
     ```
-    respectively
+    or, respectively
     ```
     gulp build
     ```

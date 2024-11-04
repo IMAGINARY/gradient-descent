@@ -6,6 +6,26 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [1.8.4]
+
+### Modified
+
+- Supports using both the Select and Start buttons for languager selection
+- Build system cleanup
+
+## [1.8.3]
+
+### Modified
+
+- Updates to the Dutch translation
+- Added new treasures for the game end
+
+## [1.8.2]
+
+### Modified
+
+- Updates to the French translation
+
 ## [1.8.1]
 
 ### Added
