@@ -67,7 +67,7 @@ export default class PlayMode extends GameMode {
     this.treasureOpenedSymbol.attr({ overflow: 'visible' });
   }
 
-  async handleEnterMode() {
+  handleEnterMode() {
     const { draw, config, numPlayers, botType } = this.game;
 
     this.isGameOver = false;
@@ -299,7 +299,7 @@ export default class PlayMode extends GameMode {
     );
   }
 
-  async handleExitMode() {
+  handleExitMode() {
     // Cleanup timers, etc. created on handleEnterMode
     if (this.bot !== null)
       this.events.removeListener('new-tangent', this.bot.tangentListener);

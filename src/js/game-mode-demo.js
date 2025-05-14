@@ -36,8 +36,8 @@ export default class DemoMode extends PlayMode {
     this.currPage = 0;
   }
 
-  async handleEnterMode() {
-    await super.handleEnterMode();
+  handleEnterMode() {
+    super.handleEnterMode();
     this.elapsedTime = 0;
     this.showDemoText();
   }

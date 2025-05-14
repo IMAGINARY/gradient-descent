@@ -14,7 +14,9 @@ export default class TitleMode extends GameMode {
     this.poly = this.logoSprite.findOne('#descent');
   }
 
-  async handleEnterMode() {
+  handleEnterMode() {
+    super.handleEnterMode();
+
     const { draw } = this.game;
     const pressToStart = document.createElement('div');
     pressToStart.classList.add('title-press-to-start');
@@ -42,12 +44,14 @@ export default class TitleMode extends GameMode {
     this.elapsedTime = 0;
   }
 
-  async handleExitMode() {
+  handleExitMode() {
     // Cleanup timers, etc. created on handleEnterMode
 
     // The animation must be set to its final state such that it can restart properly
     // when this mode is re-entered.
     this.wavyStep(Number.POSITIVE_INFINITY, Number.POSITIVE_INFINITY);
+    
+    super.handleExitMode();
   }
 
   handleInputs(inputs, lastInputs, delta, ts0) {

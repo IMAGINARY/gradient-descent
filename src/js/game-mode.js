@@ -35,7 +35,7 @@ export default class GameMode {
    * internal state. Anything done here must be cleaned up in
    * handleExitMode.
    */
-  async handleEnterMode() {
+  handleEnterMode() {
 
   }
 
@@ -45,7 +45,7 @@ export default class GameMode {
    * Should be used to remove DOM elements, event handlers
    * or anything else that was created on handleEnterMode.
    */
-  async handleExitMode() {
+  handleExitMode() {
 
   }
 

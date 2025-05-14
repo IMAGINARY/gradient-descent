@@ -274,11 +274,11 @@ export default class GradientDescentGame {
    *  Name of a previously registered mode
    * @return {Promise<void>}
    */
-  async setMode(modeID) {
+  setMode(modeID) {
     this.pause();
 
     if (this.currentMode) {
-      await this.currentMode.handleExitMode();
+      this.currentMode.handleExitMode();
     }
     if (this.modes[modeID] === undefined) {
       throw new Error(`Can't change to unknown mode ${modeID}`);
@@ -286,7 +286,7 @@ export default class GradientDescentGame {
     this.currentMode = this.modes[modeID];
     this.draw.clear();
     this.overlay.innerHTML = '';
-    await this.currentMode.handleEnterMode();
+    this.currentMode.handleEnterMode();
 
     this.resume();
   }

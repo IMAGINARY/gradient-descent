@@ -8,7 +8,8 @@ export default class MenuMode extends GameMode {
     super(game);
   }
 
-  async handleEnterMode() {
+  handleEnterMode() {
+    super.handleEnterMode();
     const $overlay = $(this.game.overlay);
 
     const menuItemsSpecs = this.getMenuItems();
@@ -56,8 +57,9 @@ export default class MenuMode extends GameMode {
     }
   }
 
-  async handleExitMode() {
+  handleExitMode() {
     // Cleanup timers, etc. created on handleEnterMode
+    super.handleExitMode();
   }
 
   handleInputs(inputs, lastInputs, delta, ts) {
