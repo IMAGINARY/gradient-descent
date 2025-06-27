@@ -30,7 +30,7 @@
     "gulp-sass": "^5.1.0",
     "gulp-sourcemaps": "^2.6.5",
     "gulp-touch-fd": "^2.0.0",
-    "gulp-uglify": "^3.0.2",
+    "gulp-uglify-es": "^3.0.0",
     "regenerator-runtime": "^0.13.5",
     "reload": "^3.1.1",
     "sass": "^1.72.0",

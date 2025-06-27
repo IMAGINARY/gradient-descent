@@ -6,7 +6,7 @@ const pug = require('gulp-pug');
 const sass = require('gulp-sass')(require('sass'));
 require('gulp-babel');
 const sourcemaps = require('gulp-sourcemaps');
-const uglify = require('gulp-uglify');
+const uglify = require('gulp-uglify-es').default;
 const rename = require('gulp-rename');
 const touch = require('gulp-touch-fd');
 const rev = require('gulp-rev');
