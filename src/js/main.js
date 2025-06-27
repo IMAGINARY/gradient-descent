@@ -1,4 +1,5 @@
 /* globals IMAGINARY */
+import initSentry from "./sentry";'./sentry';
 import GradientDescentGame from './game';
 import debugConsole from './debug-console';
 
@@ -99,6 +100,10 @@ function getConfigCustomUrl() {
  */
 (async function main() {
   try {
+    const sentryDSN = new URLSearchParams(document.location.search).get("sentry-dsn");
+    if(typeof sentryDSN === "string" && sentryDSN.length > 0)
+      initSentry(sentryDSN);
+
     const configDefaultUrl = new URL('./config.json', window.location.href);
     const defaultConfigPromise = getDefaultConfig();
     const configCustomUrl = getConfigCustomUrl();

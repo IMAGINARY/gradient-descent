@@ -47,6 +47,10 @@ A config file is loaded when opening the application. It supports the following 
 By default, the config file `config.json` is used. However, this file name can be overwritten by
 setting the `config` query string variable, e.g. `index.html?config=config.local.json`.
 
+### Sentry.io
+
+This app has Sentry.io integration for error tracking. The Sentry DSN can be set using the `sentry-dsn` URL parameter.
+
 ## Remote controlling the game
 
 The game adds a `game` object to the global scope.

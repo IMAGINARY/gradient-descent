@@ -12,6 +12,7 @@
     "@babel/core": "^7.4.5",
     "@babel/preset-env": "^7.4.5",
     "@popperjs/core": "^2.4.0",
+    "@sentry/browser": "^9.33.0",
     "@wessberg/pointer-events": "^1.0.9",
     "assert": "^2.0.0",
     "babelify": "^10.0.0",
