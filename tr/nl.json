@@ -1,5 +1,6 @@
 {
   "press-to-start": "Duw op een knop om te starten",
+  "press-to-continue": "Duw op een knop om verder te gaan",
   "press-to-restart": "Duw op een knop om opnieuw te beginnen",
   "choose-num-players": "Kies het aantal spelers",
   "choose-bot-type": {
@@ -65,5 +66,13 @@
       "Neurale netwerken leren door een vergelijkbare strategie te gebruiken.",
       "Ze volgen hun eerdere pogingen en komen steeds dichter bij de beste oplossing."
     ]
-  ]
+  ],
+  "info": {
+    "title": "Wat heeft dit met AI te maken?",
+    "paragraphs": [
+      "Kon je de schat op het diepste punt van de zeebodem in slechts een paar pogingen vinden? Hoe helpt de informatie uit mislukte pogingen je om het diepste punt te bereiken?",
+      "Zelfs als de schat zelden bij de eerste poging met de sonde wordt gevonden, leidt het hellende terrein je relatief snel naar de juiste plek.",
+      "Tijdens de training gebruiken artificiële neurale netwerken een soortgelijke aanpak: ze observeren hoe goed ze hun taken uitvoeren en verbeteren zo hun prestaties bij elke ronde."
+    ]
+  }
 }

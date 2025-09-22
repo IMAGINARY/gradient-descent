@@ -38,6 +38,7 @@ async function getDefaultConfig() {
     debugControls: false,
     debugLog: false,
     map: null,
+    showInfo: false,
   };
   const tr = await fetchJson(new URL('tr.json', window.location.href));
   defaultConfig.languages = Object.keys(tr).sort();

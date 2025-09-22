@@ -6,6 +6,7 @@ import PlayMode from './game-mode-play';
 import TitleMode from './game-mode-title';
 import PlayerNumberMode from './game-mode-numplayers';
 import DemoMode from './game-mode-demo';
+import InfoMode from './game-mode-info';
 import GamepadControls from "./controls/gamepad";
 import ScreenControls from './controls/screen';
 import KeyboardControls from "./controls/keyboard";
@@ -110,6 +111,7 @@ export default class GradientDescentGame {
     await this.registerMode('bottype', new BotTypeMode(this));
     await this.registerMode('numplayers', new PlayerNumberMode(this));
     await this.registerMode('play', new PlayMode(this));
+    await this.registerMode('info', new InfoMode(this));
 
     if (this.config.continuousGame) {
       this.transition('play', 'done', 'play');
@@ -120,6 +122,7 @@ export default class GradientDescentGame {
 
       const afterNumPlayers = showBotType ? 'bottype' : 'play';
       const afterTitle = showNumPlayers ? 'numplayers' : afterNumPlayers;
+      const afterPlay = this.config.showInfo ? 'info' : 'title';
 
       this.transition('title', 'done', afterTitle);
       this.transition('title', 'timeout', 'demo');
@@ -127,7 +130,8 @@ export default class GradientDescentGame {
       this.transition('demo', 'timeout', 'title');
       this.transition('numplayers', 'done', afterNumPlayers);
       this.transition('bottype', 'done', 'play');
-      this.transition('play', 'done', 'title');
+      this.transition('play', 'done', afterPlay);
+      this.transition('info', 'done', 'title');
       await this.setMode('title');
     }
   }

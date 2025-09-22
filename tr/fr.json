@@ -1,5 +1,6 @@
 {
   "press-to-start": "Appuyez sur une touche pour commencer",
+  "press-to-continue": "Appuyez sur une touche pour continuer",
   "press-to-restart": "Appuyez sur une touche pour recommencer",
   "choose-num-players": "Choisissez le nombre de joueurs",
   "choose-bot-type": {
@@ -68,5 +69,13 @@
       "Les réseaux neuronaux apprennent en utilisant une stratégie similaire.",
       "Ils pursuivent à base de leurs essais précédents pour se rapprocher de plus en plus de la meilleure solution."
     ]
-  ]
+  ],
+  "info": {
+    "title": "Quel est le rapport entre le jeu et l'IA ?",
+    "paragraphs": [
+      "Avez-vous réussi à trouver le trésor au fond de la mer en seulement quelques essais ? Quelles informations acquises grâce aux essais infructueux vous ont aidé à le trouver ?",
+      "Même si on trouve rarement le trésor du premier coup, sonder la profondeur et la pente du fond aide à l'atteindre relativement rapidement.",
+      "Pendant l'entraînement, les réseaux neuronaux utilisent une astuce similaire en observant leur niveau de performance dans l'exécution de leurs tâches. Cela leur permet d'optimiser leurs performances à chaque cycle."
+    ]
+  }
 }

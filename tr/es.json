@@ -1,5 +1,6 @@
 {
   "press-to-start": "Pulsa un botón para empezar",
+  "press-to-continue": "Pulsa un botón para continuar",
   "press-to-restart": "Pulsa un botón para reiniciar",
   "choose-num-players": "Elige el número de jugadores",
   "choose-bot-type": {
@@ -68,5 +69,13 @@
       "Las redes neuronales aprenden usando una estrategia similar.",
       "Se guían por sus intentos previos, aproximándose más y más a la mejor solución."
     ]
-  ]
+  ],
+  "info": {
+    "title": "La relación entre este juego y la IA",
+    "paragraphs": [
+      "¿Lograste encontrar el tesoro en lo más profundo del fondo marino en tan solo unos pocos intentos? ¿Cómo te ayuda la información de los intentos fallidos a encontrarlo?",
+      "Aunque rara vez se encuentra el tesoro al primer intento, sondear la profundidad y la pendiente del fondo ayudan a llegar a él con relativa rapidez.",
+      "Durante el entrenamiento, las redes neuronales utilizan una estrategia similar observando cómo se desempeñan en sus tareas. Esto les permite optimizar su rendimiento en cada ronda."
+    ]
+  }
 }

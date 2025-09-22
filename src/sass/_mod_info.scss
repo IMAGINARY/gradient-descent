@@ -1,0 +1,35 @@
+.info-wrapper {
+  position: relative;
+  padding: 3.5% 6% 0 6%;
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%
+}
+
+.info {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  line-height: 1.8ex;
+}
+
+.info-font-size-container {
+  font-size: smaller;
+}
+
+.info-title {
+  padding-bottom: 1ex;
+  color: $color-yellow-dim;
+}
+
+.info-paragraphs {
+  color: $color-lightgray;
+}
+
+.info-press-to-restart {
+  @extend .blinking;
+  @extend .text-center;
+  position: absolute;
+  bottom: 3%;
+  color: $color-turquoise;
+}

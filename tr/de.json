@@ -1,5 +1,6 @@
 {
   "press-to-start": "Start mit Knopfdruck",
+  "press-to-continue": "Weiter mit Knopfdruck",
   "press-to-restart": "Neustart mit Knopfdruck",
   "choose-num-players": "Wähle die Anzahl der Spieler*innen",
   "choose-bot-type": {
@@ -68,5 +69,13 @@
       "Neuronale Netze lernen, indem sie eine ähnliche Strategie anwenden.",
       "Sie folgern aus ihren Versuchen und kommen der besten Lösung immer näher."
     ]
-  ]
+  ],
+  "info": {
+    "title": "Was hat das mit KI zu tun?",
+    "paragraphs": [
+      "Hast du es geschafft, mit wenigen Versuchen den Schatz an der tiefsten Stelle des Meeresbodens zu finden? Wie helfen dir Informationen aus Fehlversuchen, die tiefste Stelle zu finden?",
+      "Auch wenn man im Spiel selten beim ersten Versuch (mit der Sonde) den Schatz findet, leitet einen die Neigung des sondierten Geländes relativ schnell zum Schatz.",
+      "Einen ähnlichen Trick verwenden neuronale Netze während des Trainings. Ein neuronales Netz beobachtet im Training selbst, wie gut es seine Aufgabe schon löst, und entwickelt sich Runde für Runde in die Richtung, die am besten funktioniert."
+    ]
+  }
 }

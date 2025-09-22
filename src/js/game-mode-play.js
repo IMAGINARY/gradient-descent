@@ -637,7 +637,7 @@ export default class PlayMode extends GameMode {
       .css('visibility', 'hidden');
     const $restartDiv = $('<div class="blinking">')
       .css('visibility', 'hidden');
-    localeInit($restartDiv, 'press-to-restart');
+    localeInit($restartDiv, this.game.config.showInfo ? 'press-to-continue' : 'press-to-restart');
 
     const $endingSequenceDiv = $('<div class="announcement-sequences-text" />')
       .addClass(cssClasses)

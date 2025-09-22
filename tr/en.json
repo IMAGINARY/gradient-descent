@@ -1,5 +1,6 @@
 {
   "press-to-start": "Press a button to start",
+  "press-to-continue": "Press a button to continue",
   "press-to-restart": "Press a button to restart",
   "choose-num-players": "Choose number of players",
   "choose-bot-type": {
@@ -68,5 +69,13 @@
       "Neural networks learn by using a similar strategy.",
       "They follow their previous attempts, getting closer and closer to the best solution."
     ]
-  ]
+  ],
+  "info": {
+    "title": "What does this have to do with AI?",
+    "paragraphs": [
+      "Were you able to find the treasure at the deepest point of the seabed in just a few attempts? How does information from failed attempts help you find the deepest point?",
+      "Even if the treasure is rarely found at the first attempt with the probe, the sloped terrain leads you to the treasure relatively quickly.",
+      "During training, neural networks use a similar trick by observing how well they are performing their tasks. This allows them to optimise their performance with each round."
+    ]
+  }
 }
