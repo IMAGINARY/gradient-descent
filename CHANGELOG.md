@@ -178,7 +178,21 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Initial game
 
-[unreleased]: https://github.com/IMAGINARY/gradient-descent/compare/v1.7.0...HEAD
+[unreleased]: https://github.com/IMAGINARY/gradient-descent/compare/v1.8.4...HEAD
+
+[1.8.4]: https://github.com/IMAGINARY/gradient-descent/compare/v1.8.4...v1.8.3
+
+[1.8.3]: https://github.com/IMAGINARY/gradient-descent/compare/v1.8.3...v1.8.2
+
+[1.8.2]: https://github.com/IMAGINARY/gradient-descent/compare/v1.8.2...v1.8.1
+
+[1.8.1]: https://github.com/IMAGINARY/gradient-descent/compare/v1.8.1...v1.8.0
+
+[1.8.0]: https://github.com/IMAGINARY/gradient-descent/compare/v1.8.0...v1.7.2
+
+[1.7.2]: https://github.com/IMAGINARY/gradient-descent/compare/v1.7.2...v1.7.1
+
+[1.7.1]: https://github.com/IMAGINARY/gradient-descent/compare/v1.7.1...v1.7.0
 
 [1.7.0]: https://github.com/IMAGINARY/gradient-descent/compare/v1.7.0...v1.6.0
 
