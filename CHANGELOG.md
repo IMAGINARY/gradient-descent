@@ -6,6 +6,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+### Added
+
+- Info page that can optionally be displayed after the game is over
+- Sentry.io support
+
+### Fixed
+- Flickering when changing modes
+
 ## [1.8.4]
 
 ### Modified
