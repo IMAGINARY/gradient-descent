@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
+## [1.9.0] - 2025-09-25
+
 ### Added
 
 - Info page that can optionally be displayed after the game is over
@@ -186,7 +188,9 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Initial game
 
-[unreleased]: https://github.com/IMAGINARY/gradient-descent/compare/v1.8.4...HEAD
+[unreleased]: https://github.com/IMAGINARY/gradient-descent/compare/v1.9.0...HEAD
+
+[1.9.0]: https://github.com/IMAGINARY/gradient-descent/compare/v1.9.0...v1.8.4
 
 [1.8.4]: https://github.com/IMAGINARY/gradient-descent/compare/v1.8.4...v1.8.3
 
