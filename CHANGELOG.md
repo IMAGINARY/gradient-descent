@@ -14,33 +14,33 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 ### Fixed
 - Flickering when changing modes
 
-## [1.8.4]
+## [1.8.4] - 2024-11-04
 
 ### Modified
 
 - Supports using both the Select and Start buttons for languager selection
 - Build system cleanup
 
-## [1.8.3]
+## [1.8.3] - 2024-08-12
 
 ### Modified
 
 - Updates to the Dutch translation
 - Added new treasures for the game end
 
-## [1.8.2]
+## [1.8.2] - 2024-05-28
 
 ### Modified
 
 - Updates to the French translation
 
-## [1.8.1]
+## [1.8.1] - 2024-04-08
 
 ### Added
 
 - Added a (missing) configuration parameter to control the demo duration. 
 
-## [1.8.0]
+## [1.8.0] - 2024-03-24
 
 ### Added
 
@@ -52,14 +52,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Fixed the 'watch' gulp task.
 
-## [1.7.2]
+## [1.7.2] - 2024-01-12
 
 ### Modified
 
 - Added the Spanish translation.
 - Forward query string and hash to iframe in the fullscreen.html page.
 
-## [1.7.1]
+## [1.7.1] - 2022-09-29
 
 ### Modified
 
@@ -67,13 +67,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - Added extra space between the lines of the end game message because the current version of the 
   font has less space between the lines than the previous version.
 
-## [1.7.0]
+## [1.7.0] - 2022-09-28
 
 ### Added
 
 - French translation
 
-## [1.6.0]
+## [1.6.0] - 2022-09-20
 
 ### Added
 
@@ -86,31 +86,31 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 - Out-of-bounds errors on gamepads and joysticks with too few buttons
 
-## [1.5.3]
+## [1.5.3] - 2022-04-25
 
 ### Added
 
 - Dutch translation
 
-## [1.5.2]
+## [1.5.2] - 2022-02-05
 
 ### Fixed
 
 - Location of the treasure being visible to the attentive player
 
-## [1.5.1]
+## [1.5.1] - 2022-02-01
 
 ### Fixed
 
 - Loading of config files with digits in file name
 
-## [1.5.0]
+## [1.5.0] - 2022-01-20
 
 ### Added
 
 - Game start sequence
 
-## [1.4.1]
+## [1.4.1] - 2021-02-23
 
 ### Added
 
